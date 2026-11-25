@@ -2,6 +2,7 @@
 // Clone of the shipped `agents` mod with one change: an agent parked behind a chat pane (Shepherdr's Chat / Terminal
 // switch) is listed too. Herdr lists agents through their panes, so a parked one would drop out otherwise.
 
+import { spaceTile } from "./tile.js";
 import { View, div, image, svg } from "gpui-kit";
 import { v_flex, h_flex } from "gpui-base";
 import { agents, terminals, panes, focused, spaces, run, theme, shared, setShared, setAgentOrder, openOverlay, closeOverlay, props, window, layout } from "herdr";
@@ -411,7 +412,11 @@ export default class Agents extends View {
     // Groups in list order: spaces (grouped) or priority sections. Agents of a
     // space are next to each other in agents(), so neighbours make a group.
     const groups = pinned.length ? [{ id: "pinned", label: "Pinned", status: null, members: pinned }] : [];
-    for (const a of rest) {
+    // Coordinators (assistant template / herdr.role=coordinator) get their own section on top; the rest are workers.
+    const coordAddrs = new Set(all.filter((k) => k?.state === "live" && (k.labels?.["herdr.role"] === "coordinator" || k.template === "assistant" || k.template === "coordinator")).map((k) => k.address));
+    const coords = rest.filter((a) => coordAddrs.has(a.address));
+    if (coords.length && !byPriority) groups.push({ id: "coordinators", label: "Coordinators", status: null, members: coords });
+    for (const a of (byPriority ? rest : rest.filter((a) => !coordAddrs.has(a.address) || !coords.length))) {
       const r = rankOf(a) || RANK.idle;
       const id = byPriority ? `sec-${r}` : `sp-${a.space}`;
       if (groups.at(-1)?.id === id) groups.at(-1).members.push(a);
@@ -438,6 +443,7 @@ export default class Agents extends View {
           open ? this.folded.add(g.id) : this.folded.delete(g.id);
           cx.notify();
         })
+        .when(g.id.startsWith("sp-") && Boolean(g.label), (el) => el.child(spaceTile(t, { id: g.members[0].space, name: g.label }, 16)))
         .child(div().truncate().text_color(t[g.status] ?? t.dim).child(g.label))
         .when(byPriority || !open, (el) => el.child(div().text_color(t.dim).child(String(g.members.length))))
         .child(div().flex_1())

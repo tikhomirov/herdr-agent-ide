@@ -1,5 +1,9 @@
 # Agent IDE for Herdr
 
+![Agent IDE + Coordinator](docs/cover.jpg)
+
+> **New:** `layouts/ide-coord.json` adds a per-project **Coordinator** (Assistant chat + Tasks + Artifacts). See RECIPE.md, "Agent IDE + Coordinator".
+
 **A layout for [Herdr](https://herdr.dev) that turns the window into an IDE for coding agents.** Your agents (Claude Code, Codex, Pi, …) stay in their terminals on the left. On the right is a panel with everything you reach for while they work: what they changed, the project's files, the same project on your server, and a real browser that you and your agents share.
 
 ![Agent IDE: Claude Code on the left, the shared browser on the right](preview.png)

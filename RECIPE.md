@@ -81,3 +81,22 @@ Programs it runs: `node`, `agent-browser` (+ Chrome for Testing, installed by `a
 8. Select + a click on an element types `browser element <path>.md ` into the shown tab's agent without sending it; the file has the selector.
 9. From the project's folder, `hib get url` prints the page's address; with `~/.local/state/herdr-ide/<project>.you` freshly touched, `hib open <url>` exits 4.
 10. Hiding the panel ends the viewer terminal; the page is still there when the panel is shown again.
+
+
+## Agent IDE + Coordinator (`layouts/ide-coord.json`)
+
+The Agent IDE panel merged with Shepherdr's per-space coordinator workflow. Needs Shepherdr's mods
+(`tasks`, `artifacts`, `chat`, `task-*`, `tabs-tasks-git`, `pane-chat`, `spaces-chat`). `cloned_from`: `ide` + `shepherdr` layouts.
+
+- **Assistant (coordinator)**: a permanent chat tab per space (`mod: chat`, `role: coordinator`, template `assistant`). The person delegates; it starts workers with `herdr-task`, watches them, reports in chat. It never writes code. Durable project memory lives in the project's `.ai/` (MEMORY.md + memories/).
+- **Right panel** (`panel-body`, 510 px): `files`, `changes`, `git-graph`, `tasks` (list + thread: chat/term/pr/browser/artifacts), `artifacts`, `remote`, `browser`. Default `tasks`; the last panel per space is remembered.
+- **Tab bar**: `tabs-ide-tasks`, built by `tools/make-tabs-ide-tasks.py` from `tabs-tasks-git` (Tasks badges, inbox, service) plus Remote, Browser, Chat and the layout switcher. Buttons exist only for panels the layout has.
+- **Sidebar**: spaces (`spaces-chat`) on top; `agents-ide` below lists **Coordinators** first, then worker agents by space.
+- Browser is unchanged: `ide-browser` still finds `browser`, `browser-bar`, `browser-host`.
+
+Install: `./install.sh && tools/make-tabs-ide-tasks.py && cp layouts/ide-coord.json ~/.config/herdr-app/layouts/` then `herdr-app do layout.switch '{"name":"ide-coord"}'`.
+
+Done when: sidebar, tab bar, main and right panel show; the bar has Files, Changes, Git, Tasks, Artifacts, Remote, Browser, Chat and the switcher; Tasks lists `herdr-task` tasks and opens the thread; Browser/Select/Remote work as above; the Assistant tab starts on the first message; `herdr-app check` passes for `tabs-ide-tasks` and `agents-ide`.
+
+### Sidebar style (idea: [petekp/coordinator](https://github.com/petekp/coordinator), MIT)
+Top row `ide-topbar` (search + toggle, no logo). Spaces and group headers in `agents-ide` use a colored letter tile (`tile.js`, color stable per space id). To get tiles in `spaces-chat` (Shepherdr's, not shipped here): copy `patches/spaces-chat-tile.js` to `mods/spaces-chat/tile.js`, import `spaceTile` and render it in place of the "#" for spaces without a picked icon.
