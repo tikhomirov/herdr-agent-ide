@@ -13,7 +13,7 @@ force=; link=
 for a in "$@"; do case "$a" in --force) force=1 ;; --hib) link=1 ;; esac; done
 
 mkdir -p "$home/mods" "$home/layouts"
-for m in ide-browser ide-browser-bar ide-browser-menu remote-files tabs-ide layout-switcher; do
+for m in ide-browser ide-browser-bar ide-browser-menu remote-files tabs-ide agents-ide layout-switcher; do
   rm -rf "$home/mods/$m.new"; cp -R "$here/mods/$m" "$home/mods/$m.new"
   rm -rf "$home/mods/$m"; mv "$home/mods/$m.new" "$home/mods/$m"
   echo "mod    $m"

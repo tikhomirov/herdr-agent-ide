@@ -49,7 +49,7 @@ A real Chrome, drawn in the panel. Your agents drive the same page with one comm
 
 ### Chat with Claude Code (optional)
 
-With Shepherdr's chat mods installed (`pane-chat`, `spaces-chat`, `workspace-status-chat`), `install.sh` gives agent panes a **Chat / Terminal** switch and the tab bar a **Chat** button: the same agent shown as a conversation, with a message box under it. The agent keeps running in its terminal.
+With Shepherdr's chat mods installed (`pane-chat`, `spaces-chat`, `workspace-status-chat`), `install.sh` gives agent panes a **Chat / Terminal** switch and the tab bar a **Chat** button: the same agent shown as a conversation, with a message box under it. The agent keeps running in its terminal. The button works in any space: with a chat already shown it does nothing, with an agent in a terminal it switches that agent to its chat, and with no agent in the tab it starts Claude Code in a new tab and shows it as a chat.
 
 ![Chat](docs/chat.png)
 
@@ -71,7 +71,7 @@ Or let your agent do it: *"Add the layout from https://github.com/tikhomirov/her
 
 Requirements: Herdr (run once so `~/.config/herdr-app` exists), `node` 22+, `git`, [agent-browser](https://github.com/vercel-labs/agent-browser) for the Browser tab, and `ssh` with a key or agent for Remote. Developed and tested on Linux.
 
-`install.sh` never replaces an existing `layouts/ide.json` unless you pass `--force`. It replaces its own mods (`ide-browser`, `ide-browser-bar`, `ide-browser-menu`, `remote-files`, `tabs-ide`, `layout-switcher`).
+`install.sh` never replaces an existing `layouts/ide.json` unless you pass `--force`. It replaces its own mods (`ide-browser`, `ide-browser-bar`, `ide-browser-menu`, `remote-files`, `tabs-ide`, `agents-ide`, `layout-switcher`).
 
 Give your agents the skill so they use the browser: copy `skills/herdr-ide-browser` to `~/.agents/skills/` (or `~/.claude/skills/`).
 
@@ -97,6 +97,7 @@ hib screenshot /tmp/shot.png
 | --- | --- |
 | `layouts/ide.json` | the layout: Herdr's `main` plus the right panel |
 | `mods/tabs-ide` | the tab bar with the panel buttons, the Chat button and the layout button (a clone of Herdr's `tabs`) |
+| `mods/agents-ide` | the Agents list (a clone of Herdr's `agents`) that also lists agents shown as a chat |
 | `mods/layout-switcher` | the layout list dialog |
 | `mods/ide-browser` | starts/stops the viewer for the shown project; `viewer.js` (the browser view), `hib` (CLI for agents), `start.html` |
 | `mods/ide-browser-bar` | the browser toolbar |

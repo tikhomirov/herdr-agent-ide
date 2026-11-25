@@ -1,6 +1,6 @@
 import { View, div, svg, image } from "gpui-kit";
 import { h_flex, ScrollHandle } from "gpui-base";
-import { spaces, panes, terminals, run, openOverlay, theme, window, shared, layout, settings, home } from "herdr";
+import { spaces, panes, terminals, run, exec, openOverlay, theme, window, shared, layout, settings, home } from "herdr";
 
 function find(node, id) {
   if (node?.id === id) return node;
@@ -25,6 +25,42 @@ function label(tab, lead) {
   const path = /^[~/]|^[A-Za-z]:\\/.test((lead.title ?? "").replace(/^[^\p{L}\p{N}~/]+/u, ""));
   const telling = live && live !== lead.terminal && live !== prog && !path && !live.includes("@") && live.toLowerCase() !== lead.program.key;
   return (tab.name === prog || !tab.named) && telling ? live : base;
+}
+
+// Claude Code and Codex are the agents Shepherdr's chat can show.
+const chatty = (p) => Boolean(p?.terminal) && (["claude-code", "codex"].includes(p.app) || ["claude", "codex"].includes(p.program?.key));
+
+// One app command, waited for: its JSON answer.
+async function app(name, args) {
+  const r = await exec("herdr-app", ["do", name, ...Object.entries(args).flatMap(([k, v]) => [`--${k}`, typeof v === "string" ? v : JSON.stringify(v)])]);
+  let out = {};
+  try { out = JSON.parse(r.stdout || "{}"); } catch {}
+  if (r.code !== 0 || out.error) throw new Error(out.error || r.stderr.trim() || `${name} failed`);
+  return out;
+}
+
+// The Chat button: the shown tab's agent as a chat, in any space.
+//   a chat is already shown  -> nothing but taking it to the keyboard;
+//   an agent runs in a pane   -> its pane gets the switch (pane-chat.toggle works on the focused pane);
+//   no agent in the tab       -> Claude Code starts in a new tab of this space, then shows as a chat.
+async function showChat(cx) {
+  const space = spaces().find(s => s.active), tab = space?.tabs.find(t => t.active);
+  if (!tab) return;
+  const here = () => panes().filter(p => p.tab === tab.id);
+  const chat = here().find(p => p.mod === "chat");
+  if (chat) { run("pane.focus", { pane: chat.pane }); return; }
+  let agent = here().find(chatty), fresh = false;
+  if (!agent) {
+    fresh = true;
+    const out = await app("tab.new", { argv: ["claude"], focus: true });
+    for (let i = 0; i < 40 && !agent; i++) { await cx.sleep(400); agent = panes().find(p => p.pane === out.pane && chatty(p)); }
+    if (!agent) return;
+  }
+  await app("pane.focus", { pane: agent.pane });
+  for (let i = 0; i < 10 && !panes().find(p => p.pane === agent.pane)?.focused; i++) await cx.sleep(100);
+  // A freshly made pane's header ignores a toggle for its first 2 s.
+  await cx.sleep(fresh ? 2200 : 300);
+  run("pane-chat.toggle");
 }
 
 export default class Tabs extends View {
@@ -110,8 +146,14 @@ export default class Tabs extends View {
         .when(i <= active, el => el.on_size_change((_size, cx) => { this.scroll.scroll_to_item(active); cx.notify(); }))
         .border(1).border_color(c.active ? t.border : t.chrome).bg(c.active ? t.raised : t.chrome).text_color(c.active ? t.foreground : t.muted)
         .hover(s => s.bg(t.hover))
-        .on_mouse_down("left", (e, cx) => { cx.stop_propagation(); this.pressed = i; if (e.click_count === 2) run("tab.rename", { id: c.id }); })
+        .on_mouse_down("left", (e, cx) => {
+          cx.stop_propagation(); this.pressed = i;
+          // The double click opens the rename dialog; the release that ends it must not select the tab, or the
+          // pane takes the keyboard back from the dialog's field.
+          if (e.click_count === 2) { this.pressed = null; this.renaming = Date.now(); run("tab.rename", { id: c.id }); }
+        })
         .on_mouse_up("left", () => {
+          if (Date.now() - (this.renaming ?? 0) < 600) { this.pressed = null; return; }
           const from = this.pressed; this.pressed = null;
           if (from !== null && from !== i) run("tab.move", { id: shown[from].id, index: space.tabs.findIndex(x => x.id === c.id) + 1 });
           else run("tab.select", { id: c.id });
@@ -155,8 +197,8 @@ export default class Tabs extends View {
     const chatHeader = find(root, "main")?.content?.pane?.header?.content?.mod === "pane-chat";
     const chatButton = h_flex().id("chat-toggle").h(26).px(8).gap(5).flex_none().items_center().rounded(6)
       .text_size(12).bg(t.chrome).text_color(t.muted).hover(s => s.bg(t.hover)).on_mouse_down("left", stop)
-      .tooltip("Chat with the agent in this pane (click again for its terminal)")
-      .on_click(() => run("pane-chat.toggle")).child(svg("mods/tabs-ide/chat.svg").size(14)).child("Chat");
+      .tooltip("Show this tab's agent as a chat (starts Claude Code if none runs)")
+      .on_click((_e, cx) => { cx.spawn(async (cx) => { try { await showChat(cx); } catch {} }); }).child(svg("mods/tabs-ide/chat.svg").size(14)).child("Chat");
     return h_flex().size_full().min_w(0).px(10).pl(lightsPadding).gap(3).items_center().bg(t.chrome).border_b(1).border_color(t.border)
       .on_mouse_up("left", () => { this.pressed = null; })
       .on_scroll_wheel(e => this.wheel(e))
