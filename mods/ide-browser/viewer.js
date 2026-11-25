@@ -470,7 +470,7 @@ async function screenshot(toAgent) {
   fs.mkdirSync(SHOT_DIR, { recursive: true });
   const f = path.join(SHOT_DIR, `${task}-${new Date().toISOString().replace(/[:.]/g, "-")}.png`);
   fs.writeFileSync(f, png);
-  if (toAgent) return sendToAgent(`[Browser screenshot of ${S.url} — ${f}] `);
+  if (toAgent) return sendToAgent("browser screenshot", f, `[Browser screenshot of ${S.url} — ${f}] `);
   const copied = await clip(png, "image/png");
   note(copied ? "Screenshot saved and copied" : `Screenshot saved: ${f}`);
 }
@@ -529,13 +529,14 @@ async function shot(rect, f) {
 async function selectRelease(p) {
   const d = S.drag; S.drag = null;
   const stamp = new Date().toISOString().replace(/[:.]/g, "-");
-  let text;
+  let text, what, ref;
   if (d && (Math.abs(p.x - d.x) > 8 || Math.abs(p.y - d.y) > 8)) {
     const rect = { x: Math.min(d.x, p.x), y: Math.min(d.y, p.y), w: Math.abs(p.x - d.x), h: Math.abs(p.y - d.y) };
     await cdp.eval(clearJs);
     const f = await shot(rect, path.join(ANNOT_DIR, `region-${stamp}.png`));
     const info = await cdp.eval(`({url:location.href,title:document.title})`);
     text = `[Browser region ${Math.round(rect.w)}×${Math.round(rect.h)} at (${Math.round(rect.x)},${Math.round(rect.y)}) on ${info?.url ?? S.url}${f ? ` — screenshot: ${f}` : ""}] `;
+    if (f) { what = "browser region screenshot"; ref = f; }
   } else {
     const info = await cdp.eval(pickJs(p.x, p.y));
     await cdp.eval(clearJs);
@@ -544,9 +545,13 @@ async function selectRelease(p) {
     const attrs = Object.entries(info.attrs || {}).map(([k, v]) => `${k}="${v}"`).join(" ");
     text = `[Browser element on ${info.url}]\n- selector: \`${info.selector}\`\n- html: \`${info.html}\`` +
       (info.text ? `\n- text: "${info.text}"` : "") + (attrs ? `\n- attrs: ${attrs}` : "") + (f ? `\n- screenshot: ${f}` : "") + "\n";
+    ref = path.join(ANNOT_DIR, `element-${stamp}.md`);
+    fs.writeFileSync(ref, text);
+    what = "browser element";
   }
   S.select = false; publish();
-  await sendToAgent(text);
+  if (!ref) { await clip(text); return note("Region copied to the clipboard"); }
+  await sendToAgent(what, ref, text);
 }
 
 // The agent of the shown tab (else the shown space's): its input gets the text, unsent; it gets the keyboard.
@@ -559,22 +564,28 @@ async function pickAgent() {
   const tab = sp.tabs.find((t) => t.active) ?? sp.tabs[0];
   return agentsOf(tab)[0] ?? sp.tabs.flatMap(agentsOf)[0] ?? null;
 }
-async function sendToAgent(text) {
-  const copied = await clip(text);
-  if (!copied) return note("No clipboard tool (wl-copy, xclip, pbcopy)");
+// The agent's input gets a short line pointing at a file that holds the details (selector, HTML, screenshot). It is
+// typed key by key with `hc keys`: that needs neither the clipboard nor Herdr's window to have the keyboard, and it
+// is left unsent. (Herdr's own paste reads a clipboard that is often stale on Wayland, and only with the window focused.)
+const KEY_OK = /^[A-Za-z0-9\/.\-\[\]`'=,;]$/;
+function keysFor(line) {
+  const keys = [];
+  for (const ch of line) keys.push(ch === " " ? "space" : /[A-Z]/.test(ch) ? `shift+${ch.toLowerCase()}` : KEY_OK.test(ch) ? ch : "-");
+  return keys;
+}
+const sdbg = (m) => { try { fs.appendFileSync(path.join(STATE_DIR, "send.log"), `${new Date().toISOString()} ${m}\n`); } catch {} };
+
+// `what` names it ("browser element"), `ref` is the file; `full` is also put on the clipboard for pasting by hand.
+async function sendToAgent(what, ref, full) {
+  if (full) clip(full).catch(() => {});
+  if ([...ref].some((ch) => ch !== " " && !/[A-Z]/.test(ch) && !KEY_OK.test(ch))) return note("Details copied: the file path has characters that can't be typed");
   const agent = await pickAgent();
-  if (!agent) return note("No agent in this space: text is on the clipboard");
+  sdbg(`agent ${JSON.stringify(agent)} ref=${ref}`);
+  if (!agent) return note("No agent in this space: details are on the clipboard");
   const name = agent.app || agent.name || agent.terminal;
-  const f = await run("herdr-app", ["do", "pane.focus", JSON.stringify({ terminal: agent.terminal })]);
-  if (f.code !== 0) return note(`Copied (couldn't focus ${name})`);
-  await sleep(200);
-  const before = (await run("hc", ["read", agent.terminal])).stdout;
-  const p = await run("herdr-app", ["do", "terminal.paste"]);
-  await sleep(700);
-  // Pasting needs Herdr's window to have the keyboard (the desktop only gives the clipboard to the focused window):
-  // when the agent's screen didn't change, say so instead of claiming it was sent.
-  const changed = (await run("hc", ["read", agent.terminal])).stdout !== before;
-  note(p.code !== 0 || !changed ? `Copied: press Ctrl+V in ${name}` : `✓ Sent to ${name}`);
+  const r = await run("hc", ["keys", agent.terminal, "--", ...keysFor(`${what} ${ref} `)]);
+  sdbg(`keys code=${r.code} ${r.stdout.trim().slice(0, 100)} ${r.stderr.trim().slice(0, 100)}`);
+  note(r.code === 0 ? `✓ Sent to ${name}` : `Couldn't type into ${name}: ${r.stderr.trim().slice(0, 60) || r.stdout.trim().slice(0, 60)}`);
 }
 
 // ---- driving: while the person uses the page, agents holding `hib` wait ----

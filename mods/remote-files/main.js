@@ -49,7 +49,7 @@ class Panel {
     this.pr = InputState.new({ placeholder: "" });
     this.pr.on("submit", (_e, cx) => this.runPrompt(cx));
     for (const i of [this.name, this.host, this.fpath]) i.on("submit", (_e, cx) => this.saveForm(cx));
-    ssh.sshHosts().then((h) => { this.hosts = h; cx.notify(); }).catch(() => {});
+    cx.spawn(async (cx) => { try { this.hosts = await ssh.sshHosts(); } catch {} cx.notify(); });
   }
 
   get remote() { return this.project.list[this.project.active] ?? null; }
@@ -178,7 +178,7 @@ class Panel {
   btn(t, id, ic, tip, onClick, on) {
     return div().id(id).size(26).flex_none().flex().items_center().justify_center().rounded(6).tooltip(tip)
       .text_color(t.muted).bg(on ? t.selected : t.chrome).cursor_pointer().hover((s) => s.bg(t.hover).text_color(t.foreground))
-      .on_click(onClick).child(svg(icon(ic)).size(15));
+      .on_click((_e, cx) => onClick(cx)).child(svg(icon(ic)).size(15));
   }
 
   renderForm(cx) {
@@ -190,7 +190,7 @@ class Panel {
       .when(Boolean(hint), (el) => el.child(div().text_size(11).text_color(t.dim).child(hint)));
     const chips = this.hosts.slice(0, 40).map((h) => div().id(`host-${h}`).h(22).px(8).flex_none().flex().items_center().rounded(11)
       .text_size(11.5).bg(t.raised).text_color(t.muted).cursor_pointer().hover((s) => s.bg(t.hover).text_color(t.foreground))
-      .on_click(() => { this.host.set_value(h); if (!this.name.value().trim()) this.name.set_value(h); cx.notify(); }).child(h));
+      .on_click((_e, cx) => { this.host.set_value(h); if (!this.name.value().trim()) this.name.set_value(h); cx.notify(); }).child(h));
     return v_flex().id("remote-form").size_full().min_h(0).p(16).gap(12).bg(t.background).overflow_y_scrollbar()
       .child(h_flex().gap(8).items_center()
         .child(svg(icon("server")).size(18).text_color(t.muted))
@@ -204,12 +204,12 @@ class Panel {
       .when(Boolean(this.formError), (el) => el.child(div().text_size(12).text_color(t.blocked).child(this.formError)))
       .child(h_flex().gap(8).items_center().pt(4)
         .child(div().id("form-save").h(30).px(14).flex().items_center().rounded(7).text_size(12.5).bg(t.solid).text_color(t.solid_foreground)
-          .cursor_pointer().on_click(() => this.saveForm(cx)).child(this.editing == null ? "Connect" : "Save"))
+          .cursor_pointer().on_click((_e, cx) => this.saveForm(cx)).child(this.editing == null ? "Connect" : "Save"))
         .when(!first, (el) => el.child(div().id("form-cancel").h(30).px(12).flex().items_center().rounded(7).text_size(12.5).text_color(t.muted)
-          .cursor_pointer().hover((s) => s.bg(t.hover)).on_click(() => { this.view = "tree"; cx.notify(); }).child("Cancel")))
+          .cursor_pointer().hover((s) => s.bg(t.hover)).on_click((_e, cx) => { this.view = "tree"; cx.notify(); }).child("Cancel")))
         .child(div().flex_1())
         .when(this.editing != null, (el) => el.child(div().id("form-remove").h(30).px(12).flex().items_center().rounded(7).text_size(12.5).text_color(t.blocked)
-          .cursor_pointer().hover((s) => s.bg(t.hover)).on_click(() => this.removeRemote(cx)).child("Remove"))));
+          .cursor_pointer().hover((s) => s.bg(t.hover)).on_click((_e, cx) => this.removeRemote(cx)).child("Remove"))));
   }
 
   renderTree(cx) {
@@ -217,28 +217,28 @@ class Panel {
     const sel = d?.entries?.find((e) => e.name === this.sel);
     const header = h_flex().h(38).flex_none().px(10).gap(4).items_center().border_b(1).border_color(t.border).bg(t.chrome)
       .child(h_flex().id("remote-switch").h(26).px(8).gap(6).flex_1().min_w(0).items_center().rounded(6).cursor_pointer()
-        .hover((s) => s.bg(t.hover)).on_click(() => { this.menu = !this.menu; cx.notify(); })
+        .hover((s) => s.bg(t.hover)).on_click((_e, cx) => { this.menu = !this.menu; cx.notify(); })
         .child(svg(icon("server")).size(14).flex_none().text_color(t.muted))
         .child(div().min_w(0).truncate().text_size(12.5).font_semibold().text_color(t.foreground).child(r.name))
         .child(div().min_w(0).truncate().text_size(11.5).text_color(t.dim).child(r.host))
         .child(svg(icon("chevron")).size(12).flex_none().text_color(t.dim)))
-      .child(this.btn(t, "rf-refresh", "refresh", "Refresh", () => this.refresh(cx)))
-      .child(this.btn(t, "rf-file", "file-plus", "New file", () => this.startPrompt("file", null, cx), this.prompt?.kind === "file"))
-      .child(this.btn(t, "rf-folder", "folder-plus", "New folder", () => this.startPrompt("folder", null, cx), this.prompt?.kind === "folder"))
-      .child(this.btn(t, "rf-edit", "pencil", "Edit this server", () => { this.openForm(this.project.active); cx.notify(); }));
+      .child(this.btn(t, "rf-refresh", "refresh", "Refresh", (cx) => this.refresh(cx)))
+      .child(this.btn(t, "rf-file", "file-plus", "New file", (cx) => this.startPrompt("file", null, cx), this.prompt?.kind === "file"))
+      .child(this.btn(t, "rf-folder", "folder-plus", "New folder", (cx) => this.startPrompt("folder", null, cx), this.prompt?.kind === "folder"))
+      .child(this.btn(t, "rf-edit", "pencil", "Edit this server", (cx) => { this.openForm(this.project.active); cx.notify(); }));
 
     const pathRow = h_flex().h(34).flex_none().px(10).gap(6).items_center().border_b(1).border_color(t.border)
-      .child(this.btn(t, "rf-up", "arrow-up", "Parent folder", () => d?.path && this.go(parentOf(d.path), cx)))
+      .child(this.btn(t, "rf-up", "arrow-up", "Parent folder", (cx) => d?.path && this.go(parentOf(d.path), cx)))
       .child(div().flex_1().min_w(0).h(26).px(8).rounded(6).border_1().border_color(t.input).bg(t.background)
         .child(Input.new(this.path).size_full().text_size(12).text_color(t.foreground)));
 
     const menu = this.menu && v_flex().id("remote-menu").flex_none().p(6).gap(2).border_b(1).border_color(t.border).bg(t.popover)
       .children(this.project.list.map((x, i) => h_flex().id(`remote-${i}`).h(28).px(8).gap(8).items_center().rounded(6).cursor_pointer()
         .bg(i === this.project.active ? t.selected : t.popover).hover((s) => s.bg(t.hover)).text_size(12.5).text_color(t.foreground)
-        .on_click(() => this.choose(i, cx))
+        .on_click((_e, cx) => this.choose(i, cx))
         .child(div().min_w(0).truncate().child(x.name)).child(div().flex_1().min_w(0).truncate().text_size(11.5).text_color(t.dim).child(`${x.host}:${x.path}`))))
       .child(h_flex().id("remote-add").h(28).px(8).gap(8).items_center().rounded(6).cursor_pointer().hover((s) => s.bg(t.hover)).text_size(12.5).text_color(t.muted)
-        .on_click(() => { this.menu = false; this.openForm(null); cx.notify(); }).child("+ Add a server…"));
+        .on_click((_e, cx) => { this.menu = false; this.openForm(null); cx.notify(); }).child("+ Add a server…"));
 
     const note = this.msg
       ? div().flex_none().px(12).py(6).text_size(12).text_color(this.msg.error ? t.blocked : t.done).border_b(1).border_color(t.border).child(this.msg.error ?? this.msg.ok)
@@ -248,26 +248,26 @@ class Panel {
       .child(svg(icon(this.prompt.kind === "folder" ? "folder-plus" : this.prompt.kind === "file" ? "file-plus" : "pencil")).size(14).text_color(t.muted))
       .child(div().flex_1().min_w(0).h(26).px(8).rounded(6).border_1().border_color(t.accent).bg(t.background)
         .child(Input.new(this.pr).size_full().text_size(12.5).text_color(t.foreground)))
-      .child(this.btn(t, "rf-ok", "check", "OK", () => this.runPrompt(cx)))
-      .child(this.btn(t, "rf-cancel", "x", "Cancel", () => { this.prompt = null; cx.notify(); }));
+      .child(this.btn(t, "rf-ok", "check", "OK", (cx) => this.runPrompt(cx)))
+      .child(this.btn(t, "rf-cancel", "x", "Cancel", (cx) => { this.prompt = null; cx.notify(); }));
 
     const bar = sel && h_flex().flex_none().h(34).px(10).gap(6).items_center().border_b(1).border_color(t.border).bg(t.raised).text_size(12)
       .child(div().flex_1().min_w(0).truncate().text_color(t.muted).child(this.confirm ? `Delete ${sel.name}${sel.dir ? " (must be empty)" : ""}?` : sel.name))
       .when(!this.confirm, (el) => el
-        .child(this.btn(t, "rf-rename", "pencil", "Rename", () => this.startPrompt("rename", sel.name, cx)))
-        .child(this.btn(t, "rf-del", "trash", "Delete", () => { this.confirm = true; cx.notify(); }))
-        .child(this.btn(t, "rf-x", "x", "Deselect", () => { this.sel = null; cx.notify(); })))
+        .child(this.btn(t, "rf-rename", "pencil", "Rename", (cx) => this.startPrompt("rename", sel.name, cx)))
+        .child(this.btn(t, "rf-del", "trash", "Delete", (cx) => { this.confirm = true; cx.notify(); }))
+        .child(this.btn(t, "rf-x", "x", "Deselect", (cx) => { this.sel = null; cx.notify(); })))
       .when(this.confirm, (el) => el
-        .child(div().id("rf-del-yes").h(24).px(10).flex().items_center().rounded(6).bg(t.blocked).text_color(t.solid_foreground).cursor_pointer().on_click(() => this.runDelete(cx)).child("Delete"))
-        .child(div().id("rf-del-no").h(24).px(10).flex().items_center().rounded(6).text_color(t.muted).cursor_pointer().hover((s) => s.bg(t.hover)).on_click(() => { this.confirm = false; cx.notify(); }).child("Cancel")));
+        .child(div().id("rf-del-yes").h(24).px(10).flex().items_center().rounded(6).bg(t.blocked).text_color(t.solid_foreground).cursor_pointer().on_click((_e, cx) => this.runDelete(cx)).child("Delete"))
+        .child(div().id("rf-del-no").h(24).px(10).flex().items_center().rounded(6).text_color(t.muted).cursor_pointer().hover((s) => s.bg(t.hover)).on_click((_e, cx) => { this.confirm = false; cx.notify(); }).child("Cancel")));
 
     const row = (e) => {
       const on = e.name === this.sel;
       return h_flex().id(`rf-${e.name}`).h(26).px(8).gap(7).flex_none().items_center().rounded(5).text_size(12.5).cursor_pointer()
         .bg(on ? t.selected : t.background).text_color(t.foreground).hover((s) => s.bg(on ? t.selected : t.hover))
         .tooltip(`${e.mode} · ${new Date(e.mtime * 1000).toLocaleString()}${e.link ? " · link" : ""}`)
-        .on_click(() => this.open(e, cx))
-        .on_mouse_down("right", (_ev, cx2) => { cx2.stop_propagation(); this.sel = on ? null : e.name; this.confirm = false; cx.notify(); })
+        .on_click((_e, cx) => this.open(e, cx))
+        .on_mouse_down("right", (_ev, cx) => { cx.stop_propagation(); this.sel = on ? null : e.name; this.confirm = false; cx.notify(); })
         .child(svg(icon(e.dir ? "folder" : "file")).size(14).flex_none().text_color(e.dir ? t.accent : t.dim))
         .child(div().flex_1().min_w(0).truncate().child(e.name))
         .when(!e.dir, (el) => el.child(div().flex_none().text_size(11).text_color(t.dim).child(ssh.human(e.size))));
@@ -275,7 +275,7 @@ class Panel {
     const MAX = 1000;
     const entries = d?.entries ?? [];
     const body = v_flex().id("rf-list").flex_1().min_h(0).p(6).gap(1).overflow_y_scrollbar().track_scroll(this.scroll)
-      .on_mouse_down("right", () => { this.sel = null; cx.notify(); })
+      .on_mouse_down("right", (_ev, cx) => { this.sel = null; cx.notify(); })
       .when(Boolean(d?.error), (el) => el.child(div().p(8).text_size(12).text_color(t.blocked).child(d.error)))
       .when(!d && this.loading, (el) => el.child(div().p(8).text_size(12).text_color(t.dim).child("Connecting…")))
       .when(Boolean(d?.entries) && entries.length === 0, (el) => el.child(div().p(8).text_size(12).text_color(t.dim).child("Empty folder")))
@@ -334,21 +334,21 @@ class RemoteEditor {
     const t = theme();
     const bt = (id, label, onClick, strong) => div().id(id).h(26).px(10).flex().items_center().flex_none().rounded(6).text_size(12).cursor_pointer()
       .bg(strong ? t.solid : t.raised).text_color(strong ? t.solid_foreground : t.muted)
-      .hover((s) => s.bg(strong ? t.solid : t.hover)).on_click(onClick).child(label);
+      .hover((s) => s.bg(strong ? t.solid : t.hover)).on_click((_e, cx) => onClick(cx)).child(label);
     return v_flex().id("remote-editor").size_full().min_h(0).bg(t.background)
-      .on_key_down((e, cx2) => {
-        if (e.keystroke === "ctrl-s" || e.keystroke === "cmd-s") { cx2.stop_propagation(); if (!e.is_held) this.save(cx); }
+      .on_key_down((e, cx) => {
+        if (e.keystroke === "ctrl-s" || e.keystroke === "cmd-s") { cx.stop_propagation(); if (!e.is_held) this.save(cx); }
       })
       .child(h_flex().h(36).flex_none().px(12).gap(8).items_center().border_b(1).border_color(t.border).bg(t.chrome)
         .child(svg(icon("file")).size(14).flex_none().text_color(t.muted))
         .child(div().min_w(0).truncate().text_size(12.5).font_semibold().text_color(t.foreground).child(this.name))
         .when(this.dirty, (el) => el.child(div().size(7).rounded(4).flex_none().bg(t.accent).tooltip("Unsaved changes")))
         .child(div().flex_1().min_w(0).truncate().text_size(11.5).text_color(t.dim).child(`${this.edit.remote} · ${this.edit.path}`))
-        .child(bt("re-reload", "Reload", () => this.load(cx)))
-        .child(bt("re-save", this.saving ? "Saving…" : "Save", () => this.save(cx), this.dirty)))
+        .child(bt("re-reload", "Reload", (cx) => this.load(cx)))
+        .child(bt("re-save", this.saving ? "Saving…" : "Save", (cx) => this.save(cx), this.dirty)))
       .when(Boolean(this.error) && this.state === "ready", (el) => el.child(h_flex().flex_none().px(12).py(6).gap(8).items_center().border_b(1).border_color(t.border)
         .child(div().flex_1().min_w(0).text_size(12).text_color(t.blocked).child(this.error))
-        .when(this.conflict, (el2) => el2.child(bt("re-over", "Overwrite", () => this.save(cx, true))).child(bt("re-fresh", "Reload", () => this.load(cx))))))
+        .when(this.conflict, (el2) => el2.child(bt("re-over", "Overwrite", (cx) => this.save(cx, true))).child(bt("re-fresh", "Reload", (cx) => this.load(cx))))))
       .child(this.state === "ready"
         ? Editor.new(this.code).id("remote-code").flex_1().min_h(0)
         : div().flex_1().p(24).text_size(12.5).text_color(this.state === "error" ? t.blocked : t.dim).child(this.state === "error" ? this.error : "Loading…"));
