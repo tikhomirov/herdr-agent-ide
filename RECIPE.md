@@ -1,0 +1,77 @@
+# Agent IDE
+
+Herdr's main layout with a right-hand panel for working with coding agents the way an agent IDE does: **Files**, **Changes** and a real **Browser** that you and your agents share. Every project (space) has its own browser. You can click, scroll and type in it, point an element or a region out to the agent, take screenshots, and look at the page at phone or tablet size. A button in the tab bar switches layouts.
+
+![Agent IDE](preview.png)
+
+## What you see
+
+The window is Herdr's `main` layout: a 268px sidebar on the left (brand row, Spaces, Agents, footer), the tab bar on top of the work area (42px, `tabs-ide`), the active tab's panes, and the status bar (28px) at the bottom.
+
+Right of the panes there is a 460px panel (min 280, max 1000) with three tabs, chosen by buttons at the right end of the tab bar, after the `+`: **Files** (file icon), **Changes** and **Browser** (monitor icon), and then a layout switcher button (layout icon). The selected panel button is highlighted (`selected` color). A tab with no mod in this layout gets no button.
+
+The **Browser** tab is two parts:
+
+- A toolbar, 44px, in the app's own colors (`chrome` background, `border` line below): back, forward and reload (28px rounded buttons), an address field (28px, 8px radius, `input` border, `accent` border while focused, a globe icon at its left), a **Select** button with a pointer icon, a device button, a camera button and a "…" button.
+- Below it the page, drawn edge to edge in the panel (a real Chrome, streamed as pictures).
+
+With the device button on, the toolbar grows by a 40px row: a preset button ("Responsive", "iPhone 15", …) with a chevron, a width field, "×", a height field, a rotate button and the word "Fit" at the right. The page is then laid out at that size and drawn centered, shrunk to fit when it is bigger than the panel.
+
+## How it behaves
+
+- Showing the Browser tab starts the project's viewer; hiding the tab, or switching to a space of another project, stops the viewer (the Chrome behind it stays open, with its page, sign-ins and cookies). Switching back shows that project's own browser. A project is the git root's folder name of the space's folder (else the folder's name), lower-cased, `[a-z0-9_-]`, at most 24 characters.
+- The address field: Enter goes there. `localhost` and `127.0.0.1` get `http://`, `*.localhost` and bare domains get `https://`, anything else is a Google search. Ctrl+L inside the page focuses the field. While a note is shown (messages like "Hard reload") it replaces the address for 6 seconds.
+- Back / forward / reload are the buttons or Alt+←, Alt+→, Ctrl+R / F5 inside the page.
+- Mouse (click, double click, drag, wheel), the keyboard, Ctrl+A/C/X/Z/Y, paste (Ctrl+V and terminal paste) all go to the page. What is copied in the page lands on the desktop clipboard.
+- **Select** turns on a mode where the page gets no clicks: hovering outlines the element under the pointer in blue with its tag, id, classes and size; a click picks it, dragging draws a region. Either way a screenshot is saved under `~/.local/state/herdr-ide/annotations/` and a message is typed (not sent) into the input of the agent of the shown tab, which gets the keyboard: `[Browser element on <url>]` with selector, HTML, text, attributes and the screenshot path, or `[Browser region WxH at (x,y) on <url> — screenshot: <path>]`. With no agent in the space the text stays on the clipboard. Esc leaves Select.
+- The camera button saves a PNG of the page to `~/Pictures/herdr-screenshots/` and copies it to the clipboard.
+- The "…" menu: Take Screenshot, Screenshot to Agent (types the file's path into the agent's input), Hard Reload (cache ignored), Copy Current URL, Open in Chrome Window (a headed Chrome on the same session), Clear Cookies, Clear Cache, Clear Site Data (the current site only).
+- Device mode: the preset button opens a menu: iPhone SE 375×667, iPhone 15 393×852, Pixel 7 412×915, iPad mini 768×1024, iPad Pro 11 834×1194, Laptop 1280×800, Desktop 1920×1080. Typing a width and a height and pressing Enter sets any size from 200 to 4000; the rotate button swaps them; the device button turns the mode off. Pages narrower than 768px get touch emulation, a mobile user agent and 2x pixels.
+- While you use the page, a file in `~/.local/state/herdr-ide/` marks it as yours; agents using `hib` get exit code 4 for acting commands until you have been idle 20 seconds.
+- Agents drive the same browser with the `hib` command (`hib open <url>`, `hib snapshot -i`, `hib click @e3`, `hib screenshot`…); you watch it happen.
+- The layout switcher button opens a dialog listing every layout; the active one says "✓ Active"; Up/Down/Enter choose, Esc closes.
+- Agent status (working, blocked, done, idle) shows as in Herdr's own tabs and sidebar; nothing about it changes.
+
+## Built from
+
+`layouts/ide.json`: a clone of the shipped `main` layout (0.1.17). `root` row → `sidebar` column (`workspace-chrome`, `spaces`, `agents`, `workspace-chrome` footer) and `work` column: `tabs` block with `{"mod":"tabs-ide"}` (px 42), `work-body` row with `main` (the active tab's panes) and `panel` column (px 460) holding a `stack` `panel-body` with children `files` (`{"mod":"files"}`), `changes` (`{"mod":"changes"}`) and `browser`, a column of `browser-bar` (block, px 44, `ide-browser-bar`) and `browser-host` (block, `ide-browser`); then the `status` block. A person with a different file editor mod can put it in the `files` block (the `file-editor` mod from `werlang/herdr-file-editor` opens clicked files in tabs).
+
+Mods (`mods/<name>/`, all `place: none`):
+
+- `tabs-ide`: a clone of the shipped `tabs` mod (0.1.17) plus the panel buttons for the stack's children that exist (`files`, `changes`, `git-graph`, `browser`; the icons come from the shipped `files`, `changes`, `workspace-chrome` mods, and from `git-graph` when present) and the layout switcher button (`openOverlay({mod:"layout-switcher",kind:"dialog",width:340,height:302})`). `run("layout.select"/"layout.show"/"layout.hide")` open and close the panel; it remembers the open panel per space in `localStorage`.
+- `layout-switcher`: a dialog listing `layouts()`, `run("layout.switch",{name})`.
+- `ide-browser`: the block inside the `browser` column. While the Browser tab is shown it runs `hc run --bg --json --cwd <folder> --label herdr.ide-view=<project> -- node mods/ide-browser/viewer.js --task <project>` and rewrites `layouts/<current layout>.json` so the `browser` column is `[browser-bar, browser-host (hidden), browser-view {terminal: <address>}]`; when the tab hides, the space or project changes, or the terminal ends, it kills the terminal and writes `[browser-bar, browser-host]` back. A ticker (every 2 s) does this; it also removes a `browser-view` left by an earlier run and publishes `shared("ide-browser") = {task}` for the toolbar. Uses `hc`, `exec("git", ["-C", folder, "rev-parse", "--show-toplevel"])`, `readTextFile`/`writeTextFile`.
+- `ide-browser-bar`: the toolbar; icons (Lucide-style SVGs) in its folder; `InputState`/`Input` for the address and the size fields; talks to the viewer through `~/.local/state/herdr-ide/<project>.ctl` (commands appended, one per line: `nav <url>`, `back`, `forward`, `reload`, `hardreload`, `select`, `window`, `device <w> <h>` / `device off`, `screenshot [agent]`, `copyurl`, `clearcookies`, `clearcache`, `clearsite`) and `<project>.state.json` (written by the viewer every 2 s and on change: `url`, `title`, `live`, `select`, `device`, `note`, `noteAt`, `focusAddr`; older than 8 s = offline). Resizes its own block with `layout.resize {id:"browser-bar", px: 44 | 84}` as device mode turns on and off.
+- `ide-browser-menu`: popup (`openOverlay kind popup`) for the "…" menu and the presets; a choice appends its command to the `.ctl` file and closes it.
+- `ide-browser/viewer.js` (Node, no dependencies, uses the global `WebSocket`): opens or finds the project's agent-browser session (`agent-browser --session herdr-ide-<project> --profile ~/.local/state/herdr-ide/profiles/<project>`), reads its CDP address (`get cdp-url`), attaches to the page agent-browser has in front, sets the viewport to the terminal's pixel size (`Emulation.setDeviceMetricsOverride`; device mode uses the chosen size) and draws `Page.startScreencast` PNG frames (12 fps) with Kitty graphics (`a=T,f=100`) inside its own terminal; parses SGR (pixel) mouse, Kitty keyboard and bracketed paste and forwards them with `Input.dispatch*`; implements Select (an injected overlay div, `elementFromPoint`, `Page.captureScreenshot` with a clip), screenshots, cache/cookie/site clearing (`Network.clearBrowserCache`, `Network.clearBrowserCookies`, `Storage.clearDataForOrigin`), and sends text to the agent with the clipboard (`wl-copy`/`xclip`/`pbcopy`), `herdr-app do pane.focus` and `herdr-app do terminal.paste`. The agent is the first terminal with a `status` in the shown tab of the shown space (`herdr-app ls`).
+- `ide-browser/hib`: a shell script: finds `agent-browser` (`$HERDR_IDE_AGENT_BROWSER`, the PATH, or Shepherdr's copy), computes the project's name the same way, refuses acting commands (exit 4) while `<project>.you` is younger than a minute, and `exec`s `agent-browser --session herdr-ide-<project> --profile … "$@"` with `AGENT_BROWSER_ARGS=--force-prefers-reduced-motion`.
+- `ide-browser/start.html`: the page a fresh browser opens, a dark centered note.
+- `skills/herdr-ide-browser/SKILL.md` (optional, for the agents): tells them to use `hib` and what the Select messages mean.
+
+Programs it runs: `node`, `agent-browser` (+ Chrome for Testing, installed by `agent-browser install`), `git`, `hc`, `herdr-app`, and a clipboard tool.
+
+## Watch out
+
+- Herdr has no web view: the page is a stream of PNGs in a terminal. It is smooth enough to use but not for scrolling-heavy animation (12 fps, `--force-prefers-reduced-motion` on so pages don't animate).
+- A mod can't draw a terminal. The viewer's terminal block exists in the layout file only while the tab is shown; if Herdr is stopped meanwhile, the next start clears the leftover block. The `browser-host` block is hidden while the view is up and its mod keeps running; if the file ever says `hidden` without a `browser-view`, delete the `hidden` line.
+- The terminal reports cell size with `CSI 16 t` and, when the terminal supports `?1016`, pixel mouse; without that mouse positions are cell-accurate only.
+- Select types text into the agent's input but doesn't press Enter; the agent of the *shown* tab of the *shown* space gets it.
+- One viewer at a time (the shown project's). Each project's Chrome keeps running when you leave it: memory adds up, close one with `hib close` (its next view reopens it).
+- Two projects whose git roots have the same folder name share a browser.
+- Cookies and sign-ins live in `~/.local/state/herdr-ide/profiles/<project>/`.
+- `tabs-ide` is a clone of `tabs` 0.1.17: later improvements of the shipped tabs mod need to be carried over by hand.
+- The viewer needs `node` 22+ (a global `WebSocket`) on the PATH Herdr's terminals get.
+- Screenshot to Agent and Select use whichever agent they find; with several agents in the tab they take the first.
+
+## Done when
+
+1. `herdr-app check` passes in each of `mods/tabs-ide`, `mods/layout-switcher`, `mods/ide-browser`, `mods/ide-browser-bar`, `mods/ide-browser-menu`, and `node --check mods/ide-browser/viewer.js` passes.
+2. `layout.switch {name:"ide"}` shows the layout, the tab bar has Files, Changes, Browser and the layout button, and the button opens the list of layouts.
+3. Opening Browser makes a `node …/viewer.js --task <project>` terminal appear (`hc ls`), the toolbar shows the page's address, and the page is visible in the panel, filling its width.
+4. Typing `example.com` in the address field and pressing Enter loads it; Back works.
+5. In another space (another project) the Browser tab shows a different browser (its own address); going back shows the first one's page again.
+6. The device button adds the second row and a 390 × 844 request (`device 390 844` in the `.ctl` file) draws a centered phone-sized page; the preset menu lists seven devices; rotate swaps the numbers; turning it off removes the row.
+7. The camera button writes a PNG under `~/Pictures/herdr-screenshots/`; "Hard Reload", "Copy Current URL", "Clear Cookies", "Clear Cache" and "Clear Site Data" each show a note in the address field.
+8. Select + a click on an element types `[Browser element on …]` with a selector into the shown tab's agent without sending it.
+9. From the project's folder, `hib get url` prints the page's address; with `~/.local/state/herdr-ide/<project>.you` freshly touched, `hib open <url>` exits 4.
+10. Hiding the panel ends the viewer terminal; the page is still there when the panel is shown again.

@@ -1,0 +1,39 @@
+#!/bin/sh
+# hib: drive this project's browser, the one in Herdr's Browser tab (agent-browser on its own session and profile).
+#   hib [--task NAME] <agent-browser command...>      e.g.  hib open http://localhost:8000   hib snapshot -i   hib screenshot
+# The project's name is its git root folder's name (or the current folder's), the same one the Browser tab uses.
+# While the person is using the page, commands that act on it wait (exit 4); reading ones still work.
+
+task=
+if [ "$1" = "--task" ]; then task=$2; shift 2; fi
+[ -z "$task" ] && task=${HERDR_IDE_TASK:-}
+if [ -z "$task" ]; then
+  dir=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
+  task=$(basename "$dir")
+fi
+task=$(printf %s "$task" | tr 'A-Z' 'a-z' | tr -c 'a-z0-9_-' '-' | sed 's/-\{2,\}/-/g;s/^-//;s/-$//' | cut -c1-24 | sed 's/-$//')
+[ -z "$task" ] && task=default
+
+ab=${HERDR_IDE_AGENT_BROWSER:-}
+[ -z "$ab" ] && ab=$(command -v agent-browser 2>/dev/null)
+if [ -z "$ab" ]; then
+  for c in "$HOME"/.local/share/shepherdr/agent-browser/*/agent-browser; do [ -x "$c" ] && ab=$c; done
+fi
+if [ -z "$ab" ]; then
+  echo "hib: agent-browser is not installed. Run: npm i -g agent-browser && agent-browser install" >&2
+  exit 127
+fi
+
+state="$HOME/.local/state/herdr-ide"
+you="$state/$task.you"
+case "$1" in
+  snapshot|get|is|screenshot|read|console|errors|session|skills|tab|--help|-h|--version) ;;
+  *)
+    if [ -n "$(find "$you" -mmin -1 2>/dev/null)" ]; then
+      echo "hib: the person is using the browser right now ($task). Wait a few seconds and try again, or ask them." >&2
+      exit 4
+    fi ;;
+esac
+
+export AGENT_BROWSER_ARGS="${AGENT_BROWSER_ARGS:---force-prefers-reduced-motion}"
+exec "$ab" --session "herdr-ide-$task" --profile "$state/profiles/$task" "$@"
