@@ -1,5 +1,5 @@
 // Sidebar top row without the logo: search and the sidebar toggle (layout idea: petekp/coordinator, MIT).
-import { View, div, svg } from "gpui-kit";
+import { View, div, svg, image } from "gpui-kit";
 import { h_flex } from "gpui-base";
 import { lang } from "./i18n.js";
 import { theme, run, window, shared, setShared, layout } from "herdr";
@@ -27,7 +27,7 @@ export default class Topbar extends View {
     const t = theme(), collapsed = narrow();
     return h_flex().size_full().bg(t.chrome).pl(collapsed ? 6 : 14).pr(10).gap(4).items_center()
       .when(window()?.platform === "macos" && !window()?.fullscreen && !collapsed, el => el.pl(76))
-      .when(!collapsed, el => el.child(div().flex_1()))
+      .when(!collapsed, el => el.child(h_flex().flex_1().gap(8).items_center().child(image("frame/welcome/herdr.png").size(20).rounded(5)).child(div().font_semibold().text_size(13.5).text_color(t.foreground).child("Herdr"))))
       .when(!collapsed, el => el.child(div().id("lang").h(26).px(7).flex_none().flex().items_center().rounded(6).text_size(11.5).font_medium().text_color(t.muted)
         .hover(s => s.bg(t.hover).text_color(t.foreground)).cursor_pointer().tooltip("Язык / Language")
         .on_mouse_down("left", (_e, cx) => cx.stop_propagation()).on_click(() => setShared("ui.lang", lang() === "ru" ? "en" : "ru")).child(lang() === "ru" ? "RU" : "EN")))
