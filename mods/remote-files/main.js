@@ -105,6 +105,15 @@ class Panel {
     run("tab.new", { name, mod: "remote-files", props: { edit: { host: r.host, path, remote: r.name } } });
   }
 
+  // A terminal tab on the server, in the selected folder (else the one shown).
+  openShell(cx) {
+    const r = this.remote;
+    if (!r || !ssh.validHost(r.host)) return;
+    const d = this.data, sel = d?.entries?.find((e) => e.name === this.sel);
+    const path = sel?.dir ? join(d.path, sel.name) : this.here();
+    run("terminal.open", { argv: ssh.shellArgv(r.host, path), name: r.name, place: "tab" });
+  }
+
   // ---- actions on the tree ----
 
   startPrompt(kind, from, cx) {
@@ -228,6 +237,7 @@ class Panel {
       .child(this.btn(t, "rf-refresh", "refresh", "Refresh", (cx) => this.refresh(cx)))
       .child(this.btn(t, "rf-file", "file-plus", "New file", (cx) => this.startPrompt("file", null, cx), this.prompt?.kind === "file"))
       .child(this.btn(t, "rf-folder", "folder-plus", "New folder", (cx) => this.startPrompt("folder", null, cx), this.prompt?.kind === "folder"))
+      .child(this.btn(t, "rf-ssh", "terminal", "SSH terminal in the selected folder", (cx) => this.openShell(cx)))
       .child(this.btn(t, "rf-edit", "pencil", "Edit this server", (cx) => { this.openForm(this.project.active); cx.notify(); }));
 
     const pathRow = h_flex().h(34).flex_none().px(10).gap(6).items_center().border_b(1).border_color(t.border)

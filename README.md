@@ -53,6 +53,8 @@ With Shepherdr's chat mods installed (`pane-chat`, `spaces-chat`, `workspace-sta
 
 ![Chat](docs/chat.png)
 
+The Remote toolbar has an **SSH terminal** button: it opens a terminal tab on the server in the selected folder (or the one shown), on the already open connection when there is one. Unlike the tree, the terminal may ask for a password.
+
 ### Rename with emoji
 
 Double-click a tab to rename it in a dialog with an emoji picker (Recent, Work, Faces, Nature, Symbols). The emoji becomes the first character of the name; picking another swaps it, **No emoji** removes it. Herdr's own right-click Rename still opens its plain prompt.

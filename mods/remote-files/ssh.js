@@ -57,6 +57,9 @@ const cd = (path) => {
   return `cd -- ${q(p)}`;
 };
 
+/** The command that opens an interactive shell on the server in `path`: for a terminal (it may ask for a password, and shares the open connection when there is one). */
+export const shellArgv = (host, path) => ["ssh", "-t", "-o", `ControlPath=${DIR()}/%C`, "-o", "ControlMaster=no", host, "--", `sh -c ${q(`${cd(path)} || true; exec "\${SHELL:-sh}" -l`)}`];
+
 /** A folder: { path (resolved), entries: [{ name, dir, link, size, mtime, mode }] }, folders first. */
 export async function list(host, path) {
   const r = await remote(host, `${cd(path)} && pwd -P && { LC_ALL=C find . -mindepth 1 -maxdepth 1 -printf '%y%Y\\t%s\\t%T@\\t%m\\t%f\\0'; true; }`);
