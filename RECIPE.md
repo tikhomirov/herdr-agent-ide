@@ -100,3 +100,6 @@ Done when: sidebar, tab bar, main and right panel show; the bar has Files, Chang
 
 ### Sidebar style (idea: [petekp/coordinator](https://github.com/petekp/coordinator), MIT)
 Top row `ide-topbar` (search + toggle, no logo). Spaces and group headers in `agents-ide` use a colored letter tile (`tile.js`, color stable per space id). To get tiles in `spaces-chat` (Shepherdr's, not shipped here): copy `patches/spaces-chat-tile.js` to `mods/spaces-chat/tile.js`, import `spaceTile` and render it in place of the "#" for spaces without a picked icon.
+
+### Language (Ru / En)
+`i18n/` (`i18n.js`, `ru.js`) + `tools/localize.py`: copies the dictionary into the installed mods and wraps UI literals with `tr()` (originals kept as `*.js.orig-i18n`; `--undo` restores them; re-run after updating a mod). The language is shared `ui.lang`, switched with the RU/EN button in the sidebar's top row. Strings absent from `ru.js` stay English; add them to `ru.js` and re-run. Not covered: `chat` mod, core menu data.

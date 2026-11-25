@@ -5,6 +5,8 @@
 import { View, div } from "gpui-kit";
 import { v_flex, h_flex, InputState, Input } from "gpui-base";
 import { run, props, closeOverlay, theme } from "herdr";
+import { keepKeys, dropKeys } from "./keyholder.js";
+const HOLDER = "dialog:rename-dialog";
 
 const SETS = [
   ["Work", "🚀 🔧 🛠️ 🐞 ✅ ❌ ⚠️ 📦 🧪 📝 📄 📁 🔥 ⚡ 🔒 🔑 🌐 🗄️ 💾 🧹 🔍 🧠 🤖 📊 📈 🧩 🎯 💡 ⏱️ 🔔 🚧 🏗️ ♻️ 📌 🔗 ☁️ 🐳 ⚙️ 🧰 🛡️ 💬 📣 🔬 🧵 🪄 🧮 🛒 💳 📧 📱 💻 🖥️ 🗂️ 🧭"],
@@ -30,8 +32,13 @@ export default class Rename extends View {
     this.input.on("blur", (_e, cx) => { this.focused = false; cx.notify(); });
     this.input.focus();
     cx.timer.after(300, () => this.input.focus());
+    // The keyboard is this dialog's while it is open: the chat behind it takes nothing back.
+    keepKeys(HOLDER);
+    cx.timer.every(2000, () => keepKeys(HOLDER));
     this.handle = cx.focus_handle();
   }
+
+  close() { dropKeys(HOLDER); }
 
   lead() { return this.text.match(LEAD)?.[1] ?? null; }
 
@@ -50,12 +57,12 @@ export default class Rename extends View {
 
   submit() {
     const p = props();
-    closeOverlay(p.overlay);
+    dropKeys(HOLDER); closeOverlay(p.overlay);
     run("tab.rename", { id: p.id, name: this.text.trim() });
   }
 
   key(e, cx) {
-    if (e.key === "escape") { closeOverlay(props().overlay); cx.stop_propagation(); }
+    if (e.key === "escape") { dropKeys(HOLDER); closeOverlay(props().overlay); cx.stop_propagation(); }
   }
 
   render() {

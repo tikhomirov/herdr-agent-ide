@@ -432,8 +432,17 @@ const cdp = {
       this.pump();
     });
   },
-  back() { this.call("Runtime.evaluate", { expression: "history.back()" }); },
-  forward() { this.call("Runtime.evaluate", { expression: "history.forward()" }); },
+  // Through the browser's own navigation history: works where history.back() in the page doesn't (no user gesture, replaced entries).
+  async step(d) {
+    try {
+      const h = await this.call("Page.getNavigationHistory", {});
+      const e = h?.entries?.[h.currentIndex + d];
+      if (e) await this.call("Page.navigateToHistoryEntry", { entryId: e.id });
+      else note(d < 0 ? "No page to go back to" : "No page to go forward to");
+    } catch { this.call("Runtime.evaluate", { expression: d < 0 ? "history.back()" : "history.forward()" }); }
+  },
+  back() { return this.step(-1); },
+  forward() { return this.step(1); },
   reload() { this.call("Page.reload", {}); },
   navigate(url) { return this.call("Page.navigate", { url }); },
   async eval(expression) {

@@ -1,6 +1,7 @@
 // Sidebar top row without the logo: search and the sidebar toggle (layout idea: petekp/coordinator, MIT).
 import { View, div, svg } from "gpui-kit";
 import { h_flex } from "gpui-base";
+import { lang } from "./i18n.js";
 import { theme, run, window, shared, setShared, layout } from "herdr";
 
 function find(node, id) {
@@ -27,6 +28,9 @@ export default class Topbar extends View {
     return h_flex().size_full().bg(t.chrome).pl(collapsed ? 6 : 14).pr(10).gap(4).items_center()
       .when(window()?.platform === "macos" && !window()?.fullscreen && !collapsed, el => el.pl(76))
       .when(!collapsed, el => el.child(div().flex_1()))
+      .when(!collapsed, el => el.child(div().id("lang").h(26).px(7).flex_none().flex().items_center().rounded(6).text_size(11.5).font_medium().text_color(t.muted)
+        .hover(s => s.bg(t.hover).text_color(t.foreground)).cursor_pointer().tooltip("Язык / Language")
+        .on_mouse_down("left", (_e, cx) => cx.stop_propagation()).on_click(() => setShared("ui.lang", lang() === "ru" ? "en" : "ru")).child(lang() === "ru" ? "RU" : "EN")))
       .when(!collapsed, el => el.child(this.button("search", "mods/workspace-chrome/search.svg", () => run("mod.open", { name: "picker" }))))
       .when(!(collapsed && window()?.platform === "macos"), el => el.child(this.button("sidebar-toggle", "mods/workspace-chrome/sidebar.svg", toggleSidebar)));
   }
