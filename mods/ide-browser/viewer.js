@@ -7,7 +7,7 @@
 // ~/.local/state/herdr-ide: <task>.state.json (written here) and <task>.ctl (the mod appends one command a line).
 // The page is laid out at exactly the pane's pixel size (viewport override), or at a device size in device mode.
 "use strict";
-const { execFile } = require("child_process");
+const { execFile, spawn } = require("child_process");
 const fs = require("fs");
 const path = require("path");
 const { StringDecoder } = require("string_decoder");
@@ -69,12 +69,25 @@ const out = process.stdout;
 const w = (s) => out.write(s);
 const dbg = (m) => { if (process.env.HERDR_IDE_DEBUG) fs.appendFileSync("/tmp/herdr-ide-viewer.log", `${new Date().toISOString()} ${m}\n`); };
 
-// The desktop clipboard: text or a PNG, whichever tool this machine has.
+// The desktop clipboard: text or a PNG, whichever tool this machine has. These tools stay in the background to serve
+// the clipboard (wl-copy, xclip), so they are started with no pipes but stdin and waited for only until they let go
+// of the foreground: waiting on their output would hold us for the whole timeout and then kill the clipboard.
+function pipeTo(cmd, a, data) {
+  return new Promise((resolve) => {
+    let p;
+    try { p = spawn(cmd, a, { stdio: ["pipe", "ignore", "ignore"] }); } catch { return resolve(false); }
+    const timer = setTimeout(() => resolve(true), 1500);
+    p.on("error", () => { clearTimeout(timer); resolve(false); });
+    p.on("exit", (code) => { clearTimeout(timer); resolve(code === 0); });
+    p.stdin.on("error", () => {});
+    p.stdin.end(data);
+  });
+}
 async function clip(data, type) {
   const tools = type === "image/png"
     ? [["wl-copy", ["-t", "image/png"]], ["xclip", ["-selection", "clipboard", "-t", "image/png"]]]
     : [["wl-copy", []], ["xclip", ["-selection", "clipboard"]], ["pbcopy", []]];
-  for (const [cmd, a] of tools) if ((await run(cmd, a, data)).code === 0) return true;
+  for (const [cmd, a] of tools) if (await pipeTo(cmd, a, data)) return true;
   return false;
 }
 async function clipText() {
@@ -544,17 +557,24 @@ async function pickAgent() {
   const sp = spaces.find((s) => s.active) ?? spaces[0];
   if (!sp) return null;
   const tab = sp.tabs.find((t) => t.active) ?? sp.tabs[0];
-  return agentsOf(tab)[0]?.terminal ?? sp.tabs.flatMap(agentsOf)[0]?.terminal ?? null;
+  return agentsOf(tab)[0] ?? sp.tabs.flatMap(agentsOf)[0] ?? null;
 }
 async function sendToAgent(text) {
-  await clip(text);
+  const copied = await clip(text);
+  if (!copied) return note("No clipboard tool (wl-copy, xclip, pbcopy)");
   const agent = await pickAgent();
   if (!agent) return note("No agent in this space: text is on the clipboard");
-  const f = await run("herdr-app", ["do", "pane.focus", JSON.stringify({ terminal: agent })]);
-  if (f.code !== 0) return note("Copied (couldn't focus the agent)");
-  await sleep(150);
-  await run("herdr-app", ["do", "terminal.paste"]);
-  note(`✓ Sent to the agent ${agent}`);
+  const name = agent.app || agent.name || agent.terminal;
+  const f = await run("herdr-app", ["do", "pane.focus", JSON.stringify({ terminal: agent.terminal })]);
+  if (f.code !== 0) return note(`Copied (couldn't focus ${name})`);
+  await sleep(200);
+  const before = (await run("hc", ["read", agent.terminal])).stdout;
+  const p = await run("herdr-app", ["do", "terminal.paste"]);
+  await sleep(700);
+  // Pasting needs Herdr's window to have the keyboard (the desktop only gives the clipboard to the focused window):
+  // when the agent's screen didn't change, say so instead of claiming it was sent.
+  const changed = (await run("hc", ["read", agent.terminal])).stdout !== before;
+  note(p.code !== 0 || !changed ? `Copied: press Ctrl+V in ${name}` : `✓ Sent to ${name}`);
 }
 
 // ---- driving: while the person uses the page, agents holding `hib` wait ----
