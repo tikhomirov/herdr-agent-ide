@@ -151,6 +151,12 @@ export default class Tabs extends View {
           else { run("layout.select", { stack: "panel-body", child: id }); run("layout.show", { id: "panel" }); }
         }).child(svg(icon).size(14)).child(label);
     };
+    // Chat / Terminal for the focused agent: only when the layout's pane header is `pane-chat` (Shepherdr's).
+    const chatHeader = find(root, "main")?.content?.pane?.header?.content?.mod === "pane-chat";
+    const chatButton = h_flex().id("chat-toggle").h(26).px(8).gap(5).flex_none().items_center().rounded(6)
+      .text_size(12).bg(t.chrome).text_color(t.muted).hover(s => s.bg(t.hover)).on_mouse_down("left", stop)
+      .tooltip("Chat with the agent in this pane (click again for its terminal)")
+      .on_click(() => run("pane-chat.toggle")).child(svg("mods/tabs-ide/chat.svg").size(14)).child("Chat");
     return h_flex().size_full().min_w(0).px(10).pl(lightsPadding).gap(3).items_center().bg(t.chrome).border_b(1).border_color(t.border)
       .on_mouse_up("left", () => { this.pressed = null; })
       .on_scroll_wheel(e => this.wheel(e))
@@ -158,6 +164,7 @@ export default class Tabs extends View {
         .on_size_change((_size, cx) => { if (active >= 0) { this.scroll.scroll_to_item(active); cx.notify(); } })
         .children(shown.map(item)))
       .child(button("tab-new", "+", () => openOverlay({ mod: "new-menu", kind: "popup", width: 250, height: 512 })))
+      .when(chatHeader, el => el.child(chatButton))
       .children(tabsHere.map(([id, name, icon]) => panelButton(id, name, icon)))
       .child(button("layout-switcher", svg("mods/tabs-ide/layout.svg").size(16),
         () => openOverlay({ mod: "layout-switcher", kind: "dialog", width: 340, height: 302 }))

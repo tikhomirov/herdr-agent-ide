@@ -22,6 +22,25 @@ chmod +x "$home/mods/ide-browser/hib" "$home/mods/ide-browser/viewer.js"
 
 if [ ! -e "$home/layouts/ide.json" ] || [ -n "$force" ]; then
   cp "$here/layouts/ide.json" "$home/layouts/ide.json"; echo "layout ide"
+  # With Shepherdr's chat mods installed, the agent panes get a Chat / Terminal switch and the tab bar a Chat button.
+  if [ -d "$home/mods/pane-chat" ] && [ -d "$home/mods/spaces-chat" ] && [ -d "$home/mods/workspace-status-chat" ] && command -v python3 >/dev/null 2>&1; then
+    python3 - "$home/layouts/ide.json" <<'PY'
+import json, sys
+p = sys.argv[1]
+t = json.load(open(p))
+swap = {"pane": "pane-chat", "spaces": "spaces-chat", "workspace-status": "workspace-status-chat"}
+def walk(n):
+    c = n.get("content")
+    if isinstance(c, dict):
+        if c.get("mod") in swap and n.get("id") in ("spaces", "status"): c["mod"] = swap[c["mod"]]
+        h = (c.get("pane") or {}).get("header", {}).get("content")
+        if isinstance(h, dict) and h.get("mod") == "pane": h["mod"] = "pane-chat"
+    for k in n.get("children", []): walk(k)
+walk(t)
+json.dump(t, open(p, "w"), indent=2)
+PY
+    echo "layout: chat switch enabled (pane-chat found)"
+  fi
 else
   echo "layout ide.json exists, left as it is (--force replaces it)"
 fi
