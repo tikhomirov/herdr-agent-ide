@@ -40,7 +40,9 @@ const shown = () => { const l = layout(); return !find(l, "panel")?.hidden && fi
 function arrange(tree, addr) {
   const col = find(tree, COLUMN);
   if (!col) throw new Error("This layout has no browser tab.");
-  const host = { id: HOST, type: "block", content: { mod: "ide-browser" }, ...(addr ? { hidden: true } : {}) };
+  // Not `hidden`: a hidden block's mod isn't loaded after a restart or a layout switch, and then nothing would start the viewer.
+  // While the view is up the host is 0px tall instead.
+  const host = { id: HOST, type: "block", content: { mod: "ide-browser" }, ...(addr ? { size: { px: 0 } } : {}) };
   col.type = "column";
   delete col.content;
   const bar = { id: BAR, type: "block", size: { px: 44 }, content: { mod: "ide-browser-bar" } };
@@ -53,7 +55,7 @@ async function pointView(addr, cx) {
     const text = await readTextFile(path);
     const tree = JSON.parse(text ?? "null");
     const want = addr ?? null, has = find(tree, VIEW)?.content?.terminal ?? null;
-    if (has === want && find(tree, COLUMN)?.type === "column" && Boolean(find(tree, HOST)?.hidden) === Boolean(addr)) return;
+    if (has === want && find(tree, COLUMN)?.type === "column" && Boolean(find(tree, HOST)?.size) === Boolean(addr) && !find(tree, HOST)?.hidden) return;
     arrange(tree, addr);
     try { await writeTextFile(path, JSON.stringify(tree, null, 2), text); break; }
     catch (e) { if (i >= 2) throw e; }
