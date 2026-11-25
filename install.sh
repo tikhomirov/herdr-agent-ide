@@ -13,7 +13,7 @@ force=; link=
 for a in "$@"; do case "$a" in --force) force=1 ;; --hib) link=1 ;; esac; done
 
 mkdir -p "$home/mods" "$home/layouts"
-for m in ide-topbar ide-browser ide-browser-bar ide-browser-menu remote-files tabs-ide agents-ide rename-dialog layout-switcher; do
+for m in ide-topbar ide-browser ide-browser-bar ide-browser-menu remote-files tabs-ide agents-ide rename-dialog layout-switcher pi-settings; do
   rm -rf "$home/mods/$m.new"; cp -R "$here/mods/$m" "$home/mods/$m.new"
   rm -rf "$home/mods/$m"; mv "$home/mods/$m.new" "$home/mods/$m"
   echo "mod    $m"
@@ -52,4 +52,5 @@ fi
 
 command -v node >/dev/null 2>&1 || echo "warning: node is needed (the browser viewer is a Node script)" >&2
 command -v agent-browser >/dev/null 2>&1 || echo "note: install the browser engine with: npm i -g agent-browser && agent-browser install" >&2
+python3 "$here/mods/pi-settings/attach.py" "$home/frame/settings/main.js" || echo "warning: Pi page was not attached to Settings" >&2
 echo "Next: switch to the layout (the layout button in the tab bar, or: herdr-app do layout.switch '{\"name\":\"ide\"}')"

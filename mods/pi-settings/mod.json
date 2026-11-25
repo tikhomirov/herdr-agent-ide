@@ -1,0 +1,6 @@
+{
+  "place": "none",
+  "title": "Pi",
+  "description": "Which provider Pi starts on, and which of its models are on. The Settings page uses this mod so the page is kept in git.",
+  "overlay": { "width": 720, "height": 640 }
+}
