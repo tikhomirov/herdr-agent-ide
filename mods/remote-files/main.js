@@ -17,7 +17,7 @@ const find = (node, id) => {
 const folderNow = () => spaces().find((s) => s.active)?.folder || home();
 const shown = () => { const l = layout(); return !find(l, "panel")?.hidden && find(l, "panel-body")?.active === "remote"; };
 const join = (dir, name) => (dir === "/" ? "" : dir.replace(/\/$/, "")) + "/" + name;
-const parentOf = (p) => (p === "/" ? "/" : p.replace(/\/[^/]*$/, "") || "/");
+const parentOf = (p) => (p === "/" ? "/" : p === "~" ? "~/.." : p.replace(/\/+$/, "").replace(/\/[^/]*$/, "") || "/");
 const icon = (name) => `mods/remote-files/${name}.svg`;
 
 // ---- what each project has: { [folder]: { list: [{ name, host, path }], active } } ----
@@ -88,6 +88,9 @@ class Panel {
       this.loading = false; cx.notify();
     });
   }
+
+  // Where the tree is, also when that folder couldn't be read (then there is no listing, but Up must still work).
+  here() { return this.data?.path ?? this.dir[this.key()] ?? this.remote?.path ?? "~"; }
 
   go(path, cx) { this.dir[this.key()] = path; this.loaded = null; this.load(path, cx); }
   refresh(cx) { this.load(this.dir[this.key()] ?? this.remote?.path ?? "~", cx); }
@@ -228,7 +231,7 @@ class Panel {
       .child(this.btn(t, "rf-edit", "pencil", "Edit this server", (cx) => { this.openForm(this.project.active); cx.notify(); }));
 
     const pathRow = h_flex().h(34).flex_none().px(10).gap(6).items_center().border_b(1).border_color(t.border)
-      .child(this.btn(t, "rf-up", "arrow-up", "Parent folder", (cx) => d?.path && this.go(parentOf(d.path), cx)))
+      .child(this.btn(t, "rf-up", "arrow-up", "Parent folder", (cx) => this.go(parentOf(this.here()), cx)))
       .child(div().flex_1().min_w(0).h(26).px(8).rounded(6).border_1().border_color(t.input).bg(t.background)
         .child(Input.new(this.path).size_full().text_size(12).text_color(t.foreground)));
 
