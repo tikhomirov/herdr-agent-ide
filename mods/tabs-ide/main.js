@@ -150,7 +150,7 @@ export default class Tabs extends View {
           cx.stop_propagation(); this.pressed = i;
           // The double click opens the rename dialog; the release that ends it must not select the tab, or the
           // pane takes the keyboard back from the dialog's field.
-          if (e.click_count === 2) { this.pressed = null; this.renaming = Date.now(); run("tab.rename", { id: c.id }); }
+          if (e.click_count === 2) { this.pressed = null; this.renaming = Date.now(); openOverlay({ mod: "rename-dialog", kind: "dialog", width: 480, height: 410, props: { id: c.id, value: c.named ? c.name : "" } }); }
         })
         .on_mouse_up("left", () => {
           if (Date.now() - (this.renaming ?? 0) < 600) { this.pressed = null; return; }

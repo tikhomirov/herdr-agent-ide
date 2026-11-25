@@ -71,7 +71,7 @@ Programs it runs: `node`, `agent-browser` (+ Chrome for Testing, installed by `a
 
 ## Done when
 
-1. `herdr-app check` passes in each of `mods/tabs-ide`, `mods/layout-switcher`, `mods/ide-browser`, `mods/ide-browser-bar`, `mods/ide-browser-menu`, `mods/remote-files`, `mods/agents-ide`, and `node --check mods/ide-browser/viewer.js` passes.
+1. `herdr-app check` passes in each of `mods/tabs-ide`, `mods/layout-switcher`, `mods/ide-browser`, `mods/ide-browser-bar`, `mods/ide-browser-menu`, `mods/remote-files`, `mods/agents-ide`, `mods/rename-dialog`, and `node --check mods/ide-browser/viewer.js` passes.
 2. `layout.switch {name:"ide"}` shows the layout, the tab bar has Files, Changes, Remote, Browser and the layout button (and Chat when `pane-chat` is installed), and the button opens the list of layouts.
 3. Opening Browser makes a `node …/viewer.js --task <project>` terminal appear (`hc ls`), the toolbar shows the page's address, and the page is visible in the panel, filling its width.
 4. Typing `example.com` in the address field and pressing Enter loads it; Back works.

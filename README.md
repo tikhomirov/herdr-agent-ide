@@ -53,6 +53,10 @@ With Shepherdr's chat mods installed (`pane-chat`, `spaces-chat`, `workspace-sta
 
 ![Chat](docs/chat.png)
 
+### Rename with emoji
+
+Double-click a tab to rename it in a dialog with an emoji picker (Recent, Work, Faces, Nature, Symbols). The emoji becomes the first character of the name; picking another swaps it, **No emoji** removes it. Herdr's own right-click Rename still opens its plain prompt.
+
 ### Layout switcher
 
 A button at the end of the tab bar lists your layouts and switches between them.
@@ -98,6 +102,7 @@ hib screenshot /tmp/shot.png
 | `layouts/ide.json` | the layout: Herdr's `main` plus the right panel |
 | `mods/tabs-ide` | the tab bar with the panel buttons, the Chat button and the layout button (a clone of Herdr's `tabs`) |
 | `mods/agents-ide` | the Agents list (a clone of Herdr's `agents`) that also lists agents shown as a chat |
+| `mods/rename-dialog` | the rename dialog with the emoji picker |
 | `mods/layout-switcher` | the layout list dialog |
 | `mods/ide-browser` | starts/stops the viewer for the shown project; `viewer.js` (the browser view), `hib` (CLI for agents), `start.html` |
 | `mods/ide-browser-bar` | the browser toolbar |
