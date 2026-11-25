@@ -142,6 +142,13 @@
                       }
                     },
                     {
+                      "id": "remote",
+                      "type": "block",
+                      "content": {
+                        "mod": "remote-files"
+                      }
+                    },
+                    {
                       "id": "browser",
                       "type": "column",
                       "children": [

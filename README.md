@@ -1,6 +1,6 @@
 # Agent IDE for Herdr
 
-A [Herdr](https://herdr.dev) layout that makes the window work like an agent IDE: next to your agents' terminals, a right-hand panel with **Files**, **Changes** and a real **Browser** that you and your agents share.
+A [Herdr](https://herdr.dev) layout that makes the window work like an agent IDE: next to your agents' terminals, a right-hand panel with **Files**, **Changes**, **Remote** (your project's files on a server) and a real **Browser** that you and your agents share.
 
 ![Agent IDE](preview.png)
 
@@ -9,6 +9,7 @@ A [Herdr](https://herdr.dev) layout that makes the window work like an agent IDE
 - **Point at things.** *Select* lets you click an element or draw a region; the selector, HTML and a screenshot are typed into your agent's input.
 - **Cursor-style toolbar.** Back/forward/reload, address bar, screenshot, and a "…" menu: Hard Reload, Copy Current URL, Clear Cookies / Cache / Site Data, Open in Chrome Window.
 - **Device mode.** Responsive width × height, presets (iPhone, Pixel, iPad, laptop, desktop), rotate; phones get touch and a mobile user agent.
+- **Remote files over SSH.** Per project, connect a server (an alias from `~/.ssh/config`, or `user@host`) and a folder: browse the tree, open a file in an editor tab with syntax highlighting, save it back to the server (it refuses to overwrite a file that changed meanwhile), create, rename and delete files and folders. Key or ssh-agent sign-in only.
 - **Layout switcher** button in the tab bar.
 
 The page is a stream of PNG frames drawn with Kitty graphics in a Herdr terminal (Herdr has no web view), so it needs a terminal with Kitty graphics, which Herdr has.
@@ -28,7 +29,7 @@ Or let your agent do it: *"Add the layout from https://github.com/tikhomirov/her
 
 Then open the **Browser** tab in the right panel. Give your agents the skill so they use it: copy `skills/herdr-ide-browser` to `~/.agents/skills/` (or `~/.claude/skills/`).
 
-`install.sh` never replaces an existing `layouts/ide.json` unless you pass `--force`. It replaces its own mods (`ide-browser`, `ide-browser-bar`, `ide-browser-menu`, `tabs-ide`, `layout-switcher`).
+`install.sh` never replaces an existing `layouts/ide.json` unless you pass `--force`. It replaces its own mods (`ide-browser`, `ide-browser-bar`, `ide-browser-menu`, `remote-files`, `tabs-ide`, `layout-switcher`).
 
 ### Optional
 
@@ -56,6 +57,7 @@ hib screenshot /tmp/shot.png
 | `mods/ide-browser` | starts/stops the viewer for the shown project; `viewer.js` (the browser view), `hib` (CLI for agents), `start.html` |
 | `mods/ide-browser-bar` | the toolbar |
 | `mods/ide-browser-menu` | the "…" and preset menus |
+| `mods/remote-files` | the Remote tab: server picker, tree, editor tab; `ssh.js` is the SSH layer (OpenSSH ControlMaster, no dependencies) |
 | `skills/herdr-ide-browser` | the skill for agents |
 | `RECIPE.md` | the brief the layout can be rebuilt from (the Herdr gallery format) |
 | `AGENTS.md` | notes for agents working on this repo |

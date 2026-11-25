@@ -134,6 +134,7 @@ export default class Tabs extends View {
       ["files", "Files", "mods/files/file.svg"],
       ["changes", "Changes", "mods/changes/changes.svg"],
       ["git-graph", "Git", "mods/git-graph/icons/graph.svg"],
+      ["remote", "Remote", "mods/remote-files/server.svg"],
       ["browser", "Browser", "mods/workspace-chrome/monitor.svg"],
     ];
     const here = new Set((body?.children ?? []).map(c => c.id));

@@ -1,0 +1,5 @@
+{
+  "place": "none",
+  "title": "Remote files",
+  "description": "Files of the project on a server over SSH: browse, open and edit, saved back over SSH"
+}
