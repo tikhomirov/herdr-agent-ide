@@ -37,3 +37,14 @@ shutil.copy(os.path.dirname(os.path.abspath(__file__)) + "/../i18n/i18n.js", dst
 open(f"{dst}/main.js", "w").write(s)
 m = json.load(open(f"{dst}/mod.json")); m["title"] = "Tabs (IDE + Tasks)"; json.dump(m, open(f"{dst}/mod.json", "w"), indent=2)
 print("built", dst)
+
+# Other mods call the tab bar's commands as "<mod>.newspace" etc.: point them at this mod.
+import re
+for m in os.listdir(home):
+    if m in ("tabs-tasks", "tabs-tasks-git", "tabs-ide-tasks"): continue
+    for f in os.listdir(f"{home}/{m}"):
+        if f.endswith((".js", ".orig-i18n")):
+            q = f"{home}/{m}/{f}"; t = open(q).read()
+            n = re.sub(r'(["`])tabs-tasks\.(newspace|inbox|alert|coordinator|rename|close)', r'\1tabs-ide-tasks.\2', t)
+            if n != t: open(q, "w").write(n)
+print("keys.json: replace tabs-tasks.* with tabs-ide-tasks.* by hand")
