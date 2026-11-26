@@ -332,7 +332,14 @@ export default class Agents extends View {
     const labels = new Map(list.map(a => {
       const tab = tabs.get(a.tab);
       const many = tabCounts.get(a.tab) > 1;
-      return [a.address, tr(tab ? title(many ? { ...tab, named: false } : tab, many ? a : leads.get(a.tab)) : (a.title || a.program?.name || ""))];
+      let nm = tr(tab ? title(many ? { ...tab, named: false } : tab, many ? a : leads.get(a.tab)) : (a.title || a.program?.name || ""));
+      // A coordinator nobody renamed is named after the folder it works in.
+      if (/^(Assistant|Координатор)$/.test(nm)) {
+        const f = Object.values(shared("coordinator.slots") ?? {}).find((v) => v?.tab === a.tab)?.folder ?? panes().find((p) => p.tab === a.tab && p.cwd)?.cwd;
+        const b = String(f ?? "").replace(/\/+$/, "").split("/").pop();
+        if (b) nm = b;
+      }
+      return [a.address, nm];
     }));
     const label = (a) => labels.get(a.address);
     const detail = new Map(list.map(a => [a.address, /^\d+$/.test(label(a)) ? null : label(a)]));

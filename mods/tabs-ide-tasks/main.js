@@ -190,7 +190,13 @@ export default class Tabs extends View {
     const tabsShown = shared("tabbar.tabs") !== false;
     const item = (c, i) => {
       const program = panes().find(p => p.tab === c.id && p.program?.agent)?.program ?? panes().find(p => p.tab === c.id)?.program;
-      const name = tabName(c.name, program?.name);
+      let name = tabName(c.name, program?.name);
+      // A coordinator nobody renamed is named after its folder.
+      if (c.name === "Assistant" && isCoordinatorTab(c.id)) {
+        const f = Object.values(shared("coordinator.slots") ?? {}).find((v) => v?.tab === c.id)?.folder ?? space?.folder;
+        const b = String(f ?? "").replace(/\/+$/, "").split("/").pop();
+        if (b) name = b;
+      }
       return h_flex().id(`tab-${c.id}`).h(H.sm).px(8).gap(6).rounded(RADIUS.control).items_center().flex_none().text_size(TEXT.body)
         .border(1).border_color(c.active ? t.border : t.chrome).bg(c.active ? t.raised : t.chrome).text_color(c.active ? t.foreground : t.muted)
         .cursor_pointer().hover(s => s.bg(t.hover))

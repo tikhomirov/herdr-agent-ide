@@ -190,7 +190,7 @@ export async function openCoordinator(space, show = true, settings = null) {
   const was = focused();
   const running = runningAssistant(space);
   try {
-    const out = await app("tab.new", { space: space.id, name: "Assistant", mod: "chat",
+    const out = await app("tab.new", { space: space.id, name: (String(folder ?? "").replace(/\/+$/, "").split("/").pop() || "Assistant"), mod: "chat",
       props: { role: "coordinator", template: "assistant", space: space.id, folder, slot, ...(settings ? { settings } : {}) } });
     const pane = out.pane ?? panes().find((p) => p.tab === out.tab && p.mod === "chat")?.pane ?? null;
     setShared("coordinator.slots", { ...liveSlots(), [slot]: { space: space.id, tab: out.tab, pane, folder } });
