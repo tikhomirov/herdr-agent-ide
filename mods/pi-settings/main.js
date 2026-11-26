@@ -1,5 +1,5 @@
-// The same Pi page Settings shows, opened on its own when Settings has been
-// replaced by an app update. Layouts cannot mount a settings section.
+// Pi's provider and model page, kept in this mod. Nothing in the window
+// opens it right now: Pi is chosen from the chat menu.
 import { View, div } from "gpui-kit";
 import { v_flex, h_flex } from "gpui-base";
 import { theme, closeOverlay, props } from "herdr";

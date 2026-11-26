@@ -35,7 +35,6 @@ import { NOTIFY, NOTIFY_DEFAULT, notifyMachine, notifyMachineOwn, notifyOf, noti
 import { machinesSection } from "./machines-section.js";
 import { TEXT, RADIUS, H, button, link, toggleSwitch, segmented, menuRow } from "./ui.js";
 import { webSection } from "./web-section.js";
-import { piInit, piLoad, piSection } from "./pi-section.js";
 import { SH } from "./core/paths.js";
 import { dirs } from "./dirs.js";
 // Every page's, row's and button's words, and the rows' choices: core/settings.js, shared with the web app.
@@ -78,7 +77,6 @@ export default class ShepherdrSettings extends View {
     this.scope = p.space && spaceById(p.space) ? p.space : null;
     const want = MOVED[p.section] ?? p.section;
     this.section = this.shows(want) ? want : "agents";
-    piInit(this);
     // Usage insights (lib/usage.js): Settings opened, and each page shown.
     note("view", { view: "settings", section: this.section, ...(this.scope ? { space: this.scope } : {}) });
     this.listOpen = null; // the row whose "N spaces set their own" list is open
@@ -124,7 +122,6 @@ export default class ShepherdrSettings extends View {
     }
     cx.spawn(async (cx) => {
       await this.load();
-      await piLoad(this);
       try { this.data = await models.loadChoices(null); } catch { this.data = null; }
       this.resetRoles();
       this.resetNotes();
@@ -692,7 +689,6 @@ export default class ShepherdrSettings extends View {
         cx.notify();
       })));
     const body = this.section === "agents" ? this.agents(t, cx)
-      : this.section === "pi" ? piSection(this, t)
       : this.section === "tasks" ? this.tasks(t)
       : this.section === "secrets" ? secretsSection(this, t)
       : this.section === "window" ? layoutSection(this, t)

@@ -11,7 +11,6 @@ import { SERVE } from "./host.js";
 // the others are one setting for every space (docs/settings.md says which and why).
 export const SECTIONS = [
   { id: "agents", title: "Agents", icon: "bot", space: true },
-  { id: "pi", title: "Pi", icon: "bot" },
   { id: "tasks", title: "Tasks", icon: "list-checks", space: true },
   // Everywhere's heartbeat, schedule and events, and a space's own (core/autopilot.js); a space switches it on in its
   // Assistant's header

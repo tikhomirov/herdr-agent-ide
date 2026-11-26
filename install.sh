@@ -130,7 +130,6 @@ if [ -n "$link" ]; then
   ln -sf "$home/mods/ide-browser/hib" "$bindir/hib"; echo "linked $bindir/hib"
 fi
 
-python3 "$here/mods/pi-settings/attach.py" "$home/frame/settings/main.js" || echo "warning: Pi page was not attached to Settings" >&2
 command -v node >/dev/null 2>&1 || echo "warning: node is needed (the browser viewer is a Node script)" >&2
 command -v agent-browser >/dev/null 2>&1 || echo "note: install the browser engine with: npm i -g agent-browser && agent-browser install" >&2
 echo "Next: herdr-app do layout.switch '{\"name\":\"ide\"}'"

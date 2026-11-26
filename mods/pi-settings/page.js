@@ -1,5 +1,5 @@
-// Pi's provider and model list. Settings (frame/settings) and this mod's own
-// dialog both call these methods. Keys stay in ~/.pi/agent/models.json.
+// Pi's provider and model list. The dialog in main.js calls these methods.
+// Keys stay in ~/.pi/agent/models.json and are never read here.
 import { div } from "gpui-kit";
 import { h_flex, v_flex } from "gpui-base";
 import { home, readTextFile, writeTextFile } from "herdr";
@@ -44,12 +44,13 @@ async function loadPi() {
     for (const model of provider.models ?? []) {
       const id = `${pid}/${model.id}`;
       known.add(id);
-      rows.push({ id, provider: pid, name: model.name || model.id, on: enabled.has(id) });
+      rows.push({ id, provider: pid, name: model.name || model.id, on: enabled.has(id), catalog: true });
     }
   }
   for (const id of settings.enabledModels ?? []) {
     if (known.has(id)) continue;
-    rows.push({ id, provider: split(id)[0], name: split(id)[1], on: true });
+    const rest = split(id)[1];
+    rows.push({ id, provider: split(id)[0], name: rest.split("/").pop() || rest, on: true, catalog: false });
   }
   const provider = settings.defaultProvider || providers[0]?.id || "";
   this.pi = { providers, models: rows, provider, model: settings.defaultModel ? `${provider}/${settings.defaultModel}` : "", note: "" };
@@ -125,18 +126,21 @@ function defaultPiModel(model, cx) {
 function piPage(t) {
   const pi = this.pi ?? empty();
   const shown = this.piModels();
+  const catalog = shown.filter((model) => model.catalog);
+  const extra = shown.filter((model) => !model.catalog);
   const provider = pi.providers.find((item) => item.id === pi.provider);
+  const modelRow = (model) => this.row(t, model.name, model.id,
+    h_flex().gap(6).items_center()
+      .child(this.button(t, `st-pi-on-${model.id.replace(/[^\w]+/g, "_")}`, model.on ? "On" : "Off", (_e, cx) => this.togglePiModel(model, cx)))
+      .child(div().text_size(12.5).text_color(model.id === pi.model ? t.foreground : t.muted)
+        .when(model.id !== pi.model, (el) => el.cursor_pointer().hover((s) => s.text_color(t.foreground)).on_click((_e, cx) => this.defaultPiModel(model, cx)))
+        .child(model.id === pi.model ? "Default" : "Make default")));
   return v_flex()
-    .child(this.heading(t, "Pi"))
     .when(Boolean(pi.note), (el) => el.child(div().pb(8).text_size(12.5).text_color(t.dim).child(pi.note)))
     .child(div().pb(8).text_size(12.5).line_height("18px").text_color(t.dim).child("Pi starts on this provider. The list below is only its models. The key stays in Pi's own file."))
     .child(h_flex().gap(6).flex_wrap().pb(8).children(pi.providers.map((item) => this.button(t, `st-pi-${item.id}`, item.id === pi.provider ? `${item.name} · on` : item.name, (_e, cx) => this.pickPiProvider(item.id, cx)))))
     .child(this.heading(t, provider?.name || "Models"))
-    .when(shown.length === 0, (el) => el.child(div().text_size(13).text_color(t.dim).child("This provider has no models in ~/.pi/agent.")))
-    .children(shown.map((model) => this.row(t, model.name, model.id,
-      h_flex().gap(6).items_center()
-        .child(this.button(t, `st-pi-on-${model.id.replace(/[^\w]+/g, "_")}`, model.on ? "On" : "Off", (_e, cx) => this.togglePiModel(model, cx)))
-        .child(div().text_size(12.5).text_color(model.id === pi.model ? t.foreground : t.muted)
-          .when(model.id !== pi.model, (el) => el.cursor_pointer().hover((s) => s.text_color(t.foreground)).on_click((_e, cx) => this.defaultPiModel(model, cx)))
-          .child(model.id === pi.model ? "Default" : "Make default")))));
+    .when(catalog.length === 0, (el) => el.child(div().text_size(13).text_color(t.dim).child("This provider has no models in ~/.pi/agent/models.json.")))
+    .children(catalog.map(modelRow))
+    .when(extra.length > 0, (el) => el.child(this.heading(t, "Also on")).children(extra.map(modelRow)));
 }
