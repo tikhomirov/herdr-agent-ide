@@ -5,6 +5,7 @@
 #   ./install.sh --hib      also link `hib` into ~/.local/bin
 #   ./install.sh --deps     also install the browser engine (npm i -g agent-browser)
 #   ./install.sh --no-doctor  skip the check that runs at the end (./herdr-ide doctor runs it any time)
+#   ./install.sh --no-editor  do not fetch the file-editor mod (the Files block keeps Herdr's own)
 # Herdr's app folder is $HERDR_APP_HOME, else ~/.config/herdr-app.
 # Task data lives under ~/.config/herdr-ide, ~/.local/share/herdr-ide and ~/.local/state/herdr-ide
 # (HERDR_IDE_HOME puts all four under that root). Templates go to herdr-core, which Herdr already uses.
@@ -14,7 +15,7 @@ home=${HERDR_APP_HOME:-$HOME/.config/herdr-app}
 [ -d "$home" ] || { echo "No Herdr app folder at $home (is Herdr installed and started once?)" >&2; exit 1; }
 
 force=; link=; deps=; verify=1
-for a in "$@"; do case "$a" in --force) force=1 ;; --hib) link=1 ;; --deps) deps=1 ;; --no-doctor) verify= ;; esac; done
+for a in "$@"; do case "$a" in --force) force=1 ;; --hib) link=1 ;; --deps) deps=1 ;; --no-doctor) verify= ;; --no-editor) no_editor=1 ;; esac; done
 
 mods=$(python3 -c 'import json,sys;print(" ".join(json.load(open(sys.argv[1]))["mods"]))' "$here/lib/manifest.json")
 
@@ -94,6 +95,15 @@ copy_layout() {
   fi
 }
 copy_layout agent-ide
+
+# External mod: the file editor, from our fork (upstream werlang/herdr-file-editor has no licence; see THIRD_PARTY.md).
+if [ ! -d "$home/mods/file-editor" ] && [ -z "$no_editor" ]; then
+  if command -v git >/dev/null 2>&1 && git clone -q --depth 1 https://github.com/tikhomirov/herdr-file-editor "$home/mods/file-editor" 2>/dev/null; then
+    rm -rf "$home/mods/file-editor/.git"; fresh_editor=1; echo "mod    file-editor (tikhomirov/herdr-file-editor)"
+  else
+    echo "note: could not fetch tikhomirov/herdr-file-editor; the Files block keeps Herdr's own files mod" >&2
+  fi
+fi
 
 python3 - "$home/layouts" "$home/mods" $fresh <<'PY'
 import json, os, sys

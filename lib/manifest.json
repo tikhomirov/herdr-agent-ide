@@ -73,5 +73,13 @@
       "agent-browser",
       "gh"
     ]
-  }
+  },
+  "external": [
+    {
+      "name": "file-editor",
+      "repo": "https://github.com/tikhomirov/herdr-file-editor",
+      "upstream": "https://github.com/werlang/herdr-file-editor",
+      "optional": true
+    }
+  ]
 }

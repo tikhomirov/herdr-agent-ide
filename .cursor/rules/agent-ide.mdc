@@ -1,0 +1,5 @@
+---
+description: Agent IDE for Herdr: read the context before editing
+alwaysApply: true
+---
+Read `docs/CONTEXT.md` and `AGENTS.md` before changing this repository. Keep shared core copies identical, update `lib/manifest.json` when the mod list changes, add Russian strings to `i18n/ru.js`, and verify with `herdr-app status`, `./herdr-ide doctor` and `bash tools/check.sh`.

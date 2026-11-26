@@ -1,0 +1,21 @@
+<!doctype html><meta charset=utf-8><style>
+*{box-sizing:border-box;margin:0}
+body{width:1280px;height:640px;overflow:hidden;background:#0b0d12;color:#fff;font:400 20px/1.4 "Inter","Noto Sans",system-ui,sans-serif;position:relative}
+.glow{position:absolute;inset:0;background:radial-gradient(600px 400px at 85% 20%,#5b4bff55,transparent),radial-gradient(500px 360px at 10% 100%,#1fa8ff33,transparent)}
+.l{position:absolute;left:64px;top:70px;width:520px}
+.tag{display:inline-block;padding:6px 14px;border:1px solid #ffffff30;border-radius:99px;font-size:15px;color:#aab;letter-spacing:.04em;margin-bottom:26px}
+h1{font-size:64px;line-height:1.05;font-weight:800;letter-spacing:-.02em}
+h1 span{background:linear-gradient(90deg,#4f9dff,#8b5cff);-webkit-background-clip:text;color:transparent}
+p{margin-top:24px;color:#b9bfd0;font-size:22px}
+.chips{margin-top:30px;display:flex;flex-wrap:wrap;gap:10px}
+.chips b{font-weight:500;font-size:15px;padding:7px 13px;border-radius:8px;background:#ffffff12;color:#dfe3f0}
+.cmd{position:absolute;left:64px;bottom:44px;font:500 18px "JetBrains Mono","DejaVu Sans Mono",monospace;color:#9fe0b0;background:#ffffff0d;border:1px solid #ffffff1f;border-radius:10px;padding:12px 18px}
+.s{position:absolute;border-radius:14px;border:1px solid #ffffff2a;box-shadow:0 30px 80px #000a;background-size:cover}
+.a{left:640px;top:60px;width:700px;height:445px;background:url(../../docs/overview.png) 0 0/100% 100%;transform:rotate(-1.5deg)}
+.b{left:720px;top:330px;width:520px;height:330px;background:url(../../docs/changes.png) 0 0/100% 100%;transform:rotate(2deg)}
+</style><div class=glow></div>
+<div class=l><span class=tag>LAYOUT FOR HERDR</span><h1>Agent IDE<br><span>replaces Cursor</span></h1>
+<p>Claude Code, Codex and Pi in one window with chat, tasks, diffs, files, server and a shared browser.</p>
+<div class=chips><b>Coordinator</b><b>Tasks</b><b>Changes</b><b>Browser</b><b>Remote SSH</b><b>EN / RU</b></div></div>
+<div class="s a"></div><div class="s b"></div>
+<div class=cmd>./herdr-ide install &amp;&amp; ./herdr-ide doctor</div>

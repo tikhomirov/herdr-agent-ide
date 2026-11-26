@@ -1,25 +1,46 @@
 # Agent IDE for Herdr
 
-![Agent IDE + Coordinator](docs/cover.jpg)
+![Agent IDE for Herdr: an open alternative to Cursor's agent window](preview.png)
 
-> **New:** `layouts/agent-ide.json` adds a per-project **Coordinator** (Assistant chat + Tasks + Artifacts). See RECIPE.md, "Agent IDE + Coordinator".
+**An agent IDE inside [Herdr](https://herdr.dev), and a replacement for Cursor's agent window.** Claude Code, Codex and Pi keep running in real terminals, and around them you get what Cursor gives you: a chat for each agent, a task board with a **Coordinator** per project, diffs and commits, a file browser and editor, your server over SSH, and a browser that you and your agents share. One window, one tab set per project, no editor to keep open next to it.
 
-**A layout for [Herdr](https://herdr.dev) that turns the window into an IDE for coding agents.** Your agents (Claude Code, Codex, Pi, …) stay in their terminals on the left. On the right is a panel with everything you reach for while they work: what they changed, the project's files, the same project on your server, and a real browser that you and your agents share.
+[Install](#install-in-one-command) · [What you get](#what-you-get) · [Russian and English](#russian-and-english) · [For agents](#for-agents) · [Docs](docs/CONTEXT.md)
 
-![Agent IDE: Claude Code on the left, the shared browser on the right](preview.png)
+If it saves you time, a ⭐ helps others find it.
 
-## Why it's useful
+## Install in one command
 
-When an agent works on a web project you keep switching windows: a terminal for the agent, an editor to read its changes, a browser to check the result, an SSH or FTP client for the server. This layout puts all of it in one window, one set of tabs per project:
+You need [Herdr](https://herdr.dev) (start it once), `node` 22+, `python3`, `git` and at least one agent CLI (`claude`, `codex` or `pi`).
 
-- **See what the agent did**, file by file, and commit it, without leaving Herdr.
-- **Check the result in a browser the agent also drives.** You both look at the same page; you can point at an element and it lands in the agent's input.
-- **Fix a config on the server** (nginx, `.env`, `wp-config.php`) without a separate FTP client or an SSH session.
-- **Switch project, switch everything**: every Herdr space has its own browser (its pages, sign-ins and cookies) and its own server.
+```sh
+git clone https://github.com/tikhomirov/herdr-agent-ide
+cd herdr-agent-ide
+./herdr-ide install --deps   # the layout, all 36 mods, helpers and role templates; --deps adds the browser engine
+./herdr-ide doctor           # checks everything is in place and will work on this machine
+herdr-app do layout.switch '{"name":"agent-ide"}'
+```
 
-## What's in the window
+- **From scratch is the normal case.** Every mod is in this repository (`lib/manifest.json` lists them); the only thing fetched besides is the file editor, from [`tikhomirov/herdr-file-editor`](https://github.com/tikhomirov/herdr-file-editor) (skip with `--no-editor`).
+- **`herdr-ide doctor`** checks the tools, each mod and helper, the layout, the Russian dictionary and Herdr itself. It exits 1 when something is missing and says how to fix it.
+- **`herdr-ide update`** pulls and reinstalls. An existing `layouts/agent-ide.json` is kept unless you pass `--force`.
+- **Let your agent do it:** *"Add the layout from https://github.com/tikhomirov/herdr-agent-ide"*. Herdr's agents read `AGENTS.md` and `RECIPE.md`.
 
-The window is Herdr's own `main` layout (spaces and agents on the left, tabs on top, status bar at the bottom) plus a right-hand panel with tabs, chosen by buttons at the right end of the tab bar.
+## Why it replaces Cursor for agent work
+
+| In Cursor | Here |
+| --- | --- |
+| Agent chat | Chat view for Claude Code, Codex and Pi; the agent keeps running in its terminal, switch Chat / Terminal any time |
+| Several agents, one task each | A Coordinator per project plans work, starts workers and reviewers, and keeps a task list and artifacts |
+| Review the diff | Changes tab: files, diff, commit box; Git graph |
+| Built-in browser | A real Chrome per project that your agents drive with `hib`; Select an element and it lands in the agent's input |
+| Remote-SSH | Remote tab: edit files on your server and save them back |
+| Locked to one editor | Open and scriptable: it is just Herdr mods and a Python task engine |
+
+## What you get
+
+### Coordinator, tasks and artifacts
+
+Every project has a **Coordinator**: an assistant that plans, writes tasks, starts workers and reviewers in their own branches, and reports back. **Tasks** shows the list with status and branch; **Artifacts** keeps what the agents produced (reports, screenshots). **Autopilot** lets the coordinator wake on a schedule or on events and keep the project moving, deciding on its own and alerting you only on something critical; it never merges or accepts for you. Start gates hold new agents back when the machine is busy (CPU, disk).
 
 ### Files
 
@@ -51,7 +72,7 @@ A real Chrome, drawn in the panel. Your agents drive the same page with one comm
 
 ![Device mode](docs/device.png)
 
-### Chat with Claude Code
+### Chat with Claude Code, Codex and Pi
 
 `install.sh` ships the chat mods with the layout, so agent panes get a **Chat / Terminal** switch and the tab bar a **Chat** button: the same agent shown as a conversation, with a message box under it. The agent keeps running in its terminal. The button works in any space: with a chat already shown it does nothing, with an agent in a terminal it switches that agent to its chat, and with no agent in the tab it starts Claude Code in a new tab and shows it as a chat.
 
@@ -69,30 +90,20 @@ Double-click a tab to rename it in a dialog with an emoji picker (Recent, Work, 
 
 A button at the end of the tab bar lists your layouts and switches between them.
 
-## Install
-
-```sh
-git clone https://github.com/tikhomirov/herdr-agent-ide
-cd herdr-agent-ide
-./herdr-ide install --deps   # layout + all 36 mods + helpers + templates (--deps adds agent-browser)
-./herdr-ide doctor           # checks every mod, helper, dependency and Herdr itself; exit 1 on a failure
-./herdr-ide update           # later: git pull + install
-```
-
-The mod list lives in `lib/manifest.json`; every mod is in this repository (`mods/`), so nothing else is fetched. Existing files are kept unless you pass `--force`.
-
-Or let your agent do it: *"Add the layout from https://github.com/tikhomirov/herdr-agent-ide"* (Herdr's agents read `RECIPE.md` and the files).
-
-Requirements: Herdr (run once so `~/.config/herdr-app` exists), `node` 22+, `git`, [agent-browser](https://github.com/vercel-labs/agent-browser) for the Browser tab, and `ssh` with a key or agent for Remote. Developed and tested on Linux.
-
-`install.sh` never replaces an existing `layouts/agent-ide.json` unless you pass `--force`. It replaces the mods it ships, including the coordinator, chat, and tasks mods (see [THIRD_PARTY.md](THIRD_PARTY.md)). No Shepherdr install is required. Task lists are stored under `~/.local/share/herdr-ide`.
-
-`install.sh` copies `skills/herdr-ide-browser` to `~/.agents/skills/` so agents use the shared browser.
+## More
 
 ### Optional
 
-- A better file tab: if [`werlang/herdr-file-editor`](https://github.com/werlang/herdr-file-editor) is already installed, `install.sh` points the Files block at it. That repository has no license file, so this package does not vendor it. The layout itself uses Herdr's `files` mod.
-- Git graph ships as `mods/git-graph` (MIT, rabeeh-ta/herdr-git-graph). The coordinator layout gives it a button.
+- Git graph ships as `mods/git-graph` (MIT, rabeeh-ta/herdr-git-graph).
+- The file editor mod comes from our fork of werlang/herdr-file-editor (no licence upstream; see THIRD_PARTY.md).
+
+## Russian and English
+
+The whole interface, including Settings, the Coordinator, tasks and the chat, speaks Russian and English. The **RU / EN** button in the sidebar's top row switches it. Sentences with values (`Next in {0} min`) go through one function, so they translate whole. To add a language or fix a phrase, edit `i18n/ru.js` and run `python3 tools/localize.py && ./herdr-ide install`.
+
+## Tags
+
+herdr · herdr-layout · agent-ide · claude-code · codex · pi · cursor-alternative · ai-agents · multi-agent · coordinator · tasks · terminal · ssh · browser-automation
 
 ## For agents: `hib`
 
@@ -106,6 +117,8 @@ hib screenshot /tmp/shot.png
 `hib` is [agent-browser](https://github.com/vercel-labs/agent-browser) on the project's own session and profile. If you are using the page, acting commands exit with code 4 until you are idle for 20 seconds.
 
 ## What's in the repo
+
+The full list of mods is `lib/manifest.json`; the map with explanations is [docs/CONTEXT.md](docs/CONTEXT.md). Highlights:
 
 | Path | What |
 | --- | --- |
@@ -130,3 +143,7 @@ The browser is streamed as 12 fps pictures, so there is no smooth animation; Chr
 The screenshots show a demo project (`acme-shop`) and a throw-away folder on a test server.
 
 MIT licensed.
+
+## Contributing and working on it with an agent
+
+Start an agent in this folder and give it [docs/CONTINUE_PROMPT.md](docs/CONTINUE_PROMPT.md). [docs/CONTEXT.md](docs/CONTEXT.md) has the map of the repo, the pitfalls and the open work; `AGENTS.md` has the rules and how to install or update on a machine where the person changed things. Check a change with `herdr-app status`, `./herdr-ide doctor` and `bash tools/check.sh`.

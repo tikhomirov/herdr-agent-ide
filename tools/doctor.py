@@ -58,6 +58,9 @@ if not os.path.isdir(HOME):
 else:
     add("ok", "install", f"app folder {HOME}")
     mods_dir = os.path.join(HOME, "mods")
+    for e in M.get("external", []):
+        ok = os.path.isfile(os.path.join(mods_dir, e["name"], "mod.json"))
+        add("ok" if ok else "warn", "mods", f"{e['name']} (external, from {e['repo']}) " + ("present" if ok else "missing: Files block uses Herdr's own mod (install.sh fetches it)"))
     for m in M["mods"]:
         d = os.path.join(mods_dir, m)
         if not os.path.isdir(d):

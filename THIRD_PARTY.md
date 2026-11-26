@@ -26,4 +26,4 @@ Copyright (c) Rabeeh T.A. MIT licensed. Upstream: https://github.com/rabeeh-ta/h
 
 ## file-editor
 
-The Files block uses Herdr's shipped `files` mod. [werlang/herdr-file-editor](https://github.com/werlang/herdr-file-editor) has no license file in the repository, so this package does not vendor it. If that mod is already installed, `install.sh` points the Files block at it.
+[werlang/herdr-file-editor](https://github.com/werlang/herdr-file-editor) has no license file. It is used at the maintainer's own risk: `install.sh` clones the fork [tikhomirov/herdr-file-editor](https://github.com/tikhomirov/herdr-file-editor) into the app's `mods/` (skip with `--no-editor`) and points the Files block at it. It is not copied into this repository. If the fork cannot be fetched, the Files block keeps Herdr's own `files` mod.
