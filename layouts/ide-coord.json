@@ -1,10 +1,7 @@
 {
   "id": "root",
   "cloned_from": {
-    "name": "ide",
-    "merged": [
-      "shepherdr"
-    ]
+    "name": "ide"
   },
   "type": "row",
   "children": [
@@ -100,7 +97,7 @@
                 "pane": {
                   "header": {
                     "content": {
-                      "mod": "pane-chat"
+                      "mod": "pane"
                     },
                     "reveal": "always",
                     "height": 30,
@@ -133,7 +130,7 @@
                       "id": "files",
                       "type": "block",
                       "content": {
-                        "mod": "file-editor"
+                        "mod": "files"
                       }
                     },
                     {
@@ -341,14 +338,6 @@
           "padding": 8,
           "gap": 8,
           "floating": [
-            {
-              "id": "chat-call",
-              "content": {
-                "mod": "chat-call"
-              },
-              "edge": "top",
-              "align": "center"
-            },
             {
               "id": "toasts",
               "content": {

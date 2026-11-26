@@ -3,6 +3,7 @@
 //   - as a panel block (no props): the server picker and the file tree;
 //   - as a tab (`props().edit = { host, path, remote }`, made by tab.new): the editor of one remote file.
 // Sign-in is by key or ssh-agent only (see ssh.js).
+import { tr } from "./i18n.js";
 import { View, div, svg } from "gpui-kit";
 import { h_flex, v_flex, InputState, Input, EditorState, Editor, ScrollHandle } from "gpui-base";
 import { layout, props, run, spaces, theme, home } from "herdr";
@@ -43,9 +44,9 @@ class Panel {
     this.scroll = ScrollHandle.new();
     this.path = InputState.new({ placeholder: "/path/on/the/server" });
     this.path.on("submit", (_e, cx) => { const v = this.path.value().trim(); if (v) this.go(v, cx); });
-    this.name = InputState.new({ placeholder: "Name (e.g. production)" });
-    this.host = InputState.new({ placeholder: "Server: ssh alias or user@host" });
-    this.fpath = InputState.new({ placeholder: "Project folder on the server, e.g. /var/www/app" });
+    this.name = InputState.new({ placeholder: tr("Name (e.g. production)") });
+    this.host = InputState.new({ placeholder: tr("Server: ssh alias or user@host") });
+    this.fpath = InputState.new({ placeholder: tr("Project folder on the server, e.g. /var/www/app") });
     this.pr = InputState.new({ placeholder: "" });
     this.pr.on("submit", (_e, cx) => this.runPrompt(cx));
     for (const i of [this.name, this.host, this.fpath]) i.on("submit", (_e, cx) => this.saveForm(cx));
@@ -218,10 +219,10 @@ class Panel {
         .child(div().id("form-save").h(30).px(14).flex().items_center().rounded(7).text_size(12.5).bg(t.solid).text_color(t.solid_foreground)
           .cursor_pointer().on_click((_e, cx) => this.saveForm(cx)).child(this.editing == null ? "Connect" : "Save"))
         .when(!first, (el) => el.child(div().id("form-cancel").h(30).px(12).flex().items_center().rounded(7).text_size(12.5).text_color(t.muted)
-          .cursor_pointer().hover((s) => s.bg(t.hover)).on_click((_e, cx) => { this.view = "tree"; cx.notify(); }).child("Cancel")))
+          .cursor_pointer().hover((s) => s.bg(t.hover)).on_click((_e, cx) => { this.view = "tree"; cx.notify(); }).child(tr("Cancel"))))
         .child(div().flex_1())
         .when(this.editing != null, (el) => el.child(div().id("form-remove").h(30).px(12).flex().items_center().rounded(7).text_size(12.5).text_color(t.blocked)
-          .cursor_pointer().hover((s) => s.bg(t.hover)).on_click((_e, cx) => this.removeRemote(cx)).child("Remove"))));
+          .cursor_pointer().hover((s) => s.bg(t.hover)).on_click((_e, cx) => this.removeRemote(cx)).child(tr("Remove")))));
   }
 
   renderTree(cx) {
@@ -271,8 +272,8 @@ class Panel {
         .child(this.btn(t, "rf-del", "trash", "Delete", (cx) => { this.confirm = true; cx.notify(); }))
         .child(this.btn(t, "rf-x", "x", "Deselect", (cx) => { this.sel = null; cx.notify(); })))
       .when(this.confirm, (el) => el
-        .child(div().id("rf-del-yes").h(24).px(10).flex().items_center().rounded(6).bg(t.blocked).text_color(t.solid_foreground).cursor_pointer().on_click((_e, cx) => this.runDelete(cx)).child("Delete"))
-        .child(div().id("rf-del-no").h(24).px(10).flex().items_center().rounded(6).text_color(t.muted).cursor_pointer().hover((s) => s.bg(t.hover)).on_click((_e, cx) => { this.confirm = false; cx.notify(); }).child("Cancel")));
+        .child(div().id("rf-del-yes").h(24).px(10).flex().items_center().rounded(6).bg(t.blocked).text_color(t.solid_foreground).cursor_pointer().on_click((_e, cx) => this.runDelete(cx)).child(tr("Delete")))
+        .child(div().id("rf-del-no").h(24).px(10).flex().items_center().rounded(6).text_color(t.muted).cursor_pointer().hover((s) => s.bg(t.hover)).on_click((_e, cx) => { this.confirm = false; cx.notify(); }).child(tr("Cancel"))));
 
     const row = (e) => {
       const on = e.name === this.sel;
@@ -290,8 +291,8 @@ class Panel {
     const body = v_flex().id("rf-list").flex_1().min_h(0).p(6).gap(1).overflow_y_scrollbar().track_scroll(this.scroll)
       .on_mouse_down("right", (_ev, cx) => { this.sel = null; cx.notify(); })
       .when(Boolean(d?.error), (el) => el.child(div().p(8).text_size(12).text_color(t.blocked).child(d.error)))
-      .when(!d && this.loading, (el) => el.child(div().p(8).text_size(12).text_color(t.dim).child("Connecting…")))
-      .when(Boolean(d?.entries) && entries.length === 0, (el) => el.child(div().p(8).text_size(12).text_color(t.dim).child("Empty folder")))
+      .when(!d && this.loading, (el) => el.child(div().p(8).text_size(12).text_color(t.dim).child(tr("Connecting…"))))
+      .when(Boolean(d?.entries) && entries.length === 0, (el) => el.child(div().p(8).text_size(12).text_color(t.dim).child(tr("Empty folder"))))
       .children(entries.slice(0, MAX).map(row))
       .when(entries.length > MAX, (el) => el.child(div().p(8).text_size(11.5).text_color(t.dim).child(`${entries.length - MAX} more not shown`)));
 
@@ -355,7 +356,7 @@ class RemoteEditor {
       .child(h_flex().h(36).flex_none().px(12).gap(8).items_center().border_b(1).border_color(t.border).bg(t.chrome)
         .child(svg(icon("file")).size(14).flex_none().text_color(t.muted))
         .child(div().min_w(0).truncate().text_size(12.5).font_semibold().text_color(t.foreground).child(this.name))
-        .when(this.dirty, (el) => el.child(div().size(7).rounded(4).flex_none().bg(t.accent).tooltip("Unsaved changes")))
+        .when(this.dirty, (el) => el.child(div().size(7).rounded(4).flex_none().bg(t.accent).tooltip(tr("Unsaved changes"))))
         .child(div().flex_1().min_w(0).truncate().text_size(11.5).text_color(t.dim).child(`${this.edit.remote} · ${this.edit.path}`))
         .child(bt("re-reload", "Reload", (cx) => this.load(cx)))
         .child(bt("re-save", this.saving ? "Saving…" : "Save", (cx) => this.save(cx), this.dirty)))

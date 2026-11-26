@@ -1,3 +1,4 @@
+import { tr } from "./i18n.js";
 import { View, div, svg, image } from "gpui-kit";
 import { h_flex, ScrollHandle } from "gpui-base";
 import { spaces, panes, terminals, run, exec, openOverlay, theme, window, shared, layout, settings, home } from "herdr";
@@ -197,8 +198,8 @@ export default class Tabs extends View {
     const chatHeader = find(root, "main")?.content?.pane?.header?.content?.mod === "pane-chat";
     const chatButton = h_flex().id("chat-toggle").h(26).px(8).gap(5).flex_none().items_center().rounded(6)
       .text_size(12).bg(t.chrome).text_color(t.muted).hover(s => s.bg(t.hover)).on_mouse_down("left", stop)
-      .tooltip("Show this tab's agent as a chat (starts Claude Code if none runs)")
-      .on_click((_e, cx) => { cx.spawn(async (cx) => { try { await showChat(cx); } catch {} }); }).child(svg("mods/tabs-ide/chat.svg").size(14)).child("Chat");
+      .tooltip(tr("Show this tab's agent as a chat (starts Claude Code if none runs)"))
+      .on_click((_e, cx) => { cx.spawn(async (cx) => { try { await showChat(cx); } catch {} }); }).child(svg("mods/tabs-ide/chat.svg").size(14)).child(tr("Chat"));
     return h_flex().size_full().min_w(0).px(10).pl(lightsPadding).gap(3).items_center().bg(t.chrome).border_b(1).border_color(t.border)
       .on_mouse_up("left", () => { this.pressed = null; })
       .on_scroll_wheel(e => this.wheel(e))
@@ -210,7 +211,7 @@ export default class Tabs extends View {
       .children(tabsHere.map(([id, name, icon]) => panelButton(id, name, icon)))
       .child(button("layout-switcher", svg("mods/tabs-ide/layout.svg").size(16),
         () => openOverlay({ mod: "layout-switcher", kind: "dialog", width: 340, height: 302 }))
-        .role("button").accessibility_label("Switch layout").tooltip("Switch layout").cursor_pointer())
+        .role("button").accessibility_label(tr("Switch layout")).tooltip(tr("Switch layout")).cursor_pointer())
       .when(w?.buttons, el => el.child(button("minimize", w.platform === "windows" ? svg("mods/tabs-ide/win-min.svg").size(16) : "−", () => run("window.minimize")))
         .child(button("maximize", w.platform === "windows" ? svg(`mods/tabs-ide/${w.maximized ? "win-restore" : "win-max"}.svg`).size(16) : "□", () => run("window.maximize")))
         .child(button("close-window", w.platform === "windows" ? svg("mods/tabs-ide/win-close.svg").size(16) : svg("mods/pane/close.svg").size(13), () => run("window.close"))));

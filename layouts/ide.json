@@ -98,7 +98,7 @@
                 "pane": {
                   "header": {
                     "content": {
-                      "mod": "pane"
+                      "mod": "pane-chat"
                     },
                     "reveal": "always",
                     "height": 30,
@@ -139,6 +139,13 @@
                       "type": "block",
                       "content": {
                         "mod": "changes"
+                      }
+                    },
+                    {
+                      "id": "git-graph",
+                      "type": "block",
+                      "content": {
+                        "mod": "git-graph"
                       }
                     },
                     {

@@ -3,6 +3,7 @@
 // It drives the viewer (mods/ide-browser/viewer.js) through two files in ~/.local/state/herdr-ide:
 // <project>.state.json (the viewer writes: url, select, device, note) and <project>.ctl (this mod appends commands).
 // <project> is shared("ide-browser").task, which the ide-browser mod keeps current: one browser per project.
+import { tr } from "./i18n.js";
 import { View, div, svg } from "gpui-kit";
 import { h_flex, v_flex, InputState, Input } from "gpui-base";
 import { exec, readTextFile, home, theme, shared, run, openOverlay } from "herdr";
@@ -20,7 +21,7 @@ const PRESETS = [
 export default class IdeBrowserBar extends View {
   init(_props, cx) {
     this.st = null; this.task = null; this.focused = false; this.seenFocus = 0; this.height = null;
-    this.input = InputState.new({ placeholder: "Enter an address or a search" });
+    this.input = InputState.new({ placeholder: tr("Enter an address or a search") });
     this.input.on("submit", (_e, cx) => {
       const v = this.input.value().trim();
       if (v) this.ctl(`nav ${v}`);
@@ -125,7 +126,7 @@ export default class IdeBrowserBar extends View {
       .child(field(this.hIn))
       .child(btn("bb-rotate", "rotate", "Rotate", () => this.ctl(`device ${device.h} ${device.w}`)))
       .child(div().flex_1())
-      .child(div().text_size(11.5).text_color(t.dim).child("Fit"));
+      .child(div().text_size(11.5).text_color(t.dim).child(tr("Fit")));
 
     return v_flex().size_full().min_w(0).bg(t.chrome).border_b(1).border_color(t.border).child(row1).when(Boolean(row2), el => el.child(row2));
   }

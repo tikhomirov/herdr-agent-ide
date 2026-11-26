@@ -1,3 +1,4 @@
+import { tr } from "./i18n.js";
 import { View, div, svg } from "gpui-kit";
 import { h_flex, v_flex, ScrollHandle } from "gpui-base";
 import { closeOverlay, layouts, props, run, shared, theme } from "herdr";
@@ -26,7 +27,7 @@ export default class LayoutSwitcher extends View {
     const current = shared("layout");
     const cursor = [this.cursor, current].find(name => names.includes(name));
 
-    return v_flex().id("layout-switcher").role("dialog").accessibility_label("Layouts")
+    return v_flex().id("layout-switcher").role("dialog").accessibility_label(tr("Layouts"))
       .track_focus(this.focus).size_full().min_h(0).p(14).gap(10).bg(t.popover)
       .on_key_down((event, cx) => {
         if (event.key === "escape") closeOverlay(props().overlay);
@@ -43,14 +44,14 @@ export default class LayoutSwitcher extends View {
       })
       .child(h_flex().h(28).flex_none().gap(8).items_center()
         .child(svg("mods/layout-switcher/layout.svg").size(17).text_color(t.muted))
-        .child(div().flex_1().text_size(15).font_semibold().text_color(t.foreground).child("Layouts"))
+        .child(div().flex_1().text_size(15).font_semibold().text_color(t.foreground).child(tr("Layouts")))
         .child(div().id("layout-switcher-close").size(26).flex().items_center().justify_center().rounded(6)
-          .role("button").accessibility_label("Close").tooltip("Close · Esc").cursor_pointer()
+          .role("button").accessibility_label(tr("Close")).tooltip(tr("Close · Esc")).cursor_pointer()
           .text_size(17).text_color(t.muted).hover(el => el.bg(t.hover).text_color(t.foreground))
           .on_click(() => closeOverlay(props().overlay)).child("×")))
-      .child(v_flex().id("layout-switcher-list").role("list_box").accessibility_label("Available layouts")
+      .child(v_flex().id("layout-switcher-list").role("list_box").accessibility_label(tr("Available layouts"))
         .flex_1().min_h(0).gap(4).overflow_y_scrollbar().track_scroll(this.scroll)
-        .when(names.length === 0, el => el.child(div().p(8).text_size(13).text_color(t.muted).child("No layouts")))
+        .when(names.length === 0, el => el.child(div().p(8).text_size(13).text_color(t.muted).child(tr("No layouts"))))
         .children(names.map((name) => {
           const active = name === current;
           const focused = name === this.cursor;

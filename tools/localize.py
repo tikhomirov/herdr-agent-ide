@@ -1,11 +1,16 @@
 #!/usr/bin/env python3
-"""Adds Russian/English UI to the installed mods: copies i18n/ into each mod and wraps UI string literals with tr().
+"""Adds Russian/English UI: copies i18n/ into each mod and wraps UI string literals with tr().
 Only literals in UI positions are wrapped (.child("X"), .tooltip("X"), label:/title:/placeholder:/hint:/verb:/detail:/body: "X")
-and only when "X" is in i18n/ru.js. Idempotent; re-run after updating a mod (originals are kept as *.js.orig-i18n).
-  localize.py [mod ...]   (default: the list below)    localize.py --undo"""
+and only when "X" is in i18n/ru.js. Idempotent.
+  localize.py [mod ...]            the mods in this repo (what install.sh ships)
+  localize.py --home [mod ...]     the mods in $HERDR_APP_HOME instead
+  localize.py --undo               restore *.js.orig-i18n where those backups exist
+"""
 import os, re, shutil, sys, json
 here = os.path.dirname(os.path.abspath(__file__)) + "/../i18n"
-home = os.environ.get("HERDR_APP_HOME", os.path.expanduser("~/.config/herdr-app")) + "/mods"
+repo = os.path.dirname(os.path.abspath(__file__)) + "/../mods"
+installed = os.environ.get("HERDR_APP_HOME", os.path.expanduser("~/.config/herdr-app")) + "/mods"
+home = installed if "--home" in sys.argv else repo
 MODS = "tabs-ide-tasks agents-ide ide-topbar ide-browser-bar ide-browser-menu remote-files spaces-chat workspace-status-chat pane-chat new-menu-tasks menu-tasks layout-switcher tasks workspace-chrome newspace confirm-chat prompt-chat rename-dialog changes task-pr task-browser accept-card".split()
 ru = open(f"{here}/ru.js").read()
 keys = set(json.loads(ru[ru.index("{"):ru.rindex("}") + 1]))
@@ -28,7 +33,7 @@ for m in [a for a in sys.argv[1:] if not a.startswith("--")] or MODS:
         if "tr(" not in n or re.search(r'\bfunction tr\b|\bconst tr\b', n): continue
         i = re.search(r'^import ', n, re.M)
         if not i: continue
-        if not os.path.exists(bak): open(bak, "w").write(s)
+        if home == installed and not os.path.exists(bak): open(bak, "w").write(s)
         imp = '' if 'from "./i18n.js"' in n else 'import { tr } from "./i18n.js";\n'
         open(p, "w").write(n[:i.start()] + imp + n[i.start():])
     if not undo:

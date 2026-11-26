@@ -10,10 +10,10 @@ Notes for agents working in this repository (a Herdr layout + mods; see README.m
 ## Installing for a person (when asked to "add this layout")
 
 1. Read `RECIPE.md` and every file under `mods/` and `layouts/` first. Tell the person that the mods run programs (`node`, `agent-browser`, `git`, `hc`, `herdr-app`, `ssh`, optionally a clipboard tool), read and write `layouts/<current>.json`, write files in `~/.local/state/herdr-ide/` and `~/Pictures/herdr-screenshots/`, and that Chrome pages are loaded from the network.
-2. Run `./install.sh --hib` (or copy by hand: `layouts/ide.json` to `<app home>/layouts/`, each `mods/<name>/` to `<app home>/mods/`; never overwrite a name that is taken, rename instead; the app home is `$HERDR_APP_HOME` or `~/.config/herdr-app`).
+2. Run `./install.sh --hib`. It copies every mod under `mods/`, both layouts, the role templates, and links `herdr-task`. The app home is `$HERDR_APP_HOME` or `~/.config/herdr-app`. Coordinator and chat code is vendored (see THIRD_PARTY.md); do not tell the person to install Shepherdr.
 3. Check agent-browser: `command -v agent-browser`; if missing, `npm i -g agent-browser && agent-browser install`.
-4. `herdr-app check` each mod directory (`cd mods/<name> && herdr-app check .`), then `herdr-app do layout.switch '{"name":"ide"}'`.
-5. Offer to copy `skills/herdr-ide-browser` to the person's skills folder.
+4. `herdr-app check` each mod directory (`cd mods/<name> && herdr-app check .`), then `herdr-app do layout.switch '{"name":"ide-coord"}'`. The pane header is Herdr's `pane`. `"ide"` is the same panel without the coordinator.
+5. The installer already copied `skills/herdr-ide-browser` to `~/.agents/skills/`.
 
 ## Working on the code
 

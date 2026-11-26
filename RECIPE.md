@@ -8,11 +8,11 @@ Herdr's main layout with a right-hand panel for working with coding agents the w
 
 The window is Herdr's `main` layout: a 268px sidebar on the left (brand row, Spaces, Agents, footer), the tab bar on top of the work area (42px, `tabs-ide`), the active tab's panes, and the status bar (28px) at the bottom.
 
-Right of the panes there is a 460px panel (min 280, max 1000) with four tabs, chosen by buttons at the right end of the tab bar, after the `+`: **Files** (file icon), **Changes**, **Remote** (server icon) and **Browser** (monitor icon), and then a layout switcher button (layout icon). The selected panel button is highlighted (`selected` color). A tab with no mod in this layout gets no button.
+Right of the panes there is a 460px panel (min 280, max 1000). Buttons at the right end of the tab bar, after the `+`: **Chat**, then **Files** (file icon), **Changes**, **Git**, **Remote** (server icon) and **Browser** (monitor icon), and then a layout switcher button (layout icon). The selected panel button is highlighted (`selected` color). A tab with no mod in this layout gets no button. Chat is a button, not a panel: it turns the focused agent into a chat. Git is the `git-graph` panel. Remote is the SSH file manager.
 
 The **Remote** tab (`mods/remote-files`, a `remote` block in `panel-body`) shows the project's folder on a server over SSH. A project is a space's `folder`; its servers (`name`, `host`, `path`) are kept in the mod's `localStorage` under `projects[folder]`. With none, the tab shows a form (name, server with chips for the aliases in `~/.ssh/config`, folder). Header: server switcher, refresh, new file, new folder, edit server; below it the parent button and an editable path, then the list (click a folder to enter it, a file to open it; right click selects an entry to rename or delete it). A file opens as a tab (`tab.new` with `mod: "remote-files"` and `props.edit = {host, path, remote}`) holding an `Editor` with the language from the extension; Save or Ctrl+S writes it back atomically and with the owner and mode kept; if the file changed on the server since it was opened, saving stops and offers Overwrite or Reload. `ssh.js` runs `ssh` (BatchMode, so no password prompts) through `exec`, over a background master connection (`ControlMaster=yes -fN`, `ControlPersist=300`, started apart with its stdio closed: one started by a call keeps that call's pipes open and the call never returns).
 
-**Chat** (optional): when the layout's pane header is `pane-chat` (Shepherdr's clone of `pane`, with `spaces-chat` and `workspace-status-chat` for the lists; `install.sh` swaps them in when those mods exist), agent panes show a Chat / Terminal switch and `tabs-ide` draws a **Chat** button (chat icon, left of the panel buttons). `tabs-ide` decides by itself what it does, in any space: a `chat` pane already in the shown tab gets the focus and nothing else happens; else the tab's Claude Code / Codex pane is focused and `pane-chat.toggle` turns it into a chat (mod `chat`); with no such agent in the tab, `tab.new {argv:["claude"]}` starts one and, once it reports as an agent, the same toggle follows (a new pane's header ignores a toggle for 2 s, so it waits). A chat's agent is parked (it has no pane), and Herdr's shipped `agents` list leaves out agents without a pane, so the layout uses `agents-ide`: the `agents` mod plus the terminals labelled `herdr.chat=<chat pane>` (the label `pane-chat` writes), listed with the chat pane as their `pane`. Renaming a tab by double click opens the dialog and the mouse release that follows must not select the tab, or the pane takes the keyboard from the dialog (`tabs-ide` skips that release).
+The pane header is `pane-chat`. Agent panes show a Chat / Terminal switch, and `tabs-ide` draws a **Chat** button (chat icon, left of the panel buttons). `tabs-ide` decides by itself what it does, in any space: a `chat` pane already in the shown tab gets the focus and nothing else happens; else the tab's Claude Code / Codex pane is focused and `pane-chat.toggle` turns it into a chat (mod `chat`); with no such agent in the tab, `tab.new {argv:["claude"]}` starts one and, once it reports as an agent, the same toggle follows (a new pane's header ignores a toggle for 2 s, so it waits). A chat's agent is parked (it has no pane), and Herdr's shipped `agents` list leaves out agents without a pane, so the layout uses `agents-ide`: the `agents` mod plus the terminals labelled `herdr.chat=<chat pane>` (the label `pane-chat` writes), listed with the chat pane as their `pane`. Renaming a tab by double click opens the dialog and the mouse release that follows must not select the tab, or the pane takes the keyboard from the dialog (`tabs-ide` skips that release).
 
 The **Browser** tab is two parts:
 
@@ -38,7 +38,7 @@ With the device button on, the toolbar grows by a 40px row: a preset button ("Re
 
 ## Built from
 
-`layouts/ide.json`: a clone of the shipped `main` layout (0.1.17). `root` row → `sidebar` column (`workspace-chrome`, `spaces`, `agents`, `workspace-chrome` footer) and `work` column: `tabs` block with `{"mod":"tabs-ide"}` (px 42), `work-body` row with `main` (the active tab's panes) and `panel` column (px 460) holding a `stack` `panel-body` with children `files` (`{"mod":"files"}`), `changes` (`{"mod":"changes"}`) and `browser`, a column of `browser-bar` (block, px 44, `ide-browser-bar`) and `browser-host` (block, `ide-browser`); then the `status` block. A person with a different file editor mod can put it in the `files` block (the `file-editor` mod from `werlang/herdr-file-editor` opens clicked files in tabs).
+`layouts/ide.json`: a clone of the shipped `main` layout (0.1.17). `root` row → `sidebar` column (`workspace-chrome`, `spaces`, `agents`, `workspace-chrome` footer) and `work` column: `tabs` block with `{"mod":"tabs-ide"}` (px 42), `work-body` row with `main` (the active tab's panes) and `panel` column (px 460) holding a `stack` `panel-body` with children `files` (`{"mod":"files"}`), `changes` (`{"mod":"changes"}`), `git-graph` (`{"mod":"git-graph"}`), `remote` (`{"mod":"remote-files"}`) and `browser`, a column of `browser-bar` (block, px 44, `ide-browser-bar`) and `browser-host` (block, `ide-browser`); then the `status` block. A person with a different file editor mod can put it in the `files` block (the `file-editor` mod from `werlang/herdr-file-editor` opens clicked files in tabs).
 
 Mods (`mods/<name>/`, all `place: none`):
 
@@ -72,7 +72,7 @@ Programs it runs: `node`, `agent-browser` (+ Chrome for Testing, installed by `a
 ## Done when
 
 1. `herdr-app check` passes in each of `mods/tabs-ide`, `mods/layout-switcher`, `mods/ide-browser`, `mods/ide-browser-bar`, `mods/ide-browser-menu`, `mods/remote-files`, `mods/agents-ide`, `mods/rename-dialog`, and `node --check mods/ide-browser/viewer.js` passes.
-2. `layout.switch {name:"ide"}` shows the layout, the tab bar has Files, Changes, Remote, Browser and the layout button (and Chat when `pane-chat` is installed), and the button opens the list of layouts.
+2. `layout.switch {name:"ide"}` shows the layout. The tab bar has Chat, Files, Changes, Git, Remote, Browser and the layout button. Git opens `git-graph`. Remote is the SSH file manager (`remote-files`, including the SSH terminal button). The button opens the list of layouts.
 3. Opening Browser makes a `node …/viewer.js --task <project>` terminal appear (`hc ls`), the toolbar shows the page's address, and the page is visible in the panel, filling its width.
 4. Typing `example.com` in the address field and pressing Enter loads it; Back works.
 5. In another space (another project) the Browser tab shows a different browser (its own address); going back shows the first one's page again.
@@ -85,21 +85,29 @@ Programs it runs: `node`, `agent-browser` (+ Chrome for Testing, installed by `a
 
 ## Agent IDE + Coordinator (`layouts/ide-coord.json`)
 
-The Agent IDE panel merged with Shepherdr's per-space coordinator workflow. Needs Shepherdr's mods
-(`tasks`, `artifacts`, `chat`, `task-*`, `tabs-tasks-git`, `pane-chat`, `spaces-chat`). `cloned_from`: `ide` + `shepherdr` layouts.
+The Agent IDE panel with a per-space coordinator. The mods, `herdr-task`, and the role templates ship in this repo (MIT, from Shepherdr; see THIRD_PARTY.md). Nothing is read from a Shepherdr install. Task data is under `~/.config/herdr-ide`, `~/.local/share/herdr-ide` and `~/.local/state/herdr-ide`.
 
 - **Assistant (coordinator)**: a permanent chat tab per space (`mod: chat`, `role: coordinator`, template `assistant`). The person delegates; it starts workers with `herdr-task`, watches them, reports in chat. It never writes code. Durable project memory lives in the project's `.ai/` (MEMORY.md + memories/).
 - **Right panel** (`panel-body`, 510 px): `files`, `changes`, `git-graph`, `tasks` (list + thread: chat/term/pr/browser/artifacts), `artifacts`, `remote`, `browser`. Default `tasks`; the last panel per space is remembered.
-- **Tab bar**: `tabs-ide-tasks`, built by `tools/make-tabs-ide-tasks.py` from `tabs-tasks-git` (Tasks badges, inbox, service) plus Remote, Browser, Chat and the layout switcher. Buttons exist only for panels the layout has.
+- **Pane header**: Herdr's `pane`, the same strip as `ide`.
+- **Tab bar**: `tabs-ide-tasks`, built by `tools/make-tabs-ide-tasks.py` from `mods/tabs-tasks` (Tasks badges, inbox) plus Remote, Browser, Pi and the layout switcher. A Chat button is drawn only when the pane header mod is `pane-chat`. Buttons exist only for panels the layout has. The Files block is Herdr's `files` mod; `install.sh` points it at `file-editor` when that mod is already installed.
 - **Sidebar**: spaces (`spaces-chat`) on top; `agents-ide` below lists **Coordinators** first, then worker agents by space.
 - Browser is unchanged: `ide-browser` still finds `browser`, `browser-bar`, `browser-host`.
 
-Install: `./install.sh && tools/make-tabs-ide-tasks.py && cp layouts/ide-coord.json ~/.config/herdr-app/layouts/` then `herdr-app do layout.switch '{"name":"ide-coord"}'`.
+Install: `./install.sh` then `herdr-app do layout.switch '{"name":"ide-coord"}'`. `"ide"` is the panel without the coordinator.
 
-Done when: sidebar, tab bar, main and right panel show; the bar has Files, Changes, Git, Tasks, Artifacts, Remote, Browser, Chat and the switcher; Tasks lists `herdr-task` tasks and opens the thread; Browser/Select/Remote work as above; the Assistant tab starts on the first message; `herdr-app check` passes for `tabs-ide-tasks` and `agents-ide`.
+Done when: sidebar, tab bar, main and right panel show; the pane header is Herdr's `pane`; the bar has Files, Changes, Git, Tasks, Artifacts, Remote, Browser, Pi and the switcher; Tasks lists `herdr-task` tasks and opens the thread; Browser/Select/Remote work as above; the Assistant tab starts on the first message; `herdr-app check` passes for `tabs-ide-tasks` and `agents-ide`.
 
 ### Sidebar style (idea: [petekp/coordinator](https://github.com/petekp/coordinator), MIT)
-Top row `ide-topbar` (search + toggle, no logo). Spaces and group headers in `agents-ide` use a colored letter tile (`tile.js`, color stable per space id). To get tiles in `spaces-chat` (Shepherdr's, not shipped here): copy `patches/spaces-chat-tile.js` to `mods/spaces-chat/tile.js`, import `spaceTile` and render it in place of the "#" for spaces without a picked icon.
+Top row `ide-topbar` (search + toggle, no logo). Spaces and group headers in `agents-ide`, and spaces without a picked icon in `spaces-chat`, use a colored letter tile (`tile.js`, color stable per space id).
+
+### Pi chat (`mods/chat-acp`)
+
+A gpui-kit chat for Pi through ACP, then any other ACP agent. `acp.js` is the JSON-RPC framing and transcript reducer (`node --experimental-default-type=module --test mods/chat-acp/acp.test.js`). `bridge.mjs` is the process `hc` keeps alive: it spawns the adapter, writes `~/.local/state/herdr-ide/chat-acp/<tab>/state.json`, and reads commands from `inbox/`. `pi-shim.sh` sits in front of `pi` so read-only mode can pass `--tools read,grep,find,ls` and a coordinator pane can pass `--append-system-prompt`.
+
+The **Pi** button in `tabs-ide` and `tabs-ide-tasks` opens the mod. `props.role: "coordinator"` is the coordinator chat (it may run `herdr-task`). `props.command` overrides the adapter command. Provider keys use `herdr-secret` (`CHAT_ACP_<ID>` or the built-in names `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, `OPENROUTER_API_KEY`, `GROQ_API_KEY`, `GEMINI_API_KEY`). The bridge reports status with OSC `7501` (`state=working|idle|blocked`), and `agents-ide` lists that terminal when it is labelled `herdr.chat=<pane>`.
+
+Check: `herdr-app check mods/chat-acp`.
 
 ### Language (Ru / En)
-`i18n/` (`i18n.js`, `ru.js`) + `tools/localize.py`: copies the dictionary into the installed mods and wraps UI literals with `tr()` (originals kept as `*.js.orig-i18n`; `--undo` restores them; re-run after updating a mod). The language is shared `ui.lang`, switched with the RU/EN button in the sidebar's top row. Strings absent from `ru.js` stay English; add them to `ru.js` and re-run. Not covered: `chat` mod, core menu data.
+`i18n/` (`i18n.js`, `ru.js`) is copied into the mods, and UI literals are wrapped with `tr()` in the repo (`tools/localize.py`; `--home` does the same to an installed copy). The language is shared `ui.lang`, switched with the RU/EN button in the sidebar's top row. Strings absent from `ru.js` stay English; add them to `ru.js` and re-run. Not covered: the `chat` mod.

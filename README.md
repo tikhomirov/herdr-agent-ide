@@ -51,11 +51,13 @@ A real Chrome, drawn in the panel. Your agents drive the same page with one comm
 
 ![Device mode](docs/device.png)
 
-### Chat with Claude Code (optional)
+### Chat with Claude Code
 
-With Shepherdr's chat mods installed (`pane-chat`, `spaces-chat`, `workspace-status-chat`), `install.sh` gives agent panes a **Chat / Terminal** switch and the tab bar a **Chat** button: the same agent shown as a conversation, with a message box under it. The agent keeps running in its terminal. The button works in any space: with a chat already shown it does nothing, with an agent in a terminal it switches that agent to its chat, and with no agent in the tab it starts Claude Code in a new tab and shows it as a chat.
+`install.sh` ships the chat mods with the layout, so agent panes get a **Chat / Terminal** switch and the tab bar a **Chat** button: the same agent shown as a conversation, with a message box under it. The agent keeps running in its terminal. The button works in any space: with a chat already shown it does nothing, with an agent in a terminal it switches that agent to its chat, and with no agent in the tab it starts Claude Code in a new tab and shows it as a chat.
 
 ![Chat](docs/chat.png)
+
+Pi is the third agent in the same chat menu as Claude Code and Codex. Settings has its own **Pi** page: which provider Pi starts on, and which of its models are on. Keys stay in `~/.pi/agent/models.json`.
 
 The Remote toolbar has an **SSH terminal** button: it opens a terminal tab on the server in the selected folder (or the one shown), on the already open connection when there is one. Unlike the tree, the terminal may ask for a password.
 
@@ -72,23 +74,23 @@ A button at the end of the tab bar lists your layouts and switches between them.
 ```sh
 git clone https://github.com/tikhomirov/herdr-agent-ide
 cd herdr-agent-ide
-./install.sh --hib          # copies the mods and the layout, links `hib` into ~/.local/bin
+./install.sh --hib          # mods, both layouts, herdr-task, templates, the browser skill
 npm i -g agent-browser && agent-browser install     # the browser engine
-herdr-app do layout.switch '{"name":"ide"}'
+herdr-app do layout.switch '{"name":"ide-coord"}'   # assistants, git, editor, remote; "ide" is the panel alone
 ```
 
 Or let your agent do it: *"Add the layout from https://github.com/tikhomirov/herdr-agent-ide"* (Herdr's agents read `RECIPE.md` and the files).
 
 Requirements: Herdr (run once so `~/.config/herdr-app` exists), `node` 22+, `git`, [agent-browser](https://github.com/vercel-labs/agent-browser) for the Browser tab, and `ssh` with a key or agent for Remote. Developed and tested on Linux.
 
-`install.sh` never replaces an existing `layouts/ide.json` unless you pass `--force`. It replaces its own mods (`ide-browser`, `ide-browser-bar`, `ide-browser-menu`, `remote-files`, `tabs-ide`, `agents-ide`, `layout-switcher`).
+`install.sh` never replaces an existing `layouts/ide.json` or `layouts/ide-coord.json` unless you pass `--force`. It replaces the mods it ships, including the coordinator, chat, and tasks mods (see [THIRD_PARTY.md](THIRD_PARTY.md)). No Shepherdr install is required. Task lists are stored under `~/.local/share/herdr-ide`.
 
-Give your agents the skill so they use the browser: copy `skills/herdr-ide-browser` to `~/.agents/skills/` (or `~/.claude/skills/`).
+`install.sh` copies `skills/herdr-ide-browser` to `~/.agents/skills/` so agents use the shared browser.
 
 ### Optional
 
-- A better file tab: install [`werlang/herdr-file-editor`](https://github.com/werlang/herdr-file-editor) and put `{"mod":"file-editor"}` in the `files` block of `layouts/ide.json`: clicking a file opens it in an editor tab with syntax highlighting.
-- A Git graph tab: any mod with the id `git-graph` in the panel's stack gets a button automatically.
+- A better file tab: if [`werlang/herdr-file-editor`](https://github.com/werlang/herdr-file-editor) is already installed, `install.sh` points the Files block at it. That repository has no license file, so this package does not vendor it. The layout itself uses Herdr's `files` mod.
+- Git graph ships as `mods/git-graph` (MIT, rabeeh-ta/herdr-git-graph). The coordinator layout gives it a button.
 
 ## For agents: `hib`
 
@@ -106,6 +108,8 @@ hib screenshot /tmp/shot.png
 | Path | What |
 | --- | --- |
 | `layouts/ide.json` | the layout: Herdr's `main` plus the right panel |
+| `layouts/ide-coord.json` | the same panel plus the coordinator (tasks, artifacts, assistant chat) |
+| `THIRD_PARTY.md` | Shepherdr and git-graph, MIT, with the commits they were taken from |
 | `mods/tabs-ide` | the tab bar with the panel buttons, the Chat button and the layout button (a clone of Herdr's `tabs`) |
 | `mods/agents-ide` | the Agents list (a clone of Herdr's `agents`) that also lists agents shown as a chat |
 | `mods/rename-dialog` | the rename dialog with the emoji picker |

@@ -1,0 +1,25 @@
+name: Check
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  check:
+    name: check
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: syntax, paths, clean home
+        run: bash tools/check.sh
+        # herdr-app is not on GitHub runners. The script still checks JavaScript, herdr-task, and a throwaway install.
+        # On a machine with Herdr it also runs `herdr-app check` for every mod.

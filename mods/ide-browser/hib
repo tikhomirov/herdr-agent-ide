@@ -17,7 +17,7 @@ task=$(printf %s "$task" | tr 'A-Z' 'a-z' | tr -c 'a-z0-9_-' '-' | sed 's/-\{2,\
 ab=${HERDR_IDE_AGENT_BROWSER:-}
 [ -z "$ab" ] && ab=$(command -v agent-browser 2>/dev/null)
 if [ -z "$ab" ]; then
-  for c in "$HOME"/.local/share/shepherdr/agent-browser/*/agent-browser; do [ -x "$c" ] && ab=$c; done
+  for c in "$HOME"/.local/share/herdr-ide/agent-browser/*/agent-browser; do [ -x "$c" ] && ab=$c; done
 fi
 if [ -z "$ab" ]; then
   echo "hib: agent-browser is not installed. Run: npm i -g agent-browser && agent-browser install" >&2

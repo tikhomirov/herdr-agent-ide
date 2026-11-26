@@ -91,8 +91,8 @@ const kidStatus = (k, listed) => {
   return s === "error" ? "blocked" : s === "done" ? "idle" : s;
 };
 const SORTS = [
-  { id: "priority", label: "Priority", icon: "clock" },
-  { id: "grouped", label: "Grouped by space", icon: "layers" },
+  { id: "priority", label: tr("Priority"), icon: "clock" },
+  { id: "grouped", label: tr("Grouped by space"), icon: "layers" },
 ];
 const sortOf = () => SORTS.find((s) => s.id === shared("agents.sort")) ?? SORTS[0];
 const SECTION = { 4: "Needs you", 3: "Done", 2: "Working", 1: "Idle" };
@@ -178,7 +178,7 @@ export default class Agents extends View {
       .p(5)
       .bg(t.popover)
       .text_size(12.8)
-      .child(div().px(8).pt(4).pb(6).text_size(11).text_color(t.dim).child("Sort agents"))
+      .child(div().px(8).pt(4).pb(6).text_size(11).text_color(t.dim).child(tr("Sort agents")))
       .children(SORTS.map((s) => h_flex()
         .id(`sort-${s.id}`)
         .h(31)
@@ -244,7 +244,7 @@ export default class Agents extends View {
     const color = t[a.status] ?? t.dim;
     if (a.status === "working") return svg("mods/workspace-chrome/spinner.svg").size(12).mx(1).flex_none().text_color(t.working).spin(900);
     if (a.status === "blocked" && compact) return div().size(14).flex_none().rounded(4).bg(t.blocked + "26").text_size(10.5).font_bold().text_color(t.blocked).flex().items_center().justify_center().child("!");
-    if (a.status === "blocked") return div().flex_none().px(6).h(18).rounded(5).bg(t.blocked + "26").text_size(10.5).font_semibold().text_color(t.blocked).flex().items_center().child("Needs you");
+    if (a.status === "blocked") return div().flex_none().px(6).h(18).rounded(5).bg(t.blocked + "26").text_size(10.5).font_semibold().text_color(t.blocked).flex().items_center().child(tr("Needs you"));
     // Idle: a ring; done: a dot.
     if (a.status === "idle") return div().size(7).mx(3).flex_none().rounded(4).border(1.5).border_color(t.idle ?? t.dim);
     return div().size(7).mx(3).flex_none().rounded(4).bg(a.status === "done" ? color : t.dim + "00");
@@ -412,11 +412,11 @@ export default class Agents extends View {
 
     // Groups in list order: spaces (grouped) or priority sections. Agents of a
     // space are next to each other in agents(), so neighbours make a group.
-    const groups = pinned.length ? [{ id: "pinned", label: "Pinned", status: null, members: pinned }] : [];
+    const groups = pinned.length ? [{ id: "pinned", label: tr("Pinned"), status: null, members: pinned }] : [];
     // Coordinators (assistant template / herdr.role=coordinator) get their own section on top; the rest are workers.
     const coordAddrs = new Set(all.filter((k) => k?.state === "live" && (k.labels?.["herdr.role"] === "coordinator" || k.template === "assistant" || k.template === "coordinator")).map((k) => k.address));
     const coords = rest.filter((a) => coordAddrs.has(a.address));
-    if (coords.length && !byPriority) groups.push({ id: "coordinators", label: "Coordinators", status: null, members: coords });
+    if (coords.length && !byPriority) groups.push({ id: "coordinators", label: tr("Coordinators"), status: null, members: coords });
     for (const a of (byPriority ? rest : rest.filter((a) => !coordAddrs.has(a.address) || !coords.length))) {
       const r = rankOf(a) || RANK.idle;
       const id = byPriority ? `sec-${r}` : `sp-${a.space}`;
@@ -473,7 +473,7 @@ export default class Agents extends View {
             .flex_none()
             .items_center()
             .justify_between()
-            .child(div().text_size(11.5).font_medium().text_color(t.dim).child("Agents"))
+            .child(div().text_size(11.5).font_medium().text_color(t.dim).child(tr("Agents")))
             .child(
               div()
                 .id("ag-sort")

@@ -1,5 +1,6 @@
 // Popup menus of the Browser toolbar: props().menu is "more" (the "…" menu) or "presets" (device sizes).
 // A choice appends a command to the project's control file, which the viewer reads (see ide-browser-bar).
+import { tr } from "./i18n.js";
 import { View, div, svg } from "gpui-kit";
 import { h_flex, v_flex } from "gpui-base";
 import { closeOverlay, exec, home, props, theme } from "herdr";
@@ -10,16 +11,16 @@ const PRESETS = [
 ];
 
 const MORE = [
-  { label: "Take Screenshot", hint: "saved and copied", cmd: "screenshot" },
-  { label: "Screenshot to Agent", hint: "sends the file's path", cmd: "screenshot agent" },
+  { label: tr("Take Screenshot"), hint: "saved and copied", cmd: "screenshot" },
+  { label: tr("Screenshot to Agent"), hint: "sends the file's path", cmd: "screenshot agent" },
   null,
-  { label: "Hard Reload", hint: "ignores the cache", cmd: "hardreload" },
-  { label: "Copy Current URL", cmd: "copyurl" },
-  { label: "Open in Chrome Window", cmd: "window" },
+  { label: tr("Hard Reload"), hint: "ignores the cache", cmd: "hardreload" },
+  { label: tr("Copy Current URL"), cmd: "copyurl" },
+  { label: tr("Open in Chrome Window"), cmd: "window" },
   null,
-  { label: "Clear Cookies", cmd: "clearcookies" },
-  { label: "Clear Cache", cmd: "clearcache" },
-  { label: "Clear Site Data", hint: "this site", cmd: "clearsite" },
+  { label: tr("Clear Cookies"), cmd: "clearcookies" },
+  { label: tr("Clear Cache"), cmd: "clearcache" },
+  { label: tr("Clear Site Data"), hint: "this site", cmd: "clearsite" },
 ];
 
 export default class IdeBrowserMenu extends View {
