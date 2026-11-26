@@ -3,6 +3,7 @@
 // yes. The switch is per scope (as Reactions); the repo it files to is Everywhere's only (one box:
 // owner/name, a github.com link made one, empty for Agent IDE's own repo).
 
+import { tr } from "./i18n.js";
 import { div } from "gpui-kit";
 import { v_flex, InputState, Input } from "gpui-base";
 import { toggleSwitch } from "./ui.js";
@@ -56,8 +57,8 @@ export function feedbackRepoRow(view, t) {
     .child(Input.new(f.box).w_full().h(30).px(10).rounded(7).border_1().border_color(f.err ? t.blocked : f.focus ? t.accent : t.input)
       .bg(t.background).text_size(13).text_color(t.foreground))
     .when(!f.box.value(), (el) => el.child(div().absolute().top(6).left(11).right(11).truncate().text_size(13).text_color(t.dim)
-      .child(FEEDBACK.repo)));
-  const control = v_flex().items_end().gap(5).child(box)
-    .when(Boolean(f.err), (el) => el.child(div().w(220).text_size(12).line_height("17px").text_color(t.blocked).child(f.err)));
+      .child(tr(FEEDBACK.repo))));
+  const control = v_flex().items_end().gap(5).child(tr(box))
+    .when(Boolean(f.err), (el) => el.child(div().w(220).text_size(12).line_height("17px").text_color(t.blocked).child(tr(f.err))));
   return view.row(t, FEEDBACK.repoTitle, FEEDBACK.repoAbout, control, null);
 }

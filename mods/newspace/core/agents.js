@@ -21,7 +21,8 @@ const PERMS = {
   claude: [{ id: "manual", label: "Ask" }, { id: "auto", label: "Auto" }, { id: "acceptEdits", label: "Accept edits" },
     { id: "plan", label: "Plan" }, { id: "bypassPermissions", label: "Full access" }],
   codex: [{ id: "read-only", label: "Read only" }, { id: "auto", label: "Auto" }, { id: "full", label: "Full access" }],
-  pi: [{ id: "read-only", label: "Read only" }, { id: "ask", label: "Ask" }, { id: "full", label: "Full access" }],
+  // Pi has no approval step: its tools are all there, or only the reading ones.
+  pi: [{ id: "read-only", label: "Read only" }, { id: "full", label: "Full access" }],
 };
 // A permission mode carried to the other agent when the agent is switched: its nearest mode there (auto stays auto,
 // full access stays full access, Claude's accept edits is Codex's auto, plan and read only swap), else that agent's

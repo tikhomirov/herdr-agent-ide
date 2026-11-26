@@ -12,6 +12,7 @@
 // artifact-bar.js: title, version stepper, Mark up, Open in the sidebar, close) over the
 // artifact's own mod, on the same backdrop.
 
+import { tr } from "./i18n.js";
 import { View, div, image, svg } from "gpui-kit";
 import { h_flex, v_flex } from "gpui-base";
 import { theme, props, closeOverlay, readTextFile, settings, exec, appHome, window as win } from "herdr";
@@ -58,7 +59,7 @@ export default class ImageViewer extends View {
           .child(div().flex_1().min_w(0).truncate().text_size(12.5).font_medium().text_color(t.foreground).child(props()?.title ?? "Pasted text")))
         .child(div().id("text-body").flex_1().min_h(0).p(14).overflow_y_scrollbar()
           .font_family(settings().font_family ?? "JetBrains Mono").text_size(12.5).text_color(t.foreground)
-          .children(String(this.text ?? "").split("\n").slice(0, 5000).map((l) => div().min_h(18).child(l || " ")))));
+          .children(String(this.text ?? "").split("\n").slice(0, 5000).map((l) => div().min_h(18).child(tr(l || " "))))));
   }
 
   // ---- geometry --------------------------------------------------------------------------
@@ -151,7 +152,7 @@ export default class ImageViewer extends View {
       this.copied = true;
       cx.notify();
       cx.timer.after(1400, (cx) => { this.copied = false; cx.notify(); });
-    }).catch(() => toast({ title: "Couldn't copy the image", level: "error" }));
+    }).catch(() => toast({ title: tr("Couldn't copy the image"), level: "error" }));
   }
 
   openFile() {
@@ -256,7 +257,7 @@ export default class ImageViewer extends View {
     return h_flex().id("bar").w_full().h(BAR).flex_none().pl(16).pr(8).gap(2).items_center()
       .on_mouse_down("left", (_e, cx) => cx.stop_propagation())
       .child(h_flex().flex_1().min_w(0).gap(8).items_baseline().text_size(TEXT.body)
-        .child(div().min_w(0).truncate().font_medium().text_color(t.foreground).child(img?.name ?? "Image"))
+        .child(div().min_w(0).truncate().font_medium().text_color(t.foreground).child(img?.name ?? tr("Image")))
         .when(Boolean(img), (el) => el.child(div().flex_none().text_size(TEXT.label).text_color(t.muted).child(`${img.w} × ${img.h}`))))
       .when(Boolean(img), (el) => el
         .child(this.btn("zoom-out", "zoom-out", () => this.zoomBy(1 / STEP), t))
@@ -265,7 +266,7 @@ export default class ImageViewer extends View {
           .text_size(TEXT.label).text_color(t.muted).hover((s) => s.bg(t.hover).text_color(t.foreground))
           .on_mouse_down("left", (_e, cx) => cx.stop_propagation())
           .on_click((_e, cx) => { cx.stop_propagation(); this.toggleActual(); cx.notify(); })
-          .child(pct))
+          .child(tr(pct)))
         .child(this.btn("zoom-in", "zoom-in", () => this.zoomBy(STEP), t))
         .child(this.rule(t))
         .child(this.btn("copy", this.copied ? "check" : "copy", (cx) => this.copy(cx), t))
@@ -310,7 +311,7 @@ export default class ImageViewer extends View {
         .when(Boolean(img), (el) => el.child(div().absolute().left(Math.round(r.left)).top(Math.round(r.top))
           .w(Math.round(r.w)).h(Math.round(r.h)).rounded(this.fit ? 4 : 0).overflow_hidden().shadow_lg()
           .child(image(img.rel).size_full())))
-        .when(!img, (el) => el.child(div().size_full().flex().items_center().justify_center().text_size(TEXT.body).text_color(t.muted).child("Can't show this image.")))
+        .when(!img, (el) => el.child(div().size_full().flex().items_center().justify_center().text_size(TEXT.body).text_color(t.muted).child(tr("Can't show this image."))))
         .when(this.many(), (el) => el
           .child(this.arrow("prev", "chevron-left", -1, "left", t))
           .child(this.arrow("next", "chevron-right", 1, "right", t))

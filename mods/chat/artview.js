@@ -8,6 +8,7 @@
 // Shared: the source is lib/artview.js; bin/sync-shared copies it into each mod in lib/COPIES.
 // Edit lib/artview.js, never a mod's copy, then run bin/sync-shared.
 
+import { tr } from "./i18n.js";
 import { exec, appHome, openOverlay, theme, shared, setShared, panes, focused, settings } from "herdr";
 import { toast, plainError } from "./ui.js";
 
@@ -77,7 +78,7 @@ export function openViewer(a, area = null, show = showViewer) {
   const older = a.latest && a.version && a.version < a.latest;
   return artifactCli(null, ["pull", a.id, ...(machine ? ["--from", machine] : []), ...(older ? ["--version", String(a.version)] : [])])
     .then((out) => show({ mod: out.mod, base: baseMod(out.mod), id: a.id, title: a.title, version: a.version, latest: a.latest ?? a.version, machine, ...(area ? { area } : {}), ...(a.modal ? { modal: true } : {}) }))
-    .catch((e) => { toast({ title: "Artifact didn't open", body: plainError(e), level: "error" }); });
+    .catch((e) => { toast({ title: tr("Artifact didn't open"), body: plainError(e), level: "error" }); });
 }
 
 // Where each chat is in the window, and whether it has the keyboard (shared "chat.areas": { [key]:

@@ -6,6 +6,7 @@
 // card says "Kept: NAME". Shown in the agent's own chat where it asked, and in its Assistant's
 // chat for a task's worker (main.js workerAsks()), as strips of the timeline (strips.js).
 
+import { tr } from "./i18n.js";
 import { InputState } from "gpui-base";
 import * as secrets from "./secrets.js";
 import { terminals } from "./live.js";
@@ -45,7 +46,7 @@ export class SecretCards {
       for (const k of missing) {
         const st = this.states.get(k);
         if (!st || st.box) continue;
-        st.box = InputState.new({ placeholder: "Paste the value" });
+        st.box = InputState.new({ placeholder: tr("Paste the value") });
         st.box.set_masked(true);
         st.box.on("change", (_e, cx) => { st.err = ""; cx.notify(); });
         // which masked box holds the keyboard: the chat's refocus() leaves it there (GitHub #1224)
@@ -120,13 +121,13 @@ export class SecretCards {
     const has = Boolean(st?.box?.value());
     const out = [headStrip({ who: opts.who, links: opts.links }), { key: "title", kind: "title", text: `Secret: ${ask.name}` }];
     if (ask.why) out.push({ key: "why", kind: "text", tone: "muted", text: ask.why });
-    out.push({ key: "box", kind: "input", state: st?.box ?? null, placeholder: "Paste the value", focus: () => st?.box?.focus() });
+    out.push({ key: "box", kind: "input", state: st?.box ?? null, placeholder: tr("Paste the value"), focus: () => st?.box?.focus() });
     if (lv.length > 1) out.push({ key: "for", kind: "controls", align: "start", lead: "For", ctls: lv.map((l) => ({ id: `slevel-${id}-${l.scope}`, label: l.label, look: "pill",
       on: secrets.scopeKey(l) === secrets.scopeKey(cur), fn: () => { if (st) st.level = secrets.scopeKey(l); } })) });
     out.push({ key: "note", kind: "text", tone: st?.err ? "red" : "dim", text: st?.err || "Agents use it by name, never seeing it." });
     const live = has && !st?.busy;
     out.push({ key: "actions", kind: "controls", align: "end", ctls: [
-      { id: `sdecline-${id}`, label: "Decline", look: "plain", fn: (cx) => this.decline(ask, cx) },
+      { id: `sdecline-${id}`, label: tr("Decline"), look: "plain", fn: (cx) => this.decline(ask, cx) },
       { id: `ssave-${id}`, label: st?.busy ? "Saving…" : "Save", look: "primary", disabled: !live, fn: live ? (cx) => this.save(ask, cx) : null }] });
     return out;
   }

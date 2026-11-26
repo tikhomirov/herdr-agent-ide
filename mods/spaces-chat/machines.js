@@ -16,6 +16,7 @@
 // everywhere.machine and machines[name or "local"].machine, each { start_load (× cores),
 // start_memory, start_disk } (herdr-task's tick holds new tasks by them).
 
+import { tr } from "./i18n.js";
 import { div } from "gpui-kit";
 import { v_flex, h_flex } from "gpui-base";
 import { exec, shared, setShared, appHome, home, machines, knownAgents, readTextFile } from "herdr";
@@ -130,27 +131,27 @@ export function bars(t, items, h = 12, id = "bars") {
 function meterRow(t, id, name, pct, fill, level, words, sub) {
   return v_flex().id(id).gap(4)
     .child(h_flex().gap(10).items_center()
-      .child(div().flex_1().min_w(0).truncate().text_size(12.5).font_medium().text_color(t.foreground).child(name))
-      .child(div().flex_none().text_size(12.5).text_color(level === "ok" ? t.muted : colorOf(t, level)).child(words)))
+      .child(div().flex_1().min_w(0).truncate().text_size(12.5).font_medium().text_color(t.foreground).child(tr(name)))
+      .child(div().flex_none().text_size(12.5).text_color(level === "ok" ? t.muted : colorOf(t, level)).child(tr(words))))
     .child(div().relative().h(5).w_full().rounded(3).bg(t.border).overflow_hidden()
       .child(div().absolute().left(0).top(0).h(5).rounded(3).w(`${Math.max(2, Math.min(100, fill))}%`).bg(level === "ok" ? t.muted : colorOf(t, level))))
-    .when(Boolean(sub), (el) => el.child(div().text_size(11.5).text_color(t.dim).child(sub)));
+    .when(Boolean(sub), (el) => el.child(div().text_size(11.5).text_color(t.dim).child(tr(sub))));
 }
 
 function cliBlock(t, mid, r, now) {
   const head = (extra) => h_flex().gap(8).items_center()
     .child(div().flex_1().min_w(0).truncate().text_size(13).font_semibold().text_color(t.foreground)
       .child(cliTitle(r)))
-    .child(div().flex_none().text_size(11.5).text_color(extra?.old ? t.working : t.dim).child(extra?.text ?? ""));
-  if (r.none) return v_flex().id(`${mid}-${r.cli}`).gap(4).child(head()).child(div().text_size(12).text_color(t.dim).child(NO_USAGE));
+    .child(div().flex_none().text_size(11.5).text_color(extra?.old ? t.working : t.dim).child(tr(extra?.text ?? "")));
+  if (r.none) return v_flex().id(`${mid}-${r.cli}`).gap(4).child(head()).child(div().text_size(12).text_color(t.dim).child(tr(NO_USAGE)));
   const read = r.read;
   const old = readOld(read, now);
   const box = v_flex().id(`${mid}-${r.cli}`).gap(8).child(v_flex().gap(2).child(head({ text: `Read ${ago(read.at, now)}`, old }))
-    .when(Boolean(read.account), (el) => el.child(div().truncate().text_size(11.5).text_color(t.dim).child(read.account))));
+    .when(Boolean(read.account), (el) => el.child(div().truncate().text_size(11.5).text_color(t.dim).child(tr(read.account)))));
   if (read.state === "ok") {
     return box.children(read.windows.map((w, i) => {
       const x = windowWords(w, now);
-      if (x.dead) return div().id(`${mid}-${r.cli}-${i}`).text_size(12).text_color(t.dim).child(x.dead);
+      if (x.dead) return div().id(`${mid}-${r.cli}-${i}`).text_size(12).text_color(t.dim).child(tr(x.dead));
       return meterRow(t, `${mid}-${r.cli}-${i}`, x.name, x.pct, x.pct, x.level, x.words, x.refill);
     })).when(Boolean(read.failed), (el) => el.child(div().text_size(11.5).text_color(t.working).child(failedWords(read))));
   }
@@ -162,7 +163,7 @@ export function machineDetails(t, machine, opts = {}) {
   const s = statsOf(machine), now = Date.now();
   const mid = `md-${mkey(machine) || "local"}`;
   const out = v_flex().id(mid).gap(12);
-  if (!s) return out.child(div().text_size(12.5).text_color(t.dim).child(READING_MACHINE));
+  if (!s) return out.child(div().text_size(12.5).text_color(t.dim).child(tr(READING_MACHINE)));
   const hm = healthMeters(s);
   const healthBox = v_flex().gap(10)
     // Sentence-case headings (ui.js heading), never uppercase.
@@ -175,7 +176,7 @@ export function machineDetails(t, machine, opts = {}) {
     .when(opts.titles !== false, (el) => el.child(heading("Plan usage")))
     .children(rows.map((r) => cliBlock(t, mid, r, now)))
     .when(!rows.length, (el) => el.child(div().text_size(12).text_color(t.dim).child(noPlanWords(s))));
-  return out.when(opts.health !== false, (el) => el.child(healthBox))
+  return out.when(opts.health !== false, (el) => el.child(tr(healthBox)))
     .when(opts.health !== false && opts.plan !== false, (el) => el.child(div().h(1).bg(t.border)))
-    .when(opts.plan !== false, (el) => el.child(planBox));
+    .when(opts.plan !== false, (el) => el.child(tr(planBox)));
 }

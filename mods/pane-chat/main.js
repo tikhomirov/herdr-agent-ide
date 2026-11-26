@@ -244,8 +244,8 @@ export default class Pane extends View {
       .on_hover((hovered, cx) => { this.hovered = hovered; if (!hovered) this.ending = false; cx.notify(); })
       .on_size_change((size, cx) => { if (Math.round(size.width) !== this.width) { this.width = Math.round(size.width); cx.notify(); } })
       .on_click(() => run("pane.focus", { pane }))
-      .when(Boolean(pic), (el) => el.child(pic))
-      .child(div().flex_none().max_w(260).min_w(0).truncate().font_medium().text_color(t.foreground).child(name))
+      .when(Boolean(pic), (el) => el.child(tr(pic)))
+      .child(div().flex_none().max_w(260).min_w(0).truncate().font_medium().text_color(t.foreground).child(tr(name)))
       // The folder gives way first; the switch keeps its width; the gap after pushes the rest right.
       .child(div().flex_shrink_1().min_w(0).truncate().text_color(t.dim).child(folder(p.cwd)))
       .child(div().flex_1())

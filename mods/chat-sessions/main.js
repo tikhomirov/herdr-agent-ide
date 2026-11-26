@@ -3,6 +3,7 @@
 // shared "chat.sessionreq" = { pane, at, session }; the chat restarts the agent on it.
 // Props: { pane, sessions: [{ id, at, title, turns }], current: id | null, width, height, overlay }
 
+import { tr } from "./i18n.js";
 import { View, div, svg } from "gpui-kit";
 import { h_flex, v_flex } from "gpui-base";
 import { theme, props, setShared, closeOverlay } from "herdr";
@@ -34,9 +35,9 @@ export default class Sessions extends View {
     const W = this.p.width ?? 340, H = this.p.height ?? 400;
     const box = v_flex().id("sessions-menu").w_full().flex_none().p(PAD).rounded(8).bg(t.popover).border_1().border_color(t.border).shadow_md()
       .text_size(12.8).text_color(t.foreground)
-      .child(h_flex().h(HEAD).flex_none().px(9).items_center().text_size(11.5).text_color(t.dim).child("Conversations in this folder"))
+      .child(h_flex().h(HEAD).flex_none().px(9).items_center().text_size(11.5).text_color(t.dim).child(tr("Conversations in this folder")))
       .child(list.length === 0
-        ? div().h(ROW).px(9).flex().items_center().text_color(t.dim).child("No saved conversations yet.")
+        ? div().h(ROW).px(9).flex().items_center().text_color(t.dim).child(tr("No saved conversations yet."))
         : v_flex().id("sessions-list").max_h(H - HEAD - 2 * PAD - 4).overflow_y_scroll().gap(1)
           .children(list.map((s) => {
             const now = s.id === this.p.current;
@@ -50,6 +51,6 @@ export default class Sessions extends View {
           })));
     return v_flex().id("sessions-area").w(W).h(H).justify_end()
       .on_key_down((e, cx) => { if (e.key === "escape") { cx.stop_propagation(); closeOverlay(this.p.overlay); } })
-      .child(box);
+      .child(tr(box));
   }
 }

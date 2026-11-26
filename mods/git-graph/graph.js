@@ -1,6 +1,7 @@
 // The graph itself: Git Graph's table (graph, description, date, author,
 // commit) for the focused pane's repository, or `props.folder` when opened as
 // a pane. Labels take double-clicks (checkout) and right-clicks (menus).
+import { tr } from "./i18n.js";
 import { div, svg, PathBuilder } from "gpui-kit";
 import { v_flex, h_flex, Scrollbar, v_virtual_list } from "gpui-base";
 import { spaces, panes, focused, layout, exec, watchFolder, readTextFile, theme, settings, props, shared, setShared, openOverlay, home, notify, knownAgents, updates } from "herdr";
@@ -330,7 +331,7 @@ export class Graph {
       });
       if (this.fetchAll === run) this.fetchAll = null;
       const repositories = (n) => `${n} ${n === 1 ? "repository" : "repositories"}`;
-      notify(run.failed ? { title: `Fetched ${run.total - run.failed} of ${repositories(run.total)}`, body: "The failed ones show git's error on their row.", level: "warning" }
+      notify(run.failed ? { title: `Fetched ${run.total - run.failed} of ${repositories(run.total)}`, body: tr("The failed ones show git's error on their row."), level: "warning" }
         : { title: `Fetched ${repositories(run.total)}`, level: "success", timeout: 3000 });
       cx.notify();
     });
@@ -630,7 +631,7 @@ export class Graph {
         return h_flex().w(part.width).h_full().flex_none().px(LABEL.PAD).gap(3).items_center().overflow_hidden()
           .when(i > 0, (e) => e.border_l(1).border_color(edge).bg(current ? t.background + "33" : edge + "1f"))
           .when(Boolean(part.icon), (e) => e.child(svg(icon(glyph)).size(10).flex_none().text_color(fg)))
-          .child(div().font_family(mono).text_size(LABEL.FONT).when(current, (e) => e.font_semibold()).text_color(fg).child(part.text));
+          .child(div().font_family(mono).text_size(LABEL.FONT).when(current, (e) => e.font_semibold()).text_color(fg).child(tr(part.text)));
       }));
   }
 
@@ -644,18 +645,18 @@ export class Graph {
       // Labels and description clip together, so many labels never push the fixed columns out.
       .child(h_flex().flex_1().min_w(0).h_full().gap(LABEL.GAP).items_center().overflow_hidden()
         .children(this.labels.get(commit.hash).map((l) => this.label(l, color, t, mono)))
-        .child(div().flex_1().min_w(0).truncate().text_color(fg).when(commit.head, (e) => e.font_semibold()).child(commit.subject)))
+        .child(div().flex_1().min_w(0).truncate().text_color(fg).when(commit.head, (e) => e.font_semibold()).child(tr(commit.subject))))
       .child(div().w(this.cols.date).flex_none().text_right().truncate().text_color(t.dim).child(commit.uncommitted ? "*" : ago(commit.time)))
       .when(this.wide, (e) => e
-        .child(div().w(this.cols.author).flex_none().truncate().text_color(t.muted).child(commit.uncommitted ? "*" : commit.author))
+        .child(div().w(this.cols.author).flex_none().truncate().text_color(t.muted).child(tr(commit.uncommitted ? "*" : commit.author)))
         .child(div().w(this.cols.hash).flex_none().font_family(mono).text_size(11).text_color(t.dim).child(commit.uncommitted ? "*" : commit.hash.slice(0, 8))));
   }
 
   iconButton(id, glyph, label, tip, active, action, t) {
-    return h_flex().id(id).tooltip(label).accessibility_label(label).h(24).px(6).gap(5).flex_none().items_center().rounded(6).text_size(11.5).cursor_pointer()
+    return h_flex().id(id).tooltip(tr(label)).accessibility_label(label).h(24).px(6).gap(5).flex_none().items_center().rounded(6).text_size(11.5).cursor_pointer()
       .text_color(active ? t.foreground : t.muted).when(active, (e) => e.bg(t.selected)).hover((s) => s.bg(t.hover).text_color(t.foreground))
       .on_mouse_down("left", (_e, cx) => cx.stop_propagation()).on_click(action)
-      .child(svg(icon(glyph)).size(13).flex_none()).when(Boolean(tip), (e) => e.child(tip));
+      .child(svg(icon(glyph)).size(13).flex_none()).when(Boolean(tip), (e) => e.child(tr(tip)));
   }
 
   header(t) {
@@ -666,22 +667,22 @@ export class Graph {
     const repo = ws && this.opened ? ws.repos.find((r) => r.path === this.opened) : null;
     const settingsShown = this.state === "workspace" || (this.state === "norepo" && !this.skipped);
     return h_flex().h(42).flex_none().px(14).gap(8).items_center().border_b(1).border_color(t.border)
-      .when(!repo, (e) => e.child(div().text_size(13).font_semibold().child(ws ? "Manygit" : "Git")))
+      .when(!repo, (e) => e.child(div().text_size(13).font_semibold().child(ws ? "Manygit" : tr("Git"))))
       .when(Boolean(repo), (e) => e
-        .child(h_flex().id("graph-back").tooltip("Back to repositories").accessibility_label("Back to repositories").h(24).pl(2).pr(6).gap(3).flex_none().items_center().rounded(6).cursor_pointer()
+        .child(h_flex().id("graph-back").tooltip(tr("Back to repositories")).accessibility_label(tr("Back to repositories")).h(24).pl(2).pr(6).gap(3).flex_none().items_center().rounded(6).cursor_pointer()
           .hover((s) => s.bg(t.hover)).on_click((_e, cx) => this.back(cx))
           .child(svg(icon("back")).size(14).flex_none().text_color(t.muted)).child(div().text_size(13).font_semibold().child("Manygit")))
-        .child(h_flex().id("graph-repository").tooltip("Switch repository").accessibility_label("Switch repository").h(22).px(7).gap(5).min_w(0).items_center().rounded(6).cursor_pointer()
+        .child(h_flex().id("graph-repository").tooltip(tr("Switch repository")).accessibility_label(tr("Switch repository")).h(22).px(7).gap(5).min_w(0).items_center().rounded(6).cursor_pointer()
           .bg(this.picking ? t.selected : t.raised).text_color(t.foreground).hover((s) => s.bg(t.hover)).on_click((_e, cx) => this.togglePicker(cx))
-          .child(svg(icon("folder")).size(12).flex_none()).child(div().min_w(0).truncate().text_size(11.5).font_semibold().child(repo.name))))
+          .child(svg(icon("folder")).size(12).flex_none()).child(div().min_w(0).truncate().text_size(11.5).font_semibold().child(tr(repo.name)))))
       .when(ready && Boolean(where), (e) => e.child(h_flex().h(22).px(7).gap(5).min_w(0).items_center().rounded(6).bg(t.accent + "26").text_color(t.accent)
-        .child(svg(icon(this.current ? "branch" : "commit")).size(12).flex_none()).child(div().min_w(0).truncate().text_size(11.5).font_semibold().child(where))))
+        .child(svg(icon(this.current ? "branch" : "commit")).size(12).flex_none()).child(div().min_w(0).truncate().text_size(11.5).font_semibold().child(tr(where)))))
       .when(this.state === "workspace", (e) => e.child(div().flex_none().text_size(11.5).text_color(t.dim).child(count(ws.repos.length, "repo"))))
       .child(div().flex_1())
       // A newer release: a dot, and the update window on click.
-      .when(Boolean(available()), (e) => e.child(h_flex().id("graph-update").tooltip("View graph update").accessibility_label("View graph update").h(24).px(7).gap(5).flex_none().items_center().rounded(6).text_size(11.5)
+      .when(Boolean(available()), (e) => e.child(h_flex().id("graph-update").tooltip(tr("View graph update")).accessibility_label(tr("View graph update")).h(24).px(7).gap(5).flex_none().items_center().rounded(6).text_size(11.5)
         .cursor_pointer().text_color(t.accent).hover((s) => s.bg(t.hover)).on_mouse_down("left", (_e, cx) => cx.stop_propagation())
-        .on_click(() => openUpdate()).child(div().size(6).rounded(3).bg(t.accent)).child("Update Graph")))
+        .on_click(() => openUpdate()).child(div().size(6).rounded(3).bg(t.accent)).child(tr("Update Graph"))))
       .when(ready && this.remoteNames?.length > 0, (e) => e.child(this.iconButton("graph-fetch", "fetch", "Fetch from remote", this.fetching ? "Fetching…" : null, false, (_e, cx) => this.fetch(cx), t)))
       .when(this.state === "workspace", (e) => {
         const run = this.fetchAll?.root === ws.root ? this.fetchAll : null;
@@ -703,7 +704,7 @@ export class Graph {
     let height = 8;
     repos.forEach((r, i) => {
       if (grouped && r.group !== repos[i - 1]?.group) {
-        rows.push(div().h(26).flex_none().px(14).pt(9).text_size(11).text_color(t.dim).truncate().child(r.group ? `${r.group}/` : "./"));
+        rows.push(div().h(26).flex_none().px(14).pt(9).text_size(11).text_color(t.dim).truncate().child(tr(r.group ? `${r.group}/` : "./")));
         height += 26;
       }
       rows.push(this.repoRow(r, i, grouped, t));
@@ -748,27 +749,27 @@ export class Graph {
       .when(here, (e) => e.bg(t.selected)).hover((s) => s.bg(t.hover))
       .on_click((_e, cx) => { if (here) { this.picking = false; cx.notify(); } else this.open(r.path, cx); })
       .on_mouse_down("right", (_e, cx) => { cx.stop_propagation(); if (st && !st.error) this.repoMenu(r, cx); })
-      .child(div().min_w(0).truncate().text_size(11.5).text_color(here ? t.accent : t.foreground).child(r.name))
+      .child(div().min_w(0).truncate().text_size(11.5).text_color(here ? t.accent : t.foreground).child(tr(r.name)))
       .child(h_flex().flex_none().gap(5).items_center().text_size(11.5)
         .when(st?.dirty > 0, (e) => e.child(h_flex().mr(2).gap(4).items_center().text_color(t.blocked)
           .child(div().size(6).rounded(3).bg(t.blocked)).child(String(st.dirty))))
         .when(counts && st.ahead > 0, (e) => e.child(div().text_color(t.ansi2).child(`\u2191${st.ahead}`)))
         .when(counts && st.behind > 0, (e) => e.child(div().text_color(t.ansi1).child(`\u2193${st.behind}`)))
-        .when(Boolean(label), (e) => e.child(div().text_color(color).child(label))))
+        .when(Boolean(label), (e) => e.child(div().text_color(color).child(tr(label)))))
       .child(div().flex_1())
       // The newest tag, just before the branch (Show tags).
       .when(Boolean(tag), (e) => e.child(h_flex().flex_none().max_w(120).gap(4).items_center().text_color(t.dim)
-        .child(svg(icon("tag")).size(11).flex_none()).child(div().min_w(0).truncate().text_size(11).child(tag))))
+        .child(svg(icon("tag")).size(11).flex_none()).child(div().min_w(0).truncate().text_size(11).child(tr(tag)))))
       .when(Boolean(branch), (e) => e.child(h_flex().flex_none().max_w(200).gap(5).items_center().text_color(t.muted)
-        .child(svg(icon("branch")).size(12).flex_none()).child(div().min_w(0).truncate().text_size(11).child(branch))))
-      .when(Boolean(problem), (e) => e.child(div().flex_none().max_w(200).truncate().text_size(11).text_color(t.ansi1).child(problem)));
+        .child(svg(icon("branch")).size(12).flex_none()).child(div().min_w(0).truncate().text_size(11).child(tr(branch)))))
+      .when(Boolean(problem), (e) => e.child(div().flex_none().max_w(200).truncate().text_size(11).text_color(t.ansi1).child(tr(problem))));
   }
 
 
   toolbar(t) {
     const segment = (id, text, on, action) => div().id(id).h(22).px(9).flex().items_center().rounded(5).text_size(11.5).cursor_pointer()
       .bg(on ? t.raised : t.background).text_color(on ? t.foreground : t.muted).when(on, (e) => e.border_1().border_color(t.border))
-      .hover((s) => s.text_color(t.foreground)).on_click(action).child(text);
+      .hover((s) => s.text_color(t.foreground)).on_click(action).child(tr(text));
     return h_flex().h(34).flex_none().px(10).gap(8).items_center().border_b(1).border_color(t.border)
       .child(h_flex().p(2).gap(2).rounded(7).bg(t.background).border_1().border_color(t.border)
         .child(segment("graph-all", "All branches", this.all, (_e, cx) => this.setScope(true, cx)))
@@ -777,11 +778,11 @@ export class Graph {
         .hover((s) => s.bg(t.hover).text_color(t.foreground)).on_click((_e, cx) => this.setRemotes(cx))
         .child(div().size(13).rounded(3).border_1().border_color(this.remotes ? t.accent : t.input).when(this.remotes, (e) => e.bg(t.accent)).flex().items_center().justify_center()
           .when(this.remotes, (e) => e.child(svg(icon("check")).size(10).text_color(t.accent_foreground))))
-        .child("Remotes"));
+        .child(tr("Remotes")));
   }
 
   columns(t, width) {
-    const head = (text, w) => div().when(w !== undefined, (e) => e.w(w).flex_none()).truncate().child(text);
+    const head = (text, w) => div().when(w !== undefined, (e) => e.w(w).flex_none()).truncate().child(tr(text));
     const titles = { date: "Date", author: "Author", hash: "Commit" };
     // Handles stand in for the rows' gaps, 1px wider each side.
     const handle = (key) => div().id(`graph-col-${key}`).w(LABEL.GAP + 2).mx(-1).h_full().flex_none().flex().justify_center().cursor_col_resize()
@@ -789,7 +790,7 @@ export class Graph {
       .child(div().w(1).h_full().when(this.drag?.key === key, (e) => e.bg(t.accent)))
       .hover((s) => s.bg(t.border));
     return h_flex().h(24).flex_none().pr(10).items_center().border_b(1).border_color(t.border).text_size(11).text_color(t.dim)
-      .child(head("Graph", width).pl(PAD)).child(handle("graph")).child(div().flex_1().min_w(0).child("Description"))
+      .child(head("Graph", width).pl(PAD)).child(handle("graph")).child(div().flex_1().min_w(0).child(tr("Description")))
       .children(this.trailing().flatMap((k) => [handle(k), head(titles[k], this.cols[k]).when(k === "date", (e) => e.text_right())]));
   }
 
@@ -807,7 +808,7 @@ export class Graph {
           return Array.from({ length: range.end - range.start }, (_x, k) => range.start + k).map((i) => i < this.commits.length
             ? this.row(i, t, colors, mono, width)
             : div().id("graph-more").h(this.rowH()).flex_none().px(14).flex().items_center().text_color(t.accent).hover((s) => s.bg(t.hover))
-              .child(this.loading ? "Loading more commits…" : `Load ${PAGE} more commits`));
+              .child(this.loading ? tr("Loading more commits…") : `Load ${PAGE} more commits`));
         })
         // Rows of a virtual list can't hold their own handlers: the list reports the row's key.
         .on_item_click((key, cx) => this.clicked(key, cx))
@@ -829,12 +830,12 @@ export class Graph {
     if (this.diff) {
       const rows = this.diff.rows;
       return v_flex().flex_none().h(this.detailHeight())
-        .child(grip)
+        .child(tr(grip))
         .child(top.child(div().id("graph-diff-back").px(6).py(1).rounded(4).text_color(t.muted).cursor_pointer().hover((s) => s.bg(t.hover).text_color(t.foreground))
             .on_click((_e, cx) => { this.diff = null; cx.notify(); }).child("← Files"))
-          .child(div().flex_1().min_w(0).truncate().font_family(mono).text_color(t.foreground).child(this.diff.path)).child(close))
+          .child(div().flex_1().min_w(0).truncate().font_family(mono).text_color(t.foreground).child(tr(this.diff.path))).child(tr(close)))
         .child(div().flex_1().min_h(0).relative().font_family(mono).text_size(11)
-          .when(!rows, (e) => e.child(div().p(12).text_color(t.dim).child("Loading diff…")))
+          .when(!rows, (e) => e.child(div().p(12).text_color(t.dim).child(tr("Loading diff…"))))
           .when(Boolean(rows), (e) => e.child(div().id(`${this.diffId}-x`).size_full().overflow_x_scrollbar()
               .child(div().w_full().min_w(this.diff.width).h_full().child(v_virtual_list(this.diffId, rows.length, DIFF_ROW, (i) => String(i),
                 (range) => rows.slice(range.start, range.end).map((r) => this.diffRow(r, t))).size_full())))
@@ -843,27 +844,27 @@ export class Graph {
     const title = commit.uncommitted ? "Uncommitted changes" : `Commit ${commit.hash.slice(0, 8)}`;
     const body = v_flex().id("graph-details").flex_1().min_h(0).overflow_y_scrollbar().px(14).py(10).gap(4);
     const pane = (content) => v_flex().flex_none().h(this.detailHeight())
-      .child(grip)
-      .child(top.child(div().flex_1().text_color(t.muted).child(title))
+      .child(tr(grip))
+      .child(top.child(div().flex_1().text_color(t.muted).child(tr(title)))
         .when(Boolean(commit.uncommitted), (e) => e.child(div().id("graph-open-changes").px(6).py(1).rounded(4).text_color(t.accent).cursor_pointer().hover((s) => s.bg(t.hover))
-          .on_click(() => showChanges()).child("Open Changes")))
-        .child(close))
-      .child(content);
-    if (d?.error) return pane(body.child(div().text_color(t.ansi1).child(d.error)));
-    const meta = (k, v, color) => h_flex().gap(8).text_size(11.5).child(div().w(64).flex_none().text_color(t.dim).child(k)).child(div().min_w(0).truncate().text_color(color ?? t.muted).child(v));
+          .on_click(() => showChanges()).child(tr("Open Changes"))))
+        .child(tr(close)))
+      .child(tr(content));
+    if (d?.error) return pane(body.child(div().text_color(t.ansi1).child(tr(d.error))));
+    const meta = (k, v, color) => h_flex().gap(8).text_size(11.5).child(div().w(64).flex_none().text_color(t.dim).child(tr(k))).child(div().min_w(0).truncate().text_color(color ?? t.muted).child(tr(v)));
     // The history already has the header: it shows at once, and what git adds lands below it.
     const head = commit.uncommitted ? body : body
-      .child(div().font_semibold().child(commit.subject))
+      .child(div().font_semibold().child(tr(commit.subject)))
       .child(meta("Commit", commit.hash, t.accent).font_family(mono))
       .child(meta("Parents", commit.parents.map((p) => p.slice(0, 8)).join(", ") || "none"))
       .child(meta("Author", `${commit.author} <${commit.email}>`))
       .child(meta("Date", `${stamp(commit.time)} · ${ago(commit.time)}`));
-    if (!d) return pane(head.child(div().pt(8).text_size(11.5).text_color(t.dim).child(commit.uncommitted ? "Loading…" : "Loading files…")));
+    if (!d) return pane(head.child(div().pt(8).text_size(11.5).text_color(t.dim).child(commit.uncommitted ? tr("Loading…") : tr("Loading files…"))));
     const add = d.files.reduce((n, f) => n + f.add, 0), del = d.files.reduce((n, f) => n + f.del, 0);
     const lines = commit.uncommitted ? "" : d.message.split("\n").slice(1).join("\n").trim();
     return pane(head
       .when(Boolean(d.committer && d.committer !== d.author), (el) => el.child(meta("Committer", d.committer)))
-      .when(Boolean(lines), (el) => el.child(v_flex().pt(6).children(lines.split("\n").map((line) => div().text_color(t.muted).child(line || " ")))))
+      .when(Boolean(lines), (el) => el.child(v_flex().pt(6).children(lines.split("\n").map((line) => div().text_color(t.muted).child(tr(line || " "))))))
       .child(h_flex().pt(8).pb(2).gap(8).items_center().text_size(11.5)
         .child(div().text_color(t.muted).child(count(d.files.length + d.more, "file")))
         .when(add > 0 || del > 0, (e) => e.child(div().text_color(t.ansi2).child(`+${add}`)).child(div().text_color(t.ansi1).child(`−${del}`))))
@@ -872,8 +873,8 @@ export class Graph {
         const sc = f.status === "A" ? t.ansi2 : f.status === "D" || f.status === "U" ? t.ansi1 : t.blocked;
         return h_flex().id(`gf-${i}`).h(24).flex_none().px(6).gap(8).items_center().rounded(6).cursor_pointer().hover((s) => s.bg(t.hover))
           .on_click((_e, cx) => this.openDiff(commit, f, cx))
-          .child(div().w(12).flex_none().text_size(11).text_color(sc).child(f.status))
-          .child(h_flex().flex_1().min_w(0).child(div().text_color(t.dim).truncate().child(parts.length ? parts.join("/") + "/" : "")).child(div().min_w(0).truncate().child(name)))
+          .child(div().w(12).flex_none().text_size(11).text_color(sc).child(tr(f.status)))
+          .child(h_flex().flex_1().min_w(0).child(div().text_color(t.dim).truncate().child(parts.length ? parts.join("/") + "/" : "")).child(div().min_w(0).truncate().child(tr(name))))
           .when(f.add > 0, (e) => e.child(div().text_size(11).text_color(t.ansi2).child(`+${f.add}`)))
           .when(f.del > 0, (e) => e.child(div().text_size(11).text_color(t.ansi1).child(`−${f.del}`)));
       }))
@@ -881,10 +882,10 @@ export class Graph {
   }
 
   diffRow({ kind, number, text }, t) {
-    if (kind === "@") return div().w_full().px(12).h(DIFF_ROW).flex_none().truncate().bg(t.raised).text_color(t.dim).child(text);
+    if (kind === "@") return div().w_full().px(12).h(DIFF_ROW).flex_none().truncate().bg(t.raised).text_color(t.dim).child(tr(text));
     return h_flex().w_full().h(DIFF_ROW).flex_none().gap(10).when(kind === "+", (e) => e.bg(t.ansi2 + "18")).when(kind === "-", (e) => e.bg(t.ansi1 + "18"))
       .child(div().w(34).flex_none().text_right().text_color(t.dim).child(number === undefined ? "" : String(number)))
-      .child(div().flex_1().min_w(0).truncate().child(text));
+      .child(div().flex_1().min_w(0).truncate().child(tr(text)));
   }
 
   empty(t) {
@@ -898,8 +899,8 @@ export class Graph {
     return v_flex().flex_1().min_h(0).items_center().justify_center().gap(10).px(28).pb(40)
       .child(div().size(46).rounded(12).bg(t.raised).border_1().border_color(t.border).flex().items_center().justify_center()
         .child(svg(icon(glyph)).size(22).text_color(s === "error" ? t.ansi1 : t.muted)))
-      .child(div().text_size(14).font_semibold().text_color(t.foreground).child(title))
-      .when(Boolean(body), (e) => e.child(div().max_w(280).text_center().text_size(12).text_color(t.muted).child(body)));
+      .child(div().text_size(14).font_semibold().text_color(t.foreground).child(tr(title)))
+      .when(Boolean(body), (e) => e.child(div().max_w(280).text_center().text_size(12).text_color(t.muted).child(tr(body))));
   }
 
   render(cx) {

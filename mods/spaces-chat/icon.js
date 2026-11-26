@@ -114,12 +114,12 @@ export class IconPicker {
         .child(v_virtual_list("emoji-list", rows.length, sizes, (i) => rows[i].key, (range) => {
           this.range = range;
           return rows.slice(range.start, range.end).map((r) => {
-            if (r.kind === "head") return div().w_full().h(HEAD).px(4).pt(9).text_size(11).text_color(t.dim).child(r.name);
+            if (r.kind === "head") return div().w_full().h(HEAD).px(4).pt(9).text_size(11).text_color(t.dim).child(tr(r.name));
             if (r.kind === "none") return div().w_full().h(CELL).px(4).flex().items_center().text_color(t.dim).child(tr("No emoji found"));
             return h_flex().w_full().h(CELL).children(r.list.map((x) => div().size(CELL).flex_none().flex().items_center().justify_center().rounded(7)
               .text_size(21).cursor_pointer().when(x.e === now, (el) => el.bg(t.selected))
               .hover((s) => s.bg(t.hover))
-              .child(x.e)));
+              .child(tr(x.e))));
           });
         })
           .track_scroll(this.scroll).size_full()
@@ -141,6 +141,6 @@ export class IconPicker {
             : this.p.section
             ? svg("mods/workspace-chrome/folder.svg").size(13).flex_none()
             : div().w(14).text_center().text_size(15).child("#"))
-          .child(this.p.machine ? `Reset to ${this.p.machine} icon` : this.p.section ? "Reset to folder" : "Reset to #")));
+          .child(this.p.machine ? `Reset to ${this.p.machine} icon` : this.p.section ? tr("Reset to folder") : "Reset to #")));
   }
 }

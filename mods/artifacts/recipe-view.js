@@ -3,6 +3,7 @@
 // its recipe (recipe-data.js, from recipe.json) into each recipe artifact it installs, so the viewer, its versions and Mark up stay as they are.
 // Colors from theme() only; text 12-15 px; works from 320 px wide. A choice, a form or a button sends its words to
 // the agent that made it (artifact.js reply), from a click only.
+import { tr } from "./i18n.js";
 import { View, div } from "gpui-kit";
 import { v_flex, h_flex, TextView, InputState, Input } from "gpui-base";
 import { image } from "gpui-kit";
@@ -58,7 +59,7 @@ export default class RecipeView extends View {
       .child(div().id(`copy-${key}`).flex_none().h(22).px(8).flex().items_center().rounded(6).border_1().border_color(t.border)
         .bg(t.background).text_size(12).text_color(done ? t.foreground : t.muted).cursor_pointer().hover((s) => s.text_color(t.foreground))
         .on_click((_e, cx) => this.copy(key, text, cx))
-        .child(done ? "Copied" : "Copy"));
+        .child(done ? tr("Copied") : tr("Copy")));
   }
 
   copy(key, text, cx) {
@@ -126,17 +127,17 @@ export default class RecipeView extends View {
     return v_flex().w_full().min_w(0).gap(4)
       .child(poster ? image(asset(poster)).w_full().rounded(6).border_1().border_color(t.border)
         : v_flex().w_full().h(96).rounded(6).bg(t.surface).items_center().justify_center().gap(2)
-          .child(div().text_size(17).text_color(t.muted).child(mark))
-          .child(div().text_size(12).text_color(t.muted).child(what)))
+          .child(div().text_size(17).text_color(t.muted).child(tr(mark)))
+          .child(div().text_size(12).text_color(t.muted).child(tr(what))))
       .child(div().text_size(12).text_color(t.muted).whitespace_normal().child(`${String(b.caption ?? b.src ?? what)} · plays in the web app`));
   }
 
   block(b, t, cx) {
     switch (b.type) {
-      case "heading": return div().text_size((b.level ?? 2) <= 1 ? 17 : 15).font_semibold().whitespace_normal().child(b.text);
+      case "heading": return div().text_size((b.level ?? 2) <= 1 ? 17 : 15).font_semibold().whitespace_normal().child(tr(b.text));
       case "text": return this.md(b.id, b.md, t);
       case "list": return v_flex().gap(4).children(b.items.map((x, i) => h_flex().gap(8).items_start()
-        .child(div().flex_none().w(16).text_size(13).text_color(t.muted).child(b.ordered ? `${i + 1}.` : "•"))
+        .child(div().flex_none().w(16).text_size(13).text_color(t.muted).child(tr(b.ordered ? `${i + 1}.` : "•")))
         .child(this.md(`${b.id}-${i}`, x, t))));
       case "table": return v_flex().w_full().rounded(8).border_1().border_color(t.border).overflow_hidden()
         .child(h_flex().w_full().px(10).py(6).bg(t.surface).children(b.columns.map((c, i) => div().flex_1().min_w(0).text_size(12).font_medium().text_color(t.muted)
@@ -154,14 +155,14 @@ export default class RecipeView extends View {
       case "pdf": return this.media(b, t, "PDF", "PDF", null);
       case "image": return v_flex().gap(4)
         .child(image(asset(b.src)).w_full().when(!!b.w && !!b.h, (e) => e.max_w(b.w)).rounded(6).border_1().border_color(t.border))
-        .when(!!b.caption, (e) => e.child(div().text_size(12).text_color(t.muted).whitespace_normal().child(b.caption)));
+        .when(!!b.caption, (e) => e.child(div().text_size(12).text_color(t.muted).whitespace_normal().child(tr(b.caption))));
       case "pair": return h_flex().flex_wrap().gap(10).children([["Before", b.before], ["After", b.after]].map(([w, x]) => v_flex().flex_1().min_w(240).gap(4)
         .child(mediaKind(x.src) === "video" ? this.media(x, t, "▶", "Clip", x.poster ?? null)
           : image(asset(x.src)).w_full().rounded(6).border_1().border_color(t.border))
-        .child(div().text_size(12).text_color(t.muted).child(x.caption ?? w))));
+        .child(div().text_size(12).text_color(t.muted).child(tr(x.caption ?? w)))));
       case "code": return this.code(b.id, b.text, t);
       case "callout": return v_flex().gap(4).p(12).rounded(8).bg(t[TONE[b.tone ?? "info"]] ? t.surface : t.surface).border_l(3).border_color(t[TONE[b.tone ?? "info"]] ?? t.border)
-        .when(!!b.title, (e) => e.child(div().text_size(13).font_semibold().child(b.title)))
+        .when(!!b.title, (e) => e.child(div().text_size(13).font_semibold().child(tr(b.title))))
         .when(!!b.md, (e) => e.child(this.md(b.id, b.md, t)));
       case "columns": return h_flex().flex_wrap().gap(16).items_start().children(b.columns.map((c) => v_flex().flex_1().min_w(240).gap(14).children(c.map((x) => this.block(x, t, cx)))));
       case "tabs": {
@@ -170,7 +171,7 @@ export default class RecipeView extends View {
           .child(h_flex().gap(4).flex_wrap().children(b.tabs.map((x, i) => div().id(`tab-${b.id}-${i}`).h(26).px(10).flex().items_center().rounded(6).cursor_pointer()
             .bg(i === on ? t.surface : t.background).border_1().border_color(i === on ? t.border : t.background)
             .on_click((_e, cx) => { this.tab.set(b.id, i); cx.notify(); })
-            .child(div().text_size(13).text_color(i === on ? t.foreground : t.muted).child(x.label)))))
+            .child(div().text_size(13).text_color(i === on ? t.foreground : t.muted).child(tr(x.label))))))
           .child(v_flex().gap(14).children((b.tabs[on]?.blocks ?? []).map((x) => this.block(x, t, cx))));
       }
       case "details": {
@@ -178,19 +179,19 @@ export default class RecipeView extends View {
         return v_flex().gap(10)
           .child(div().id(`det-${b.id}`).cursor_pointer().text_size(13).font_medium().text_color(t.muted)
             .on_click((_e, cx) => { if (open) this.open.delete(b.id); else this.open.add(b.id); cx.notify(); })
-            .child(`${open ? "▾" : "▸"} ${b.summary}`))
+            .child(tr(`${open ? "▾" : "▸"} ${b.summary}`)))
           .when(open, (e) => e.child(v_flex().gap(14).pl(14).children(b.blocks.map((x) => this.block(x, t, cx)))));
       }
       case "divider": return div().w_full().h(1).bg(t.border);
       case "choice": {
         const sent = this.sent.get(b.id);
         return v_flex().gap(6)
-          .child(div().text_size(13).font_semibold().whitespace_normal().child(b.question))
+          .child(div().text_size(13).font_semibold().whitespace_normal().child(tr(b.question)))
           .children(b.options.map((o, i) => v_flex().id(`ch-${b.id}-${i}`).p(10).gap(2).rounded(8).border_1().border_color(t.border)
             .bg(sent === choiceReply(b, o.label) ? t.surface : t.background).when(!sent, (e) => e.cursor_pointer().hover((s) => s.bg(t.surface)))
             .on_click((_e, cx) => this.send(b.id, choiceReply(b, o.label), cx))
             .child(div().text_size(13).font_medium().child(sent === choiceReply(b, o.label) ? `${o.label} · Sent` : o.label))
-            .when(!!o.description, (e) => e.child(div().text_size(12).text_color(t.muted).whitespace_normal().child(o.description)))));
+            .when(!!o.description, (e) => e.child(div().text_size(12).text_color(t.muted).whitespace_normal().child(tr(o.description))))));
       }
       case "form": {
         const sent = this.sent.has(b.id);
@@ -199,14 +200,14 @@ export default class RecipeView extends View {
             ? h_flex().id(`cb-${b.id}-${f.name}`).gap(8).items_center().cursor_pointer()
               .on_click((_e, cx) => { this.checks.set(`${b.id}:${f.name}`, !this.checked(b, f)); cx.notify(); })
               .child(div().size(14).rounded(3).border_1().border_color(t.border).when(this.checked(b, f), (e) => e.bg(t.accent)))
-              .child(div().text_size(13).child(f.label ?? f.name))
-            : v_flex().gap(4).child(div().text_size(12).text_color(t.muted).child(f.label ?? f.name))
+              .child(div().text_size(13).child(tr(f.label ?? f.name)))
+            : v_flex().gap(4).child(div().text_size(12).text_color(t.muted).child(tr(f.label ?? f.name)))
               .child(div().px(8).py(5).rounded(6).border_1().border_color(t.border).child(Input.new(this.input(b, f)).w_full().text_size(13)))))
           .child(div().id(`fs-${b.id}`).self_start().px(12).py(6).rounded(6).bg(t.solid).text_color(t.solid_foreground).text_size(13)
             .when(!sent, (e) => e.cursor_pointer()).on_click((_e, cx) => {
               const values = Object.fromEntries(b.fields.map((f) => [f.name, f.kind === "checkbox" ? this.checked(b, f) : this.input(b, f).value()]));
               this.send(b.id, formReply(b, values), cx);
-            }).child(sent ? "Sent" : b.submit ?? "Send"));
+            }).child(sent ? tr("Sent") : b.submit ?? tr("Send")));
       }
       case "button": return this.button(b, b.id, t).self_start();
       case "buttons": return h_flex().flex_wrap().gap(8).items_center().children(b.items.map((x, i) => this.button(x, `${b.id}-${i}`, t)));
@@ -227,12 +228,12 @@ export default class RecipeView extends View {
       .when(live, (e) => e.cursor_pointer()).on_click((_e, cx) => {
         if (link) cx.open_url(link);
         if (answers) this.send(key, b.reply, cx);
-      }).child(sent && !link ? `${b.label} · Sent` : link ? `${b.label} ↗` : b.label);
+      }).child(tr(sent && !link ? `${b.label} · Sent` : link ? `${b.label} ↗` : b.label));
   }
 
   render(cx) {
     const t = theme();
-    const body = this.error ? [div().text_size(13).text_color(t.muted).child(this.error)]
+    const body = this.error ? [div().text_size(13).text_color(t.muted).child(tr(this.error))]
       : !this.recipe ? [] : this.recipe.blocks.map((b) => v_flex().id(`blk-${b.id}`).w_full().min_w(0).child(this.block(b, t, cx)));
     return v_flex().id("recipe").size_full().overflow_y_scrollbar().bg(t.background).text_color(t.foreground)
       .child(v_flex().p(16).gap(14).max_w(860).children(body));

@@ -2,6 +2,7 @@
 // herdr-task fills it in when it makes a task's worktree ({n}: its number, {key}: its id, {slug}: its title's words);
 // empty, task/{n}-{slug}. A task's own --branch wins. Checked before it's saved (core/settings.js branchPattern).
 
+import { tr } from "./i18n.js";
 import { div } from "gpui-kit";
 import { v_flex, InputState, Input } from "gpui-base";
 import { shepherdrFor } from "./coordinator.js";
@@ -46,10 +47,10 @@ export function branchRow(view, t) {
     .child(Input.new(b.box).w_full().h(30).px(10).rounded(7).border_1().border_color(b.err ? t.blocked : b.focus ? t.accent : t.input)
       .bg(t.background).text_size(13).text_color(t.foreground))
     .when(empty, (el) => el.child(div().absolute().top(6).left(11).right(11).truncate().text_size(13).text_color(t.dim)
-      .child(BRANCH.pattern)));
+      .child(tr(BRANCH.pattern))));
   // A pattern that can't be used says why under the box, and isn't saved.
-  const control = v_flex().items_end().gap(5).child(box)
-    .when(Boolean(b.err), (el) => el.child(div().w(200).text_size(12).line_height("17px").text_color(t.blocked).child(b.err)));
+  const control = v_flex().items_end().gap(5).child(tr(box))
+    .when(Boolean(b.err), (el) => el.child(div().w(200).text_size(12).line_height("17px").text_color(t.blocked).child(tr(b.err))));
   // Reset: back to Everywhere's, shown in the box at once
   const reset = (cx) => {
     b.err = "";

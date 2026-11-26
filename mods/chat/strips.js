@@ -15,6 +15,7 @@
 // A ctl: { id, label, look ("primary" | "secondary" | "plain" | "pill" | "link"), on, done,
 // disabled, fn }. fn(cx) runs on a press.
 
+import { tr } from "./i18n.js";
 import { div, svg } from "gpui-kit";
 import { h_flex, v_flex, Input } from "gpui-base";
 import { button, red, RADIUS, TEXT } from "./ui.js";
@@ -27,13 +28,13 @@ const GAPS = { controls: 6, pill: 4 };
 export function ctlEl(t, c, pre = "") {
   const live = !c.disabled && Boolean(c.fn);
   if (c.look === "link") return div().id(`${pre}${c.id}`).flex_none().whitespace_nowrap().text_size(TEXT.label).text_color(t.muted)
-    .when(live, (el) => el.cursor_pointer().hover((s) => s.text_color(t.foreground))).child(c.label);
+    .when(live, (el) => el.cursor_pointer().hover((s) => s.text_color(t.foreground))).child(tr(c.label));
   if (c.look === "pill") return h_flex().id(`${pre}${c.id}`).h(24).px(9).gap(5).flex_none().items_center().rounded(12).whitespace_nowrap().text_size(TEXT.label)
     .when(Boolean(c.on), (el) => el.bg(t.selected).text_color(t.foreground).font_medium())
     .when(!c.on, (el) => el.text_color(t.muted).when(live, (el) => el.hover((s) => s.bg(t.hover))))
     .when(live, (el) => el.cursor_pointer())
     .when(Boolean(c.done), (el) => el.child(svg("mods/chat/check.svg").size(11).flex_none().text_color(t.dim)))
-    .child(c.label);
+    .child(tr(c.label));
   return button(`${pre}${c.id}`, c.label, { kind: c.look ?? "secondary", disabled: Boolean(c.disabled) })
     .when(live, (el) => el.cursor_pointer().hover((s) => (c.look === "primary" ? s.opacity(0.88)
       : c.look === "plain" ? s.bg(t.hover).text_color(t.foreground) : s.bg(t.hover))));
@@ -62,20 +63,20 @@ function body(t, s, pre) {
       return h_flex().w_full().min_h(18).gap(LINK_GAP).items_center()
         .child(h_flex().flex_1().min_w(0).gap(8).items_center()
           .child(div().size(8).flex_none().rounded(4).bg(s.dot ?? red()))
-          .child(div().min_w(0).truncate().text_size(TEXT.label).font_medium().text_color(s.dot ? t.muted : red()).child(s.who)))
+          .child(div().min_w(0).truncate().text_size(TEXT.label).font_medium().text_color(s.dot ? t.muted : red()).child(tr(s.who))))
         .when((s.links ?? []).length > 0, (el) => el.child(h_flex().flex_none().gap(LINK_GAP).items_center().children(s.links.map((c) => ctlEl(t, c, pre)))));
     case "title":
-      return div().min_w(0).text_size(TEXT.body).font_medium().text_color(t.foreground).child(s.text);
+      return div().min_w(0).text_size(TEXT.body).font_medium().text_color(t.foreground).child(tr(s.text));
     case "text":
-      return div().min_w(0).text_size(TEXT.label).line_height("18px").text_color(tone(t, s.tone)).child(s.text);
+      return div().min_w(0).text_size(TEXT.label).line_height("18px").text_color(tone(t, s.tone)).child(tr(s.text));
     case "detail":
       return div().w_full().px(8).py(6).rounded(RADIUS.control).bg(t.background).overflow_hidden()
         .when(s.clip != null, (el) => el.max_h(s.clip))
-        .text_size(TEXT.label).text_color(t.muted).children(s.lines.map((l) => div().min_w(0).child(l || " ")));
+        .text_size(TEXT.label).text_color(t.muted).children(s.lines.map((l) => div().min_w(0).child(tr(l || " "))));
     case "controls":
       return h_flex().w_full().gap(s.ctls.every((c) => c.look === "pill") ? GAPS.pill : GAPS.controls).items_center()
         .when(s.align === "end", (el) => el.justify_end())
-        .when(Boolean(s.lead), (el) => el.child(div().flex_none().pr(2).text_size(TEXT.label).text_color(t.dim).child(s.lead)))
+        .when(Boolean(s.lead), (el) => el.child(div().flex_none().pr(2).text_size(TEXT.label).text_color(t.dim).child(tr(s.lead))))
         .children(s.ctls.map((c) => ctlEl(t, c, pre)));
     case "option": {
       const mark = s.num != null
@@ -88,21 +89,21 @@ function body(t, s, pre) {
         .when(Boolean(s.disabled), (el) => el.opacity(0.6))
         .when(!s.disabled, (el) => el.cursor_pointer().hover((st) => st.bg(s.on ? t.selected : t.hover)))
         .when(Boolean(s.on), (el) => el.bg(t.selected))
-        .child(div().pt(s.num != null ? 0 : 2).child(mark))
+        .child(div().pt(s.num != null ? 0 : 2).child(tr(mark)))
         .child(v_flex().flex_1().min_w(0).gap(1)
-          .child(h_flex().gap(6).items_center().child(div().min_w(0).text_color(t.foreground).child(s.label))
-            .when(Boolean(s.tag), (el) => el.child(div().px(6).h(16).flex_none().flex().items_center().rounded(4).bg(t.raised).text_size(TEXT.id).text_color(t.muted).child(s.tag))))
-          .when(Boolean(s.desc), (el) => el.child(div().text_size(TEXT.label).text_color(t.dim).child(s.desc))));
+          .child(h_flex().gap(6).items_center().child(div().min_w(0).text_color(t.foreground).child(tr(s.label)))
+            .when(Boolean(s.tag), (el) => el.child(div().px(6).h(16).flex_none().flex().items_center().rounded(4).bg(t.raised).text_size(TEXT.id).text_color(t.muted).child(tr(s.tag)))))
+          .when(Boolean(s.desc), (el) => el.child(div().text_size(TEXT.label).text_color(t.dim).child(tr(s.desc)))));
     }
     case "review":
       return h_flex().w_full().px(8).py(6).gap(10).rounded(RADIUS.card).cursor_pointer().hover((st) => st.bg(t.hover))
-        .child(div().w(150).flex_none().truncate().text_size(TEXT.label).text_color(t.dim).child(s.label))
-        .child(div().flex_1().min_w(0).text_color(s.missing ? red() : t.foreground).child(s.answer));
+        .child(div().w(150).flex_none().truncate().text_size(TEXT.label).text_color(t.dim).child(tr(s.label)))
+        .child(div().flex_1().min_w(0).text_color(s.missing ? red() : t.foreground).child(tr(s.answer)));
     case "input":
       return div().w_full().pl(s.indent ?? 0).child(div().h(32).px(8).flex().items_center().rounded(RADIUS.control)
         .border_1().border_color(t.input).bg(t.background)
         .child(s.state ? Input.new(s.state).w_full().text_size(TEXT.body).text_color(t.foreground)
-          : div().text_size(TEXT.body).text_color(t.dim).child(s.placeholder ?? "")));
+          : div().text_size(TEXT.body).text_color(t.dim).child(tr(s.placeholder ?? ""))));
     default:
       return div();
   }
@@ -152,5 +153,5 @@ export function measure(t, strips, widths, onChange, unzoom = (px) => px) {
   return div().absolute().top(0).left(0).h(0).overflow_hidden().opacity(0)
     .child(h_flex().items_start().children(ctls.map((c) => div().id(`mwb-${c.id}`).flex_none()
       .on_size_change((size, cx) => { const w = unzoom(size.width); if (widths.get(c.id) !== w) { widths.set(c.id, w); onChange?.(cx); } })
-      .child(c.lead ? div().flex_none().pr(2).text_size(TEXT.label).child(c.lead) : ctlEl(t, c, "mw-")))));
+      .child(c.lead ? div().flex_none().pr(2).text_size(TEXT.label).child(tr(c.lead)) : ctlEl(t, c, "mw-")))));
 }

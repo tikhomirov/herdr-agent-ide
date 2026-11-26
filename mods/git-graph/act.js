@@ -1,3 +1,4 @@
+import { tr } from "./i18n.js";
 import { exec, notify, setShared, openOverlay, run } from "herdr";
 import { dialogFor, dialogHeight, doneText } from "./git.js";
 import { executeAction } from "./execute.js";
@@ -8,7 +9,7 @@ export async function perform(action, values, ctx, { toast = true } = {}) {
   try {
     const result = await executeAction(action, values, ctx, exec);
     if (!result.ok) {
-      if (toast) notify({ title: "Couldn't do that", body: result.message, level: "error" });
+      if (toast) notify({ title: tr("Couldn't do that"), body: result.message, level: "error" });
       return result;
     }
     notify({ title: doneText(action, values), level: "success", timeout: 3000 });
@@ -17,7 +18,7 @@ export async function perform(action, values, ctx, { toast = true } = {}) {
     return { ok: true };
   } catch (e) {
     const message = String(e?.message ?? e);
-    if (toast) notify({ title: "Git didn't run", body: message, level: "error" });
+    if (toast) notify({ title: tr("Git didn't run"), body: message, level: "error" });
     return { ok: false, message };
   } finally {
     setShared("git-graph.changed", Date.now());

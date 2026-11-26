@@ -6,6 +6,7 @@
 // reopens the viewer on that mod. mods/artifacts/main.js has the sidebar's copy of the stepper
 // (mods can't import each other's files; keep the two in step). Colors are the theme's.
 
+import { tr } from "./i18n.js";
 import { div, svg } from "gpui-kit";
 import { h_flex } from "gpui-base";
 import { props, closeOverlay, shared, setShared, theme } from "herdr";
@@ -54,7 +55,7 @@ function step(view, a, v, cx) {
       closeOverlay(props().overlay);
       showViewer({ ...a, mod: out.mod, base: a.base ?? a.mod, version: v ?? latest, latest });
     } catch (e) {
-      toast({ title: "That version didn't open", body: plainError(e), level: "error" });
+      toast({ title: tr("That version didn't open"), body: plainError(e), level: "error" });
       view.art.busy = false;
       cx.notify();
     }
@@ -78,7 +79,7 @@ function textBtn(id, icon, label, act, on, t) {
     .on_mouse_down("left", (_e, cx) => cx.stop_propagation())
     .on_click((_e, cx) => { cx.stop_propagation(); act(cx); cx.notify(); })
     .when(Boolean(icon), (el) => el.child(svg(icon).size(16).flex_none()))
-    .child(label);
+    .child(tr(label));
 }
 
 const rule = (t) => div().w(1).h(18).mx(4).flex_none().bg(t.border);
@@ -104,7 +105,7 @@ export function artifactBar(view, a, handle) {
     .track_focus(handle)
     .child(h_flex().flex_1().min_w(0).gap(8).items_center().text_size(TEXT.body)
       .child(svg("mods/artifacts/artifacts.svg").size(14).flex_none().text_color(t.muted))
-      .child(div().min_w(0).truncate().font_medium().text_color(t.foreground).child(title))
+      .child(div().min_w(0).truncate().font_medium().text_color(t.foreground).child(tr(title)))
       // One version only: which and when. Several: the stepper says it.
       .when(busy || !stepper, (el) => el.child(div().flex_none().text_size(TEXT.label).text_color(t.muted)
         .child(busy ? "Opening…" : `v${shown}${me?.at ? ` · ${ago(me.at)}` : ""}`))))
@@ -125,7 +126,7 @@ export function artifactBar(view, a, handle) {
       .on_mouse_down("left", (_e, cx) => cx.stop_propagation())
       .on_click((_e, cx) => { cx.stop_propagation(); setShared(MARKUP, marking ? null : { mod: a.mod, where: "viewer", at: Date.now() }); cx.notify(); })
       .child(marking ? svg("mods/chat-image/check.svg").size(16).flex_none().text_color(t.accent) : svg("mods/chat-image/markup.svg").size(16).flex_none())
-      .child(marking ? "Done" : "Mark up"))
+      .child(marking ? tr("Done") : tr("Mark up")))
     .child(rule(t))
     .when(!a.modal && hasSidebarView(), (el) => el
       .child(iconBtn("sidebar", "mods/chat-image/panel-right.svg", () => {

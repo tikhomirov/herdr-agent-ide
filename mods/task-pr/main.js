@@ -2,6 +2,7 @@
 // task's machine. The PR herdr-task opened (the task's record), else the one for its branch.
 // Read only. A child of the Tasks panel's task view (taskwhere.js); it asks GitHub only while it
 // shows: on showing, then every 30 s. Agent IDE's PrView, the Herdr way.
+import { tr } from "./i18n.js";
 import { View, div, svg } from "gpui-kit";
 import { v_flex, h_flex } from "gpui-base";
 import { exec, theme, shared, setShared } from "herdr";
@@ -68,13 +69,13 @@ export default class PullRequest extends View {
       .hover((s) => s.bg(t.hover).text_color(t.foreground))
       .on_click((_e, cx) => { cx.stop_propagation(); fn(cx); })
       .child(svg(icon).size(14).flex_none())
-      .child(label);
+      .child(tr(label));
   }
 
   note(text, t, error) {
     return v_flex().flex_1().items_center().justify_center().px(24).gap(8)
       .child(svg("mods/task-pr/git-pull-request.svg").size(18).flex_none().text_color(t.dim))
-      .child(div().max_w(300).text_center().text_size(12.5).text_color(error ? t.ansi1 : t.dim).child(text));
+      .child(div().max_w(300).text_center().text_size(12.5).text_color(error ? t.ansi1 : t.dim).child(tr(text)));
   }
 
   render(cx) {
@@ -97,12 +98,12 @@ export default class PullRequest extends View {
         .child(div().h(20).px(8).flex().flex_none().items_center().rounded(10).bg(tone[1] + "24").text_color(tone[1]).font_medium().child(tone[0]))
         .child(div().flex_none().text_color(t.muted).child(`#${pr.number}`))
         .child(div().flex_1())
-        .child(div().flex_none().text_color(t.dim).child(`${pr.files} ${pr.files === 1 ? "file" : "files"}`))
+        .child(div().flex_none().text_color(t.dim).child(tr(`${pr.files} ${pr.files === 1 ? "file" : "files"}`)))
         .when(pr.add > 0, (e) => e.child(div().flex_none().text_color(t.ansi2).child(`+${pr.add.toLocaleString()}`)))
         .when(pr.del > 0, (e) => e.child(div().flex_none().text_color(t.ansi1).child(`−${pr.del.toLocaleString()}`))))
       .child(v_flex().id("task-pr-body").flex_1().min_h(0).overflow_y_scrollbar().p(16).gap(16)
         .child(v_flex().gap(8)
-          .child(div().text_size(14).font_semibold().child(pr.title))
+          .child(div().text_size(14).font_semibold().child(tr(pr.title)))
           .child(h_flex().gap(6).items_center().text_size(12).text_color(t.dim)
             .child(svg("mods/workspace-chrome/git-branch.svg").size(12).flex_none())
             .child(div().min_w(0).truncate().child(`${pr.head} → ${pr.base}`)))
@@ -116,15 +117,15 @@ export default class PullRequest extends View {
             }))))
         .child(v_flex().gap(4)
           .child(h_flex().gap(8).items_center().justify_between().text_size(12)
-            .child(div().font_medium().text_color(t.muted).child("Checks"))
+            .child(div().font_medium().text_color(t.muted).child(tr("Checks")))
             .when(pr.checks.length > 0, (e) => e.child(div().min_w(0).truncate().text_color(t.dim).child(checksLine(pr.checks)))))
-          .when(!pr.checks.length, (e) => e.child(div().text_size(12).text_color(t.dim).child("No checks on it.")))
+          .when(!pr.checks.length, (e) => e.child(div().text_size(12).text_color(t.dim).child(tr("No checks on it."))))
           .children(pr.checks.map((c, i) => {
             const [ic, color] = icon[c.state];
             return h_flex().id(`task-pr-check-${i}`).h(30).mx(-8).px(8).gap(8).items_center().rounded(7)
               .when(Boolean(c.url), (e) => e.cursor_pointer().hover((s) => s.bg(t.hover)).on_click((_e, cx) => cx.open_url(c.url)))
               .child(svg(ic).size(14).flex_none().text_color(color))
-              .child(div().flex_1().min_w(0).truncate().child(c.name))
+              .child(div().flex_1().min_w(0).truncate().child(tr(c.name)))
               .when(Boolean(c.url), (e) => e.child(svg("mods/chat-image/external-link.svg").size(12).flex_none().text_color(t.dim)));
           }))));
   }

@@ -28,6 +28,7 @@
 // Create space has the tab bar make the space in the field's folder and its Assistant tab
 // (coordinator.js createSpace), and lands in it; the assistant starts on the first message.
 
+import { tr } from "./i18n.js";
 import { View, div, svg } from "gpui-kit";
 import { v_flex, h_flex, InputState, Input, Popup } from "gpui-base";
 import { props, theme, home, exec, pickFolder, closeOverlay, openOverlay, shared, setShared, focused, machines } from "herdr";
@@ -168,7 +169,7 @@ export default class NewSpace extends View {
   // The Machine choice: a field-like button with the machine's icon and name, its list under it.
   machineChoice(t, keys) {
     const look = lookOf(this.machine);
-    const iconOf = (m, l) => (l.icon ? div().w(14).flex_none().flex().justify_center().text_size(12).child(l.icon)
+    const iconOf = (m, l) => (l.icon ? div().w(14).flex_none().flex().justify_center().text_size(12).child(tr(l.icon))
       : svg(`mods/workspace-chrome/${m ? "server" : "monitor"}.svg`).size(14).flex_none().text_color(t.muted));
     const field = h_flex().id("machine").w_full().h(K.field).px(10).gap(8).items_center().rounded(RADIUS.control).border(1)
       .border_color(this.machineOpen ? t.accent : t.input).bg(t.background).text_color(t.foreground).cursor_pointer()
@@ -185,7 +186,7 @@ export default class NewSpace extends View {
             .hover((s) => s.bg(t.hover))
             .on_mouse_down("left", (_e, cx) => { cx.stop_propagation(); this.switchTo(m, cx); })
             .child(iconOf(m, l))
-            .child(div().flex_1().min_w(0).truncate().text_color(t.foreground).child(l.name))
+            .child(div().flex_1().min_w(0).truncate().text_color(t.foreground).child(tr(l.name)))
             .child(div().size(14).flex_none().when(m === this.machine, (el) => el.child(svg("mods/workspace-chrome/check.svg").size(14).text_color(t.foreground))));
         }))));
   }
@@ -361,12 +362,12 @@ export default class NewSpace extends View {
         .child(div().size(14).flex_none().flex().items_center().justify_center().border_1().rounded(3)
           .border_color(on ? t.accent : t.input).bg(on ? t.accent : t.background)
           .when(on, (el) => el.child(svg("mods/workspace-chrome/check.svg").size(10).text_color(t.background))))
-        .child(div().flex_none().text_color(t.foreground).child(W.makeRepo))
-        .child(div().min_w(0).truncate().text_color(t.dim).child(W.makeRepoWhy));
+        .child(div().flex_none().text_color(t.foreground).child(tr(W.makeRepo)))
+        .child(div().min_w(0).truncate().text_color(t.dim).child(tr(W.makeRepoWhy)));
     }
     if (folder && this.repo.get(folder) === true)
       return line.text_color(t.dim).child(svg("mods/workspace-chrome/git-branch.svg").size(13).flex_none())
-        .child(div().min_w(0).truncate().child(W.isRepo));
+        .child(div().min_w(0).truncate().child(tr(W.isRepo)));
     return line;
   }
 
@@ -405,18 +406,18 @@ export default class NewSpace extends View {
     const list = Popup.new("folder-list", input).flex_1().min_w(0).anchor("top_left")
       .when(rows.length > 0 || Boolean(empty), (el) => el.content(v_flex().id("folder-rows").w(LIST_W).h(K.row * shown + 8).overflow_y_scrollbar().mt(4).p(4).rounded(8).border(1).border_color(t.border).bg(t.popover).shadow_lg().text_size(13)
         .children(rows.map((r, i) => this.row(t, `folder-${i}`, i === this.hi, r.path, (cx) => this.pick(r.path, cx), r.up)))
-        .when(Boolean(empty), (el) => el.child(div().h(K.row).flex_none().px(9).flex().items_center().text_color(t.dim).child(empty)))));
+        .when(Boolean(empty), (el) => el.child(div().h(K.row).flex_none().px(9).flex().items_center().text_color(t.dim).child(tr(empty))))));
     const panel = v_flex().id("newspace").w_full().flex_none().p(K.pad).rounded(10).border(1).border_color(t.border).bg(t.popover).shadow_lg().text_size(13)
       .on_key_down((e, cx) => this.key(e, cx))
       .on_mouse_down("left", (_e, cx) => { if (this.listOpen || this.machineOpen) { this.listOpen = false; this.machineOpen = false; this.browse = null; this.hi = -1; cx.notify(); } })
-      .child(h_flex().h(K.title).flex_none().gap(6).items_baseline().text_size(TEXT.title).font_semibold().text_color(t.foreground).child(W.title)
+      .child(h_flex().h(K.title).flex_none().gap(6).items_baseline().text_size(TEXT.title).font_semibold().text_color(t.foreground).child(tr(W.title))
         .when(Boolean(this.machine) && !choosing, (el) => el.child(div().min_w(0).truncate().font_normal().text_color(t.dim).child(W.on(lookOf(this.machine).name)))))
       .child(div().h(K.section).flex_none())
-      .when(choosing, (el) => el.child(div().h(K.label).flex_none().text_size(TEXT.label).text_color(t.dim).child(W.machine))
+      .when(choosing, (el) => el.child(div().h(K.label).flex_none().text_size(TEXT.label).text_color(t.dim).child(tr(W.machine)))
         .child(div().h(K.gap).flex_none())
         .child(this.machineChoice(t, keys))
         .child(div().h(K.section).flex_none()))
-      .child(div().h(K.label).flex_none().text_size(TEXT.label).text_color(t.dim).child(W.label))
+      .child(div().h(K.label).flex_none().text_size(TEXT.label).text_color(t.dim).child(tr(W.label)))
       .child(div().h(K.gap).flex_none())
       // The icon (as the Rename dialog's), the field and Browse…: the desktop's own folder picker
       // here, the list on another machine.
@@ -425,16 +426,16 @@ export default class NewSpace extends View {
           .cursor_pointer().hover((s) => s.bg(t.hover))
           .on_mouse_down("left", (e) => { this.iconAt = { x: e.position.x - (e.local_position?.x ?? 0), y: e.position.y - (e.local_position?.y ?? 0), width: e.bounds?.width ?? 0, height: e.bounds?.height ?? 0 }; })
           .on_click((_e, cx) => { this.pickIcon(this.iconAt); cx.notify(); })
-          .child(this.icon ? div().text_size(16).child(this.icon) : div().text_size(16).text_color(t.muted).child("#")))
-        .child(list)
+          .child(this.icon ? div().text_size(16).child(tr(this.icon)) : div().text_size(16).text_color(t.muted).child("#")))
+        .child(tr(list))
         .child(button("browse", W.browse, { size: "lg", onClick: (_e, cx) => this.choose(cx) })))
-      .child(div().h(20).flex_none().pt(4).text_size(TEXT.label).text_color(t.dim).child(note))
+      .child(div().h(20).flex_none().pt(4).text_size(TEXT.label).text_color(t.dim).child(tr(note)))
       .child(div().h(4).flex_none())
       .child(this.repoLine(t, folder))
       .child(div().h(K.section).flex_none())
       .child(dialogFooter({ onCancel: () => this.close(), note: this.error, error: true,
         primary: { id: "create", label: this.busy ? W.creating : W.create, disabled: !folder || this.busy || this.switching, onClick: (_e, cx) => this.create(cx) } }));
     // The overlay is the panel at its tallest; the panel sits in its middle.
-    return v_flex().size_full().justify_center().child(panel);
+    return v_flex().size_full().justify_center().child(tr(panel));
   }
 }

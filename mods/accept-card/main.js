@@ -12,6 +12,7 @@
 // and Esc close it. A task that isn't Ready (accepted from elsewhere a moment ago, say) says so
 // calmly, with only Close.
 
+import { tr } from "./i18n.js";
 import { View, div, svg } from "gpui-kit";
 import { v_flex, h_flex } from "gpui-base";
 import { openViewer } from "./artview.js";
@@ -117,22 +118,22 @@ function inlineRun(t, s) {
   if (ps.every((p) => !p.code && !p.bold)) return div().w_full().min_w(0).child(ps.map((p) => p.text).join(""));
   return div().w_full().flex().flex_wrap().items_center().min_w(0)
     .children(wrapWords(ps).map((w) => h_flex().items_center().min_w(0).children(w.map((p) => p.code
-      ? div().min_w(0).px(3).rounded(3).bg(t.raised).font_family(MONO).text_size(12).line_height("18px").child(p.text)
-      : div().when(Boolean(p.bold), (el) => el.font_semibold()).child(p.text)))));
+      ? div().min_w(0).px(3).rounded(3).bg(t.raised).font_family(MONO).text_size(12).line_height("18px").child(tr(p.text))
+      : div().when(Boolean(p.bold), (el) => el.font_semibold()).child(tr(p.text))))));
 }
 
 // asIs: a document's words as written (an agent's details start each block with a capital).
 function mdView(t, md, asIs = false) {
   return v_flex().w_full().gap(8).line_height("21px").text_color(t.foreground)
     .children(mdBlocks(md).map((b) => {
-      if (b.kind === "code") return div().w_full().p(10).rounded(RADIUS.control).bg(t.raised).font_family(MONO).text_size(12).line_height("18px").child(b.text);
+      if (b.kind === "code") return div().w_full().p(10).rounded(RADIUS.control).bg(t.raised).font_family(MONO).text_size(12).line_height("18px").child(tr(b.text));
       const run = inlineRun(t, asIs || b.text.startsWith("`") ? b.text : capital(b.text));
-      if (b.kind === "heading") return div().w_full().pt(4).font_semibold().child(run);
-      if (b.kind === "quote") return div().w_full().pl(10).border_l(2).border_color(t.border).text_color(t.muted).child(run);
+      if (b.kind === "heading") return div().w_full().pt(4).font_semibold().child(tr(run));
+      if (b.kind === "quote") return div().w_full().pl(10).border_l(2).border_color(t.border).text_color(t.muted).child(tr(run));
       if (b.kind === "para") return run;
       return h_flex().w_full().items_start().gap(8).when(b.deep, (el) => el.pl(16))
         .child(div().h(21).w(8).flex_none().flex().items_center().justify_center().child(div().size(4).rounded(2).bg(t.dim)))
-        .child(div().flex_1().min_w(0).child(run));
+        .child(div().flex_1().min_w(0).child(tr(run)));
     }));
 }
 
@@ -217,15 +218,15 @@ export default class AcceptCard extends View {
   // One small section: a hairline above, a quiet label, then what it says at reading size.
   section(t, label, content) {
     return v_flex().w_full().gap(6).pt(14).border_t(1).border_color(t.border)
-      .child(div().text_size(TEXT.label).font_medium().text_color(t.muted).child(label))
-      .child(content);
+      .child(div().text_size(TEXT.label).font_medium().text_color(t.muted).child(tr(label)))
+      .child(tr(content));
   }
 
   // Changes: one line of counts, then its newest commits and its biggest files by name.
   changes(t, e) {
-    if (e.git === false) return div().text_color(t.muted).child(ACCEPT.notGit);
+    if (e.git === false) return div().text_color(t.muted).child(tr(ACCEPT.notGit));
     const c = e.commits ?? { count: 0, list: [] }, d = e.diff;
-    if (!c.count && !d?.files) return div().text_color(t.muted).child(ACCEPT.noCommits);
+    if (!c.count && !d?.files) return div().text_color(t.muted).child(tr(ACCEPT.noCommits));
     const counts = h_flex().gap(8).items_center().flex_wrap()
       .child(div().text_color(t.foreground).child(commitsLine(c.count)))
       .when(Boolean(d), (el) => el
@@ -233,13 +234,13 @@ export default class AcceptCard extends View {
         .child(div().text_color(t.foreground).child(filesLine(d.files)))
         .child(div().font_family(MONO).text_size(TEXT.label).text_color(green()).child(`+${d.added}`))
         .child(div().font_family(MONO).text_size(TEXT.label).text_color(red()).child(`−${d.removed}`)))
-      .when(!d, (el) => el.child(div().text_color(red()).child(ACCEPT.noFiles)));
+      .when(!d, (el) => el.child(div().text_color(red()).child(tr(ACCEPT.noFiles))));
     const commit = (x) => h_flex().gap(8).min_w(0).items_center()
-      .child(div().flex_none().font_family(MONO).text_size(12).text_color(t.dim).child(x.sha))
-      .child(div().flex_1().min_w(0).truncate().text_color(t.foreground).child(x.subject));
-    const file = (f) => div().min_w(0).truncate().font_family(MONO).text_size(12).text_color(t.muted).child(f.path);
+      .child(div().flex_none().font_family(MONO).text_size(12).text_color(t.dim).child(tr(x.sha)))
+      .child(div().flex_1().min_w(0).truncate().text_color(t.foreground).child(tr(x.subject)));
+    const file = (f) => div().min_w(0).truncate().font_family(MONO).text_size(12).text_color(t.muted).child(tr(f.path));
     return v_flex().gap(8).min_w(0)
-      .child(counts)
+      .child(tr(counts))
       .when(c.list.length > 0, (el) => el.child(v_flex().gap(3).min_w(0).children(c.list.map(commit))
         .when(c.count > c.list.length, (el) => el.child(div().text_size(12).text_color(t.dim).child(moreLine(c.count - c.list.length))))))
       .when(Boolean(d?.list?.length), (el) => el.child(v_flex().gap(2).min_w(0).children(d.list.map(file))
@@ -258,12 +259,12 @@ export default class AcceptCard extends View {
           .on_click((_e, cx) => { cx.stop_propagation(); this.docs[d.path] = !open; cx.notify(); })
           .child(svg(`mods/workspace-chrome/chevron-${open ? "down" : "right"}.svg`).size(13).flex_none().text_color(t.muted))
           .child(h_flex().flex_1().min_w(0).font_family(MONO).text_size(12)
-            .when(Boolean(dir), (el) => el.child(div().flex_none().text_color(t.muted).child(dir)))
-            .child(div().min_w(0).truncate().text_color(t.foreground).child(name)))
-          .child(div().flex_none().text_size(TEXT.label).text_color(t.muted).child(d.new ? ACCEPT.docNew : ACCEPT.docChanged)))
+            .when(Boolean(dir), (el) => el.child(div().flex_none().text_color(t.muted).child(tr(dir))))
+            .child(div().min_w(0).truncate().text_color(t.foreground).child(tr(name))))
+          .child(div().flex_none().text_size(TEXT.label).text_color(t.muted).child(tr(d.new ? ACCEPT.docNew : ACCEPT.docChanged))))
         .when(open, (el) => el.child(v_flex().w_full().min_w(0).gap(8).px(10).pt(12).pb(4)
           .child(mdView(t, d.text, true))
-          .when(Boolean(d.cut), (el) => el.child(div().text_size(12).text_color(t.dim).child(ACCEPT.docCut)))));
+          .when(Boolean(d.cut), (el) => el.child(div().text_size(12).text_color(t.dim).child(tr(ACCEPT.docCut))))));
     };
     return v_flex().w_full().gap(6).children(docs.list.map(doc))
       .when(more > 0, (el) => el.child(div().text_size(12).text_color(t.dim).child(moreLine(more))));
@@ -274,12 +275,12 @@ export default class AcceptCard extends View {
     const color = { passed: green(), failed: red(), running: amber(), unknown: red() }[c.state] ?? t.muted;
     return h_flex().gap(8).items_center()
       .when(c.state !== "none", (el) => el.child(div().size(7).flex_none().rounded(4).bg(color)))
-      .child(div().text_color(c.state === "none" ? t.muted : t.foreground).child(c.text));
+      .child(div().text_color(c.state === "none" ? t.muted : t.foreground).child(tr(c.text)));
   }
 
   // Proof: a row that looks pressable, opening the artifact in a modal.
   proof(t, e) {
-    if (!e.proof) return div().text_color(t.muted).child(ACCEPT.noProof);
+    if (!e.proof) return div().text_color(t.muted).child(tr(ACCEPT.noProof));
     return this.artRow(t, e.proof, "open-proof");
   }
 
@@ -294,7 +295,7 @@ export default class AcceptCard extends View {
       .on_click((_e, cx) => { cx.stop_propagation(); this.openProof(cx, a); cx.notify(); })
       .child(div().flex_1().min_w(0).truncate().text_color(t.foreground)
         .child(this.opening === a.id ? ACCEPT.opening : proofTitle(a.title)))
-      .child(div().flex_none().text_size(TEXT.label).text_color(t.muted).child(ACCEPT.open))
+      .child(div().flex_none().text_size(TEXT.label).text_color(t.muted).child(tr(ACCEPT.open)))
       .child(svg("mods/chat-image/external-link.svg").size(13).flex_none().text_color(t.muted));
   }
 
@@ -306,7 +307,7 @@ export default class AcceptCard extends View {
         .hover((s) => s.text_color(t.foreground))
         .on_click((_e, cx) => { cx.stop_propagation(); this.details = !open; cx.notify(); })
         .child(svg(`mods/workspace-chrome/chevron-${open ? "down" : "right"}.svg`).size(13).flex_none())
-        .child(div().text_size(TEXT.label).font_medium().child(ACCEPT.details)))
+        .child(div().text_size(TEXT.label).font_medium().child(tr(ACCEPT.details))))
       .when(open, (el) => el.child(div().w_full().pl(19).child(mdView(t, readable(text)))));
   }
 
@@ -316,7 +317,7 @@ export default class AcceptCard extends View {
     const text = whereNow(x);
     return h_flex().gap(8).items_center()
       .child(div().size(7).flex_none().rounded(4).bg(done ? green() : t.muted))
-      .child(div().text_color(t.foreground).child(text));
+      .child(div().text_color(t.foreground).child(tr(text)));
   }
 
   // The top-right X: closes like Cancel and Esc.
@@ -336,10 +337,10 @@ export default class AcceptCard extends View {
     const settled = Boolean(x && !ready);
     const w = e ? words(e) : null;
     const body = !x
-      ? div().text_color(this.error ? red() : t.dim).child(this.error ?? ACCEPT.reading)
+      ? div().text_color(this.error ? red() : t.dim).child(tr(this.error ?? ACCEPT.reading))
       : v_flex().w_full().gap(16).pb(4)
         .child(div().max_w(560).text_size(TEXT.body).line_height("20px").text_color(w.summary ? t.foreground : t.muted)
-          .child(w.summary || ACCEPT.noSummary))
+          .child(tr(w.summary || ACCEPT.noSummary)))
         .when(Boolean(e.docs?.list?.length), (el) => el.child(this.section(t, ACCEPT.documents, this.documents(t, e))))
         .child(this.section(t, ACCEPT.changes, this.changes(t, e)))
         .child(this.section(t, ACCEPT.checks, this.checks(t, e)))
@@ -358,11 +359,11 @@ export default class AcceptCard extends View {
         .child(v_flex().flex_1().min_w(0).gap(4)
           .child(div().text_size(TEXT.title).font_semibold().text_color(t.foreground)
             .child(!p.ref ? ACCEPT.accept : settled ? p.ref : ACCEPT.title(p.ref)))
-          .child(div().min_w(0).truncate().text_color(t.muted).child(x?.title ?? p.title ?? "")))
+          .child(div().min_w(0).truncate().text_color(t.muted).child(tr(x?.title ?? p.title ?? ""))))
         .child(div().mt(-2).mr(-6).child(this.closeButton(t))))
-      .child(div().id("accept-body").flex_1().min_h(0).overflow_y_scrollbar().pr(6).child(body))
+      .child(div().id("accept-body").flex_1().min_h(0).overflow_y_scrollbar().pr(6).child(tr(body)))
       .child(v_flex().flex_none().gap(10)
-        .when(Boolean(x && this.error), (el) => el.child(div().text_color(red()).child(this.error)))
+        .when(Boolean(x && this.error), (el) => el.child(div().text_color(red()).child(tr(this.error))))
         .when(settled, (el) => el.child(this.where(t, x)))
         // The dialog's one footer (ui.js): Cancel, then Accept; only Close once there's nothing
         // to accept.

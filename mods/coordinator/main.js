@@ -4,6 +4,7 @@
 //   "instructions"  pane: the coordinator template, editable, saved as you type
 // Starting, restarting and closing live in coordinator.js and the *.sh scripts beside it.
 
+import { tr } from "./i18n.js";
 import { View, div, svg, image } from "gpui-kit";
 import { v_flex, h_flex, Editor, EditorState } from "gpui-base";
 import { props, theme, settings, knownAgents, closeOverlay, home, exec, readTextFile, writeTextFile, watchFolder } from "herdr";
@@ -121,14 +122,14 @@ export default class Coordinator extends View {
     const p = props();
     return v_flex().size_full().min_h(0).bg(t.background)
       .when(Boolean(p?.overlay), (el) => el.child(h_flex().flex_none().h(44).pl(16).pr(8).gap(12).items_center().border_b(1).border_color(t.border)
-        .child(div().flex_1().min_w(0).truncate().text_size(TEXT.body).font_semibold().text_color(t.foreground).child(p.title ?? INSTRUCTIONS.title))
+        .child(div().flex_1().min_w(0).truncate().text_size(TEXT.body).font_semibold().text_color(t.foreground).child(tr(p.title ?? INSTRUCTIONS.title)))
         .child(uiButton("instructions-done", INSTRUCTIONS.done, { kind: "primary", onClick: () => closeOverlay(p.overlay) }))))
       .child(this.code
         ? div().flex_1().min_h(0).px(6).pt(6).child(Editor.new(this.code))
         : div().flex_1())
       .child(h_flex().flex_none().px(12).py(8).gap(12).items_start().border_t(1).border_color(t.border).text_size(12)
         .child(div().flex_1().min_w(0).text_color(t.dim).child(NOTE()))
-        .when(Boolean(this.error || this.status), (el) => el.child(div().flex_none().text_color(this.error ? t.blocked : t.dim).child(this.error ?? this.status))));
+        .when(Boolean(this.error || this.status), (el) => el.child(div().flex_none().text_color(this.error ? t.blocked : t.dim).child(tr(this.error ?? this.status)))));
   }
 
   // Restart this tab's agent as another installed one.
@@ -152,7 +153,7 @@ export default class Coordinator extends View {
         if (a) pick(a);
       })
       .child(div().px(8).child(heading(SWITCH_AGENT.title)))
-      .when(this.agents === null, (el) => el.child(div().px(8).py(6).text_color(t.dim).child(SWITCH_AGENT.loading)))
+      .when(this.agents === null, (el) => el.child(div().px(8).py(6).text_color(t.dim).child(tr(SWITCH_AGENT.loading))))
       .children(list.map((a, i) => {
         const on = a === current;
         return h_flex().id(`agent-${a.key}`).h(H.lg).px(8).gap(8).rounded(RADIUS.control).items_center().flex_none()
@@ -160,7 +161,7 @@ export default class Coordinator extends View {
           .when(!on, (el) => el.cursor_pointer().hover((s) => s.bg(t.hover)).on_click(() => pick(a)))
           .child(div().size(16).flex_none().flex().items_center().justify_center()
             .child(a.tint ? svg(a.icon).size(14).flex_none().text_color(on ? t.dim : t.foreground) : image(a.icon).size(14).flex_none()))
-          .child(div().flex_1().min_w(0).truncate().child(a.name))
+          .child(div().flex_1().min_w(0).truncate().child(tr(a.name)))
           .child(div().flex_none().text_size(TEXT.label).text_color(t.dim).child(on ? SWITCH_AGENT.current : i < 9 ? String(i + 1) : ""));
       }));
   }
@@ -183,8 +184,8 @@ export default class Coordinator extends View {
         .child(div().mt(2).size(14).flex_none().rounded(7).border(1.5).border_color(on ? t.accent : t.input).flex().items_center().justify_center()
           .when(on, (el) => el.child(div().size(6).rounded(3).bg(t.accent))))
         .child(v_flex().gap(2).flex_1().min_w(0)
-          .child(div().font_medium().text_color(t.foreground).child(title))
-          .child(div().text_size(12).text_color(t.muted).child(detail)));
+          .child(div().font_medium().text_color(t.foreground).child(tr(title)))
+          .child(div().text_size(12).text_color(t.muted).child(tr(detail))));
     };
     return v_flex().id("close-coordinator").track_focus(this.handle).size_full().min_h(0).p(18).gap(12).bg(t.popover).text_size(13)
       .on_key_down((e, cx) => {
@@ -195,14 +196,14 @@ export default class Coordinator extends View {
         cx.stop_propagation();
         cx.notify();
       })
-      .child(div().text_size(TEXT.title).font_semibold().text_color(t.foreground).child("Close the Assistant?"))
+      .child(div().text_size(TEXT.title).font_semibold().text_color(t.foreground).child(tr("Close the Assistant?")))
       .child(div().text_size(TEXT.body).text_color(t.muted).child(n
         ? `It has ${n} worker${n > 1 ? "s" : ""} running. Their branches and worktrees stay either way.`
-        : "It has no workers running."))
+        : tr("It has no workers running.")))
       .when(n > 0, (el) => el
         .child(choice("stop", true, "Stop its workers", "Ends the agents it started and closes their tabs."))
         .child(choice("keep", false, "Let them finish", "Workers keep running in their own tabs, on their own.")))
       .child(div().flex_1())
-      .child(dialogFooter({ onCancel: () => closeOverlay(p.overlay), primary: { id: "confirm", label: "Close Assistant", onClick: confirm } }));
+      .child(dialogFooter({ onCancel: () => closeOverlay(p.overlay), primary: { id: "confirm", label: tr("Close Assistant"), onClick: confirm } }));
   }
 }

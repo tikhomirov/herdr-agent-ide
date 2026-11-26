@@ -89,7 +89,7 @@ export default class IdeBrowserBar extends View {
     const t = theme(), st = this.st, live = Boolean(st?.live), device = st?.device ?? null;
     const note = st && st.note && Date.now() - st.noteAt < 6000 ? st.note : null;
     const btn = (id, icon, tip, onClick, opts = {}) => div().id(id).size(28).flex_none().flex().items_center().justify_center().rounded(6)
-      .text_color(opts.on ? t.foreground : live ? t.muted : t.dim).bg(opts.on ? t.selected : t.chrome).tooltip(tip)
+      .text_color(opts.on ? t.foreground : live ? t.muted : t.dim).bg(opts.on ? t.selected : t.chrome).tooltip(tr(tip))
       .when(live, el => el.cursor_pointer().hover(s => s.bg(t.hover).text_color(t.foreground)).on_click(onClick))
       .child(svg(`mods/ide-browser-bar/${icon}.svg`).size(15));
     const cmd = (c) => () => this.ctl(c);
@@ -101,14 +101,14 @@ export default class IdeBrowserBar extends View {
         .border_color(this.focused ? t.accent : t.input).bg(t.background)
         .child(svg("mods/ide-browser-bar/globe.svg").size(14).flex_none().text_color(t.dim))
         .child(note
-          ? div().flex_1().min_w(0).truncate().text_size(12.5).text_color(t.done).child(note)
+          ? div().flex_1().min_w(0).truncate().text_size(12.5).text_color(t.done).child(tr(note))
           : Input.new(this.input).flex_1().min_w(0).h_full().text_size(12.5).text_color(t.foreground)))
       .child(h_flex().id("bb-select").h(28).px(10).gap(6).flex_none().items_center().rounded(6).text_size(12)
         .bg(st?.select ? t.selected : t.chrome).text_color(st?.select ? t.foreground : live ? t.muted : t.dim)
         .border_1().border_color(st?.select ? t.accent : t.chrome)
-        .tooltip("Point an element or a region out to the agent: click an element or drag a frame")
+        .tooltip(tr("Point an element or a region out to the agent: click an element or drag a frame"))
         .when(live, el => el.cursor_pointer().hover(s => s.bg(t.hover)).on_click(cmd("select")))
-        .child(svg("mods/ide-browser-bar/select.svg").size(14)).child(st?.select ? "Pick on the page" : "Select"))
+        .child(svg("mods/ide-browser-bar/select.svg").size(14)).child(st?.select ? tr("Pick on the page") : tr("Select")))
       .child(btn("bb-device", "device", "Device mode: responsive sizes, phones and tablets", cmd(device ? "device off" : "device 390 844"), { on: Boolean(device) }))
       .child(btn("bb-shot", "camera", "Take screenshot (saved and copied)", cmd("screenshot")))
       .child(btn("bb-more", "more", "More", () => this.menu("more", 236, 262)));
@@ -120,7 +120,7 @@ export default class IdeBrowserBar extends View {
       .child(h_flex().id("bb-preset").h(26).px(8).gap(6).flex_none().items_center().rounded(6).text_size(12).bg(t.chrome).text_color(t.muted)
         .border_1().border_color(t.input).cursor_pointer().hover(s => s.bg(t.hover).text_color(t.foreground))
         .on_click(() => this.menu("presets", 250, PRESETS.length * 30 + 44))
-        .child(preset ? preset[0] : "Responsive").child(svg("mods/ide-browser-bar/chevron.svg").size(12)))
+        .child(preset ? preset[0] : tr("Responsive")).child(svg("mods/ide-browser-bar/chevron.svg").size(12)))
       .child(field(this.wIn))
       .child(div().text_size(12).text_color(t.dim).child("×"))
       .child(field(this.hIn))
@@ -128,6 +128,6 @@ export default class IdeBrowserBar extends View {
       .child(div().flex_1())
       .child(div().text_size(11.5).text_color(t.dim).child(tr("Fit")));
 
-    return v_flex().size_full().min_w(0).bg(t.chrome).border_b(1).border_color(t.border).child(row1).when(Boolean(row2), el => el.child(row2));
+    return v_flex().size_full().min_w(0).bg(t.chrome).border_b(1).border_color(t.border).child(tr(row1)).when(Boolean(row2), el => el.child(tr(row2)));
   }
 }

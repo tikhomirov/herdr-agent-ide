@@ -26,6 +26,7 @@ MAC = sys.platform == "darwin"
 # fullest disk (home, /tmp) is over this share (%): Agent IDE's start limits, and its disk alert.
 HOLD = {"start_load": 1.0, "start_memory": 80, "start_disk": 90}
 # Past these the sidebar's meter turns red (Agent IDE's alert limits).
+DISK_ROOM_GB = 20
 ALERT = {"load": 1.5, "memory": 90, "disk": 90}
 
 
@@ -87,14 +88,38 @@ def _disks():
     return out
 
 
+def _cpu_times():
+    """(busy, total) jiffies from /proc/stat, or None where it is not there (macOS)."""
+    try:
+        with open("/proc/stat") as f:
+            v = [int(x) for x in f.readline().split()[1:]]
+    except (OSError, ValueError):
+        return None
+    idle = v[3] + (v[4] if len(v) > 4 else 0)
+    return sum(v) - idle, sum(v)
+
+
+def _busy(cores, load):
+    """The share of the CPU in use over a quarter of a second, in %. The load average counts every process waiting
+    on a disk or a lock, so a quiet machine can show 200%: this is the time the cores really spent working."""
+    a = _cpu_times()
+    if a is None:
+        return round(load * 100 / cores)
+    time.sleep(0.25)
+    b = _cpu_times()
+    if b is None or b[1] <= a[1]:
+        return round(load * 100 / cores)
+    return round((b[0] - a[0]) * 100 / (b[1] - a[1]))
+
+
 def sample():
     """{at, cores, load, cpu, mem_total, mem_used, memory, disk, disks}: cpu is the 1-minute load
-    over the cores (%), memory in use (%), disk the fullest (%)."""
+    really in use (%), memory in use (%), disk the fullest (%)."""
     cores = os.cpu_count() or 1
     load = os.getloadavg()[0]
     total, used = _memory()
     disks = _disks()
-    return {"at": int(time.time() * 1000), "cores": cores, "load": round(load, 2), "cpu": round(load * 100 / cores),
+    return {"at": int(time.time() * 1000), "cores": cores, "load": round(load, 2), "cpu": _busy(cores, load),
             "mem_total": total, "mem_used": used, "memory": round(used * 100 / total) if total else 0,
             "disk": max([d["pct"] for d in disks] or [0]), "disks": disks}
 
@@ -150,10 +175,13 @@ def hold_reason(h, limits=None):
     lim = hold_limits(limits)
     if lim["start_memory"] is not None and h["memory"] > lim["start_memory"]:
         return "memory is %d%% full" % h["memory"]
-    if lim["start_load"] is not None and h["load"] > lim["start_load"] * h["cores"]:
+    if lim["start_load"] is not None and h["cpu"] > lim["start_load"] * 100:
         return "CPU is %d%% busy" % h["cpu"]
-    if lim["start_disk"] is not None and h["disk"] > lim["start_disk"]:
-        return "disk is %d%% full" % h["disk"]
+    # A big disk that is full by share can still have plenty of room: only a small amount left holds tasks back.
+    if lim["start_disk"] is not None:
+        full = [d for d in h.get("disks") or [] if d["pct"] > lim["start_disk"] and d.get("free_gb", 0) < DISK_ROOM_GB]
+        if full:
+            return "disk is %d%% full (%d GB left)" % (full[0]["pct"], full[0]["free_gb"])
     return None
 
 

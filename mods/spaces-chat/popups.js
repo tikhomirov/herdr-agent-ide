@@ -33,7 +33,7 @@ function closeSpace(id, name) {
   const w = spaces().find((s) => s.id === id);
   openOverlay({ mod: "confirm-chat", kind: "dialog", width: 400, height: 168, props: {
     title: `Close “${name ?? w?.name ?? "this space"}”?`,
-    detail: "Its tabs close and every program in them ends.",
+    detail: tr("Its tabs close and every program in them ends."),
     verb: tr("Close space"),
     command: { name: "space.close", args: { id, confirmed: true } } } });
   logSpace("close", id, "spaces-chat: space menu Close (asks in confirm-chat)");
@@ -156,5 +156,5 @@ function notifySetting(space, t, note) {
       .child(div().flex_1().min_w(0).child(tr("Notify")))
       .child(segmented("notify", NOTIFY.map((v) => [v, v]), now, (v) => setNotify(space, v))))
     .child(h_flex().h(NOTE).pl(TEXT_X).pr(ROW_X).pb(4).items_center()
-      .child(div().flex_1().min_w(0).truncate().text_size(TEXT.id).text_color(t.dim).child(note)));
+      .child(div().flex_1().min_w(0).truncate().text_size(TEXT.id).text_color(t.dim).child(tr(note))));
 }

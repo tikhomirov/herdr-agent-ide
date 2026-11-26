@@ -34,7 +34,7 @@ export default class WorkspaceStatus extends View {
     const t = theme();
     const space = spaces().find(s => s.active);
     const needs = needsYou();
-    const label = (icon, text) => h_flex().gap(6).items_center().child(svg(`mods/workspace-chrome/${icon}.svg`).size(14)).child(text);
+    const label = (icon, text) => h_flex().gap(6).items_center().child(svg(`mods/workspace-chrome/${icon}.svg`).size(14)).child(tr(text));
     return h_flex().size_full().px(14).gap(16).items_center().bg(t.chrome).border_t(1).border_color(t.border).text_size(TEXT.label).text_color(t.muted)
       .child(label(space?.machine ? "server" : "monitor", machineName(space?.machine ?? null)))
       .when(Boolean(space?.branch), el => el.child(label("branch", space.branch)))

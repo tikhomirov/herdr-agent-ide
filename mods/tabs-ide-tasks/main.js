@@ -179,7 +179,7 @@ export default class Tabs extends View {
     const menuHeight = (id) => 19 + 32 * (2 + (isCoordinatorTab(id) ? 1 : 0) + (agentIn(id) && !agentIn(id).address.includes("/") ? 2 : 0));
     const stop = (_e, cx) => cx.stop_propagation();
     const button = (id, label, action) => div().id(id).size(H.sm).flex_none().flex().items_center().justify_center().rounded(RADIUS.control).cursor_pointer().text_color(t.dim).hover(s => s.bg(t.hover).text_color(t.foreground))
-      .on_mouse_down("left", stop).on_click(action).child(label);
+      .on_mouse_down("left", stop).on_click(action).child(tr(label));
     // What needs the person, per tab (the Inbox's items), and Tasks' Ready: a red and a green
     // count on the tab. Agent IDE settings' "Red counts" off (shared "counts.red" false): none
     // here, nor on Tasks.
@@ -208,7 +208,7 @@ export default class Tabs extends View {
         })
         .on_mouse_down("right", (_e, cx) => { cx.stop_propagation(); openOverlay({ mod: "menu-tasks", kind: "popup", width: 236, height: menuHeight(c.id), props: { tab: "tab", target: { id: c.id, space: space.id }, right: this.right } }); })
         .when(Boolean(program?.icon), el => el.child(program.tint ? svg(program.icon).size(14).text_color(t.muted) : image(program.icon).size(14)))
-        .child(div().max_w(170).truncate().child(c.zoomed ? `${name} Z` : name))
+        .child(div().max_w(170).truncate().child(tr(c.zoomed ? `${name} Z` : name)))
         .when(c.status === "working", el => el.child(svg("mods/workspace-chrome/spinner.svg").size(12).flex_none().text_color(t.working).spin(900)))
         .when(needs.get(c.id) > 0 || readies.get(c.id) > 0, el => el.child(countBadge(needs.get(c.id), readies.get(c.id), c.active ? t.raised : t.chrome)))
         .when(!(needs.get(c.id) > 0 || readies.get(c.id) > 0) && (c.status === "blocked" || c.status === "done"), el => el.child(div().size(6).rounded(3).bg(t[c.status])))
@@ -246,7 +246,7 @@ export default class Tabs extends View {
           if (on) run("layout.hide", { id: "panel" });
           else { run("layout.select", { stack: "panel-body", child: id }); run("layout.show", { id: "panel" }); }
         }).child(svg(icon).size(14).flex_none())
-        .when(roomy || on, el => el.child(label))
+        .when(roomy || on, el => el.child(tr(label)))
         .when(badge > 0, el => el.child(countBadge(need, ready, on ? t.selected : t.chrome)));
     };
     return h_flex().id("tabs-bar").size_full().min_w(0).px(10).pl(lightsPadding).gap(3).items_center().bg(t.chrome).border_b(1).border_color(t.border)

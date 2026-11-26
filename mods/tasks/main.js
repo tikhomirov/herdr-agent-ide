@@ -363,7 +363,7 @@ export default class Tasks extends View {
     const rowsFor = (s) => (rowsOf[s] ??= tasksOf[s].map((p) => this.row(p, t)));
     // Searching, every group shows whole and open (folded or not).
     const open = Boolean(q);
-    const note = (text) => div().px(18).py(28).text_center().text_size(TEXT.label).text_color(t.dim).child(text);
+    const note = (text) => div().px(18).py(28).text_center().text_size(TEXT.label).text_color(t.dim).child(tr(text));
     const body = [];
     if (this.archivedOpen) { this.names = { machine: true, space: true }; body.push(this.archivedView(found, q, t)); }
     else if (filter !== "all") {
@@ -445,10 +445,10 @@ export default class Tasks extends View {
         })
         .when(Boolean(this.error), (el) => el.child(h_flex().m(6).p(10).gap(8).items_start().rounded(RADIUS.card).bg(t.surface).border_1().border_color(t.border)
           .child(div().size(8).mt(5).flex_none().rounded(4).bg(red()))
-          .child(div().flex_1().text_size(TEXT.label).text_color(t.muted).child(this.error))))
+          .child(div().flex_1().text_size(TEXT.label).text_color(t.muted).child(tr(this.error)))))
         .children([...this.warns.values()].map((w) => h_flex().m(6).p(10).gap(8).items_start().rounded(RADIUS.card).bg(t.surface).border_1().border_color(t.border)
           .child(div().size(8).mt(5).flex_none().rounded(4).bg(t.dim))
-          .child(div().flex_1().text_size(TEXT.label).text_color(t.muted).child(w))))
+          .child(div().flex_1().text_size(TEXT.label).text_color(t.muted).child(tr(w)))))
         .when(!this.ready && !this.error, (el) => el.child(div().px(18).py(28).text_center().text_size(TEXT.label).text_color(t.dim).child(tr("Reading tasks…"))))
         .children(body));
   }
@@ -495,7 +495,7 @@ export default class Tasks extends View {
         openOverlay({ mod: "tasks-menu", kind: "popup", width: 168, height: 8 + items.length * 32,
           at: b ? { x: b.x, y: b.y + b.height + 4 } : "pointer", props: { menu: "filter", items, current: filter } });
       })
-      .child(text)
+      .child(tr(text))
       .when(n > 0, (el) => el.child(div().text_color(t.dim).child(String(n))))
       .child(svg("mods/workspace-chrome/chevron-down.svg").size(12).flex_none().text_color(open ? t.muted : t.dim));
   }
@@ -507,7 +507,7 @@ export default class Tasks extends View {
       .bg(on ? t.selected : t.background).text_color(on ? t.foreground : t.muted)
       .hover((s) => s.bg(on ? t.selected : t.hover).text_color(t.foreground))
       .on_click((_e, cx) => { this.pickFilter(key); cx.notify(); })
-      .child(label)
+      .child(tr(label))
       .when(n > 0, (el) => el.child(div().text_color(t.dim).child(String(n))));
   }
 
@@ -613,7 +613,7 @@ export default class Tasks extends View {
   // The Archived view: back to the tasks, its heading and count, then the archived tasks, the
   // latest archived first (the search narrows them too).
   archivedView(ps, q, t) {
-    const note = (text) => div().px(8).py(8).text_size(TEXT.label).text_color(t.dim).child(text);
+    const note = (text) => div().px(8).py(8).text_size(TEXT.label).text_color(t.dim).child(tr(text));
     return v_flex().flex_none().gap(1)
       .child(h_flex().h(30).pl(2).pr(8).gap(6).items_center().text_size(TEXT.label)
         .child(h_flex().id("task-archived-back").size(H.sm).flex_none().items_center().justify_center().rounded(RADIUS.control).cursor_pointer()
@@ -666,7 +666,7 @@ export default class Tasks extends View {
             .text_color(this.hoverHead === key ? t.foreground : t.dim)))
         .child(h_flex().id(`head-${key}-label`).flex_1().min_w(0).gap(6).items_center()
           .child(div().min_w(0).truncate().when(top, (el) => el.text_size(TEXT.body).font_semibold().text_color(t.foreground))
-            .when(!top, (el) => el.font_medium().text_color(t.muted)).child(label))
+            .when(!top, (el) => el.font_medium().text_color(t.muted)).child(tr(label)))
           .when(Boolean(note), (el) => el.child(div().flex_none().text_color(t.dim).child(`· ${note}`)))
           .when(Boolean(count), (el) => el.child(div().flex_none().text_color(t.dim).child(String(count))))))
       .when(!shut, (el) => el.children(shown)
@@ -677,7 +677,7 @@ export default class Tasks extends View {
             try { localStorage.setItem("alldone", JSON.stringify([...this.allDone])); } catch {}
             cx.notify();
           })
-          .child(all ? "Show less" : `Show ${cut} more`))));
+          .child(all ? tr("Show less") : `Show ${cut} more`))));
   }
 
   // For you: a space's name over its other work (Agent IDE's SpaceHeading): its emoji (else #) where
@@ -692,7 +692,7 @@ export default class Tasks extends View {
         .when(Boolean(sp.id), (el) => el.cursor_pointer().hover((s) => s.bg(t.hover))
           .on_click(() => run("space.select", { id: sp.id })))
         .child(h_flex().w(14).h(14).flex_none().items_center().justify_center()
-          .child(div().text_size(icon ? 12 : TEXT.label).text_color(t.dim).child(icon ?? "#")))
+          .child(div().text_size(icon ? 12 : TEXT.label).text_color(t.dim).child(tr(icon ?? "#"))))
         .child(h_flex().flex_1().min_w(0).gap(6).items_center()
           .child(div().min_w(0).truncate().font_medium().text_color(t.muted).child(placeName(list)))
           .when(Boolean(note), (el) => el.child(div().flex_none().text_color(t.dim).child(`· ${note}`)))
@@ -709,7 +709,7 @@ export default class Tasks extends View {
       .on_click((_e, cx) => { this.fold("done:open", true); cx.notify(); })
       .child(h_flex().w(14).h(14).flex_none().items_center().justify_center()
         .child(svg("mods/workspace-chrome/chevron-right.svg").size(12).flex_none()))
-      .child(`${ps.length} done${all ? " today" : ""}`);
+      .child(tr(`${ps.length} done${all ? " today" : ""}`));
   }
 
   // A row's status mark: Agent IDE's task dot (dot.js); a Working row's pie shows its % done.
@@ -944,7 +944,7 @@ export default class Tasks extends View {
       .when(busy, (el) => el.opacity(0.6))
       .when(!busy, (el) => el.cursor_pointer().hover((s) => s.bg(t.selected))
         .on_click((_e, cx) => { cx.stop_propagation(); this.accept(p); cx.notify(); }))
-      .child(busy ? "Accepting…" : "Review");
+      .child(busy ? "Accepting…" : tr("Review"));
   }
 
   // Accept shows what you approve first: the Accept card (mods/accept-card) runs herdr-task
@@ -972,27 +972,27 @@ export default class Tasks extends View {
     const said = sub ? capital(sub) : null;
     const shown = said ? fit(said) : null;
     const two = Boolean(ref) || Boolean(shown) || Boolean(where);
-    const end = action ?? (meta ? div().flex_none().whitespace_nowrap().text_size(TEXT.label).text_color(metaColor ?? t.dim).child(meta) : null);
+    const end = action ?? (meta ? div().flex_none().whitespace_nowrap().text_size(TEXT.label).text_color(metaColor ?? t.dim).child(tr(meta)) : null);
     const row = h_flex().id(id).relative().flex_none().px(8).gap(12).items_center().rounded(RADIUS.card)
       .when(Boolean(selected), (el) => el.bg(t.selected))
       .when(Boolean(pin), (el) => el.on_mouse_down("right", (_e, cx) => { cx.stop_propagation(); this.rowMenu(pin); }))
       .when(Boolean(go), (el) => el.cursor_pointer().hover((s) => s.bg(selected ? t.selected : t.hover)).on_click((_e, cx) => { go(); cx.notify(); }));
-    const mark = h_flex().w(14).h(20).flex_none().items_center().justify_center().child(glyph);
-    const head = div().id(`${id}-title`).min_w(0).truncate().text_color(dim ? t.muted : t.foreground).child(title);
-    if (!two) return row.h(32).child(mark).child(head.flex_1()).when(Boolean(end), (el) => el.child(end));
+    const mark = h_flex().w(14).h(20).flex_none().items_center().justify_center().child(tr(glyph));
+    const head = div().id(`${id}-title`).min_w(0).truncate().text_color(dim ? t.muted : t.foreground).child(tr(title));
+    if (!two) return row.h(32).child(tr(mark)).child(head.flex_1()).when(Boolean(end), (el) => el.child(tr(end)));
     // The words keep their room: where it is takes only what is left after them, and gives way first.
     const second = h_flex().h(16).min_w(0).gap(6).items_center().text_size(TEXT.label)
-      .when(Boolean(ref), (el) => el.child(div().flex_none().font_family(ID_FONT).text_size(ID_SIZE).text_color(t.dim).child(ref)))
-      .when(Boolean(shown), (el) => el.child(div().id(`${id}-sub`).flex_shrink_1().min_w(0).truncate().text_color(t.muted).child(shown)))
+      .when(Boolean(ref), (el) => el.child(div().flex_none().font_family(ID_FONT).text_size(ID_SIZE).text_color(t.dim).child(tr(ref))))
+      .when(Boolean(shown), (el) => el.child(div().id(`${id}-sub`).flex_shrink_1().min_w(0).truncate().text_color(t.muted).child(tr(shown))))
       .when(Boolean(where), (el) => el.child(div().flex_shrink(1000).min_w(0).truncate().text_color(t.dim)
-        .child(ref || shown ? `· ${where}` : where)));
+        .child(tr(ref || shown ? `· ${where}` : where))));
     // The time left as tall as the second line (16), 2 under the glyph as the line is under the title.
     return row.py(8)
-      .child(v_flex().w(14).flex_none().self_start().gap(2).child(mark)
+      .child(v_flex().w(14).flex_none().self_start().gap(2).child(tr(mark))
         .when(Boolean(left), (el) => el.child(h_flex().w(14).h(16).items_center().justify_center().whitespace_nowrap()
-          .font_family(ID_FONT).text_size(ID_SIZE).font_semibold().text_color(leftColor ?? amber()).child(left))))
-      .child(v_flex().flex_1().min_w(0).gap(2).child(h_flex().h(20).min_w(0).items_center().child(head.flex_1())).child(second))
-      .when(Boolean(end), (el) => el.child(end));
+          .font_family(ID_FONT).text_size(ID_SIZE).font_semibold().text_color(leftColor ?? amber()).child(tr(left)))))
+      .child(v_flex().flex_1().min_w(0).gap(2).child(h_flex().h(20).min_w(0).items_center().child(head.flex_1())).child(tr(second)))
+      .when(Boolean(end), (el) => el.child(tr(end)));
   }
 
 }

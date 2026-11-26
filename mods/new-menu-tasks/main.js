@@ -1,3 +1,4 @@
+import { tr } from "./i18n.js";
 import { View, div, svg, image } from "gpui-kit";
 import { h_flex, v_flex } from "gpui-base";
 import { theme, knownAgents, run, openOverlay, closeOverlay, props, window, keys } from "herdr";
@@ -41,8 +42,8 @@ export default class NewMenu extends View {
     return h_flex().id(id).h(H.lg).px(8).gap(8).rounded(RADIUS.control).items_center().flex_none()
       .text_color(enabled ? t.foreground : t.dim).when(enabled, el => el.cursor_pointer().hover(s => s.bg(t.hover)))
       .on_click(() => { if (enabled) { closeOverlay(props().overlay); action(); } })
-      .child(div().size(16).flex_none().flex().items_center().justify_center().child(icon))
-      .child(div().flex_1().min_w(0).truncate().child(name)).child(div().flex_none().text_size(TEXT.label).text_color(t.dim).child(hint));
+      .child(div().size(16).flex_none().flex().items_center().justify_center().child(tr(icon)))
+      .child(div().flex_1().min_w(0).truncate().child(tr(name))).child(div().flex_none().text_size(TEXT.label).text_color(t.dim).child(tr(hint)));
   }
   // One copy of Herdr's live lists for the whole render (live.js): past ~50 ms Herdr stops it.
   render(cx) {
@@ -72,11 +73,11 @@ export default class NewMenu extends View {
       .child(this.row("terminal", svg("icons/shell.svg").size(14), NEW_MENU.terminal, () => run("tab.new", { space: space?.id }), shortcut("tab.new")))
       .child(this.row("coordinator", svg("mods/coordinator/network.svg").size(14), aRow.label, coordinate,
         aRow.hint, canCoordinate))
-      .child(div().h(28).flex_none().px(8).flex().items_center().text_size(TEXT.label).font_medium().text_color(t.dim).child(NEW_MENU.agents))
+      .child(div().h(28).flex_none().px(8).flex().items_center().text_size(TEXT.label).font_medium().text_color(t.dim).child(tr(NEW_MENU.agents)))
       .child(v_flex().flex_1().min_h(0).overflow_y_scrollbar()
         .children(choices.map((a, i) => this.row(a.key, a.tint ? svg(a.icon).size(14).text_color(t.foreground) : image(a.icon).size(14), a.name,
           () => run("tab.new", { name: a.name, space: space?.id, argv: a.run }), agentHint(a, i), a.installed)))
-        .when(this.agents.length === 0, el => el.child(div().px(8).py(6).text_color(t.dim).child(this.failed ? NEW_MENU.failed : NEW_MENU.loading))))
+        .when(this.agents.length === 0, el => el.child(div().px(8).py(6).text_color(t.dim).child(tr(this.failed ? NEW_MENU.failed : NEW_MENU.loading)))))
       .child(div().h(1).mx(8).my(5).bg(t.border))
       .child(this.row("space", svg("mods/workspace-chrome/plus.svg").size(14), NEW_MENU.space, () => run("tabs-ide-tasks.newspace"), shortcut("tabs-ide-tasks.newspace") || shortcut("space.new")))
       .child(this.row("worktree", svg("mods/workspace-chrome/branch.svg").size(14), NEW_MENU.worktreeNew, () => openOverlay({ mod: "worktree", kind: "dialog", width: 460, height: 280, props: { space: space?.id, folder: panes().find(p => p.focused)?.cwd, action: "new" } }), "", Boolean(space)))

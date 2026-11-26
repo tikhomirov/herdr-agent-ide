@@ -3,6 +3,7 @@
 // header, dialog footer, hover). lib/UI.md lists them and the rules.
 // Shared: the source is lib/ui.js; bin/sync-shared copies it into each mod in lib/COPIES.
 // Edit lib/ui.js, never a mod's copy, then run bin/sync-shared.
+import { tr } from "./i18n.js";
 import { div, svg } from "gpui-kit";
 import { h_flex } from "gpui-base";
 import { settings, theme, openOverlay, notify, layout, shared, setShared, spaces } from "herdr";
@@ -59,7 +60,7 @@ export function button(id, label, { kind = "secondary", size = "sm", icon = null
     .when(disabled, (el) => el.opacity(0.5))
     .when(live, (el) => el.cursor_pointer().on_click((e, cx) => { cx.stop_propagation(); onClick(e, cx); cx.notify(); }))
     .when(Boolean(icon), (el) => el.child(svg(icon).size(iconSize).flex_none()))
-    .child(label);
+    .child(tr(label));
 }
 
 // A quiet text link (card headers, "Show all"): muted, foreground on hover, sized to its words.
@@ -68,7 +69,7 @@ export function link(id, label, onClick) {
   return div().id(id).flex_none().whitespace_nowrap().text_size(TEXT.label).text_color(t.muted).cursor_pointer()
     .hover((s) => s.text_color(t.foreground))
     .on_click((e, cx) => { cx.stop_propagation(); onClick(e, cx); cx.notify(); })
-    .child(label);
+    .child(tr(label));
 }
 
 // Switch ---------------------------------------------------------------------
@@ -103,7 +104,7 @@ export function segmented(id, options, value, onPick, { size = "sm", disabled = 
         .when(!on && !o?.disabled, (el) => el.text_color(t.muted))
         .when(!on && !off, (el) => el.cursor_pointer().hover((s) => s.text_color(t.foreground))
           .on_click((e, cx) => { cx.stop_propagation(); onPick(v, e, cx); cx.notify(); }))
-        .child(label);
+        .child(tr(label));
     }));
 }
 
@@ -120,8 +121,8 @@ export function menuRow(id, label, { icon = null, hint = null, check = null, dan
       .on_click((e, cx) => { cx.stop_propagation(); onClick(e, cx); cx.notify(); }))
     .child(div().size(16).flex_none().flex().items_center().justify_center()
       .when(Boolean(icon), (el) => el.child(svg(icon).size(16).text_color(danger ? red() : t.muted))))
-    .child(div().flex_1().min_w(0).truncate().child(label))
-    .when(Boolean(hint), (el) => el.child(div().flex_none().pl(8).text_size(TEXT.label).text_color(t.dim).child(hint)))
+    .child(div().flex_1().min_w(0).truncate().child(tr(label)))
+    .when(Boolean(hint), (el) => el.child(div().flex_none().pl(8).text_size(TEXT.label).text_color(t.dim).child(tr(hint))))
     .when(check !== null, (el) => el.child(div().size(16).flex_none()
       .when(check, (el) => el.child(svg("mods/workspace-chrome/check.svg").size(16).text_color(t.foreground)))));
 }
@@ -132,8 +133,8 @@ export function menuRow(id, label, { icon = null, hint = null, check = null, dan
 export function heading(text, right = null) {
   const t = theme();
   return h_flex().h(28).flex_none().gap(8).items_center().justify_between().text_size(TEXT.label).font_medium().text_color(t.dim)
-    .child(div().min_w(0).truncate().child(text))
-    .when(Boolean(right), (el) => el.child(div().flex_none().child(right)));
+    .child(div().min_w(0).truncate().child(tr(text)))
+    .when(Boolean(right), (el) => el.child(div().flex_none().child(tr(right))));
 }
 
 // A card's header: the title at the left (13, medium), its links or small buttons at the right.
@@ -141,7 +142,7 @@ export function heading(text, right = null) {
 export function cardHeader(title, actions = []) {
   const t = theme();
   return h_flex().w_full().flex_none().gap(12).items_center()
-    .child(div().flex_1().min_w(0).truncate().text_size(TEXT.body).font_medium().text_color(t.foreground).child(title))
+    .child(div().flex_1().min_w(0).truncate().text_size(TEXT.body).font_medium().text_color(t.foreground).child(tr(title)))
     .when(actions.length > 0, (el) => el.child(h_flex().flex_none().gap(12).items_center().children(actions)));
 }
 
@@ -151,7 +152,7 @@ export function cardHeader(title, actions = []) {
 export function dialogFooter({ onCancel, primary, cancelLabel = "Cancel", note = "", error = false }) {
   const t = theme();
   return h_flex().h(H.lg).w_full().flex_none().gap(8).items_center()
-    .child(div().flex_1().min_w(0).truncate().text_size(TEXT.label).text_color(error ? red() : t.dim).child(note || ""))
+    .child(div().flex_1().min_w(0).truncate().text_size(TEXT.label).text_color(error ? red() : t.dim).child(tr(note || "")))
     .child(button("dialog-cancel", cancelLabel, { kind: "plain", size: "lg", onClick: onCancel }))
     .when(Boolean(primary), (el) => el.child(button(primary.id ?? "dialog-primary", primary.label,
       { kind: "primary", size: "lg", disabled: primary.disabled, onClick: primary.onClick })));

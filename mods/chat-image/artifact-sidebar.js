@@ -5,6 +5,7 @@
 // shows "artifacts-view", whose body block ("artifacts-view-body") gets the artifact's mod;
 // shared "artifacts.view" says which artifact its header names.
 
+import { tr } from "./i18n.js";
 import { layout, run, shared, setShared, appHome, readTextFile, writeTextFile } from "herdr";
 import { toast, plainError } from "./ui.js";
 
@@ -46,5 +47,5 @@ export function showInSidebar(view) {
   if (body.content?.mod === view.mod && !body.content?.props) { show(); return Promise.resolve(true); }
   return setBody(view.mod)
     .then(() => { show(); return true; })
-    .catch((e) => { toast({ title: "Artifact didn't open", body: plainError(e), level: "error" }); return false; });
+    .catch((e) => { toast({ title: tr("Artifact didn't open"), body: plainError(e), level: "error" }); return false; });
 }

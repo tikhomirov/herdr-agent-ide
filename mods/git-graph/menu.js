@@ -1,5 +1,6 @@
 // The right-click menu, opened as a popup at the pointer with props
 // { role: "menu", target, ctx }. Styled like Herdr's own menu.
+import { tr } from "./i18n.js";
 import { div, svg, image } from "gpui-kit";
 import { v_flex, h_flex } from "gpui-base";
 import { props, closeOverlay, notify, theme, run, exec } from "herdr";
@@ -33,13 +34,13 @@ export class Menu {
     } else if (a.type === "copy") {
       cx.write_to_clipboard(a.text);
       closeOverlay(overlay);
-      notify({ title: "Copied", body: a.text, level: "success", timeout: 2000 });
+      notify({ title: tr("Copied"), body: a.text, level: "success", timeout: 2000 });
     } else if (a.type === "copyMessage") {
       this.busy = i;
       cx.spawn(async (cx) => {
         const result = await readCommitMessage(a.hash, ctx, exec);
-        if (result.ok) { cx.write_to_clipboard(result.text); closeOverlay(overlay); notify({ title: "Commit message copied", level: "success", timeout: 2000 }); }
-        else { this.busy = null; notify({ title: "Couldn't copy commit message", body: result.message, level: "error" }); cx.notify(); }
+        if (result.ok) { cx.write_to_clipboard(result.text); closeOverlay(overlay); notify({ title: tr("Commit message copied"), level: "success", timeout: 2000 }); }
+        else { this.busy = null; notify({ title: tr("Couldn't copy commit message"), body: result.message, level: "error" }); cx.notify(); }
       });
     } else if (a.type === "showChanges") {
       closeOverlay(overlay);
@@ -82,6 +83,6 @@ export class Menu {
           .on_click((_e, cx) => this.choose(i, cx))
           // An agent's own icon keeps its colors when it isn't drawn tinted.
           .child(it.image ? image(it.icon).size(14).flex_none() : svg(icon(it.icon)).size(14).flex_none().text_color(it.action.type.startsWith("delete") ? t.ansi1 : t.muted))
-          .child(div().flex_1().min_w(0).truncate().child(this.busy === i ? "Working…" : it.label))));
+          .child(div().flex_1().min_w(0).truncate().child(this.busy === i ? tr("Working…") : it.label))));
   }
 }

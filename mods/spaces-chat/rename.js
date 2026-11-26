@@ -115,7 +115,7 @@ export class Rename {
     // What stands for it in the sidebar: the emoji, else "#" (a space), the folder (a section) or
     // the server / monitor (a machine).
     const mark = this.icon
-      ? div().text_size(16).child(this.icon)
+      ? div().text_size(16).child(tr(this.icon))
       : this.isMachine
         ? svg(`mods/workspace-chrome/${this.p.machine ? "server" : "monitor"}.svg`).size(14).text_color(t.muted)
       : this.isSection
@@ -123,7 +123,7 @@ export class Rename {
         : div().text_size(16).text_color(t.muted).child("#");
     const panel = v_flex().id("rename").w_full().flex_none().p(K.pad).rounded(10).border(1).border_color(t.border).bg(t.popover).shadow_lg().text_size(TEXT.body)
       .on_key_down((e) => { if (e.key === "escape") this.cancel(); })
-      .child(div().h(K.title).flex_none().text_size(TEXT.title).font_semibold().text_color(t.foreground).child(this.p.new ? "New section" : this.isMachine ? "Rename machine" : this.p.section ? "Rename section" : "Rename space"))
+      .child(div().h(K.title).flex_none().text_size(TEXT.title).font_semibold().text_color(t.foreground).child(this.p.new ? tr("New section") : this.isMachine ? tr("Rename machine") : this.p.section ? tr("Rename section") : tr("Rename space")))
       .child(div().h(K.section).flex_none())
       .child(div().h(K.label).flex_none().text_size(TEXT.label).text_color(t.dim).child(tr("Icon and name")))
       .child(div().h(K.gap).flex_none())
@@ -132,12 +132,12 @@ export class Rename {
           .cursor_pointer().hover((s) => s.bg(t.hover))
           .on_mouse_down("left", (e) => { this.at = rectOf(e); })
           .on_click(() => this.pick(this.at))
-          .child(mark))
+          .child(tr(mark)))
         .child(Input.new(this.input).flex_1().h(K.field).px(10).items_center().rounded(RADIUS.control).border(1)
           .border_color(this.error ? t.blocked : this.focused ? t.accent : t.input).bg(t.background).text_color(t.foreground)))
       .child(div().h(K.section).flex_none())
       .child(dialogFooter({ onCancel: () => this.cancel(), note: this.error, error: true,
         primary: { id: "save", label: this.p.new ? "Create section" : "Save", onClick: () => this.save() } }));
-    return v_flex().size_full().justify_center().child(panel);
+    return v_flex().size_full().justify_center().child(tr(panel));
   }
 }

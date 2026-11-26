@@ -4,6 +4,8 @@
 // Shared core: the source is core/machines.js; bin/sync-shared copies it into the mods in lib/COPIES.
 
 export const HOLD = { start_load: 1, start_memory: 80, start_disk: 90 };
+// A disk with this much room free is never a reason to wait, however full it is by share.
+export const DISK_ROOM_GB = 20;
 export const ALERT = { load: 1.5, memory: 90, disk: 90 };
 // A machine's start limits: Everywhere's, then its own (as herdr-task's machine_limits). Settings
 // keys machines by name, "local" for this computer.
@@ -25,10 +27,10 @@ export function healthMeters(s) {
   const lv = (v, start, alert) => (v > alert ? "over" : start !== null && start !== undefined && v > start ? "busy" : "ok");
   const gb = (b) => `${Math.round(b / 2 ** 30)} GB`;
   return [
-    { name: "CPU", pct: h.cpu, level: lv(h.load, hold.start_load === null ? null : hold.start_load * h.cores, ALERT.load * h.cores),
+    { name: "CPU", pct: h.cpu, level: lv(h.cpu, hold.start_load === null ? null : hold.start_load * 100, ALERT.load * 100),
       detail: `Load ${Number(h.load).toFixed(1)} on ${h.cores} cores` },
     { name: "Memory", pct: h.memory, level: lv(h.memory, hold.start_memory, ALERT.memory), detail: `${gb(h.mem_used)} of ${gb(h.mem_total)}` },
-    ...(h.disks?.length ? [{ name: "Disk", pct: h.disk, level: lv(h.disk, hold.start_disk, ALERT.disk),
+    ...(h.disks?.length ? [{ name: "Disk", pct: h.disk, level: lv(Math.max(0, ...h.disks.filter((d) => d.free_gb < DISK_ROOM_GB).map((d) => d.pct)), hold.start_disk, ALERT.disk),
       detail: h.disks.map((d) => `${d.path} ${d.pct}% · ${d.free_gb} GB free`).join(" · ") }] : []),
   ];
 }

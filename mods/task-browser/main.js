@@ -12,6 +12,7 @@
 // view shows a task and is stopped when it hides or another task shows; it has no tab or pane.
 // This copy keeps ~/.local/state/herdr-ide/browser/<name>.view fresh while it wants the viewer: a viewer whose
 // file goes stale (this copy reloaded or gone) ends by itself.
+import { tr } from "./i18n.js";
 import { View, div } from "gpui-kit";
 import { v_flex } from "gpui-base";
 import { exec, hc, theme, terminals, appHome, home, shared, layout, readTextFile, writeTextFile } from "herdr";
@@ -159,6 +160,6 @@ export default class TaskBrowser extends View {
       : this.why || "Pick a task to see its browser.";
     return v_flex().id("task-browser").size_full().min_h(0).items_center().justify_center().px(24).gap(10)
       .bg(t.background).text_size(12.5).text_color(t.dim)
-      .child(div().text_center().max_w(380).child(line));
+      .child(div().text_center().max_w(380).child(tr(line)));
   }
 }

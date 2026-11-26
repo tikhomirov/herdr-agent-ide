@@ -10,6 +10,7 @@
 // Shared: the source is lib/secrets.js; bin/sync-shared copies it into each mod in lib/COPIES.
 // Edit lib/secrets.js, never a mod's copy, then run bin/sync-shared.
 
+import { tr } from "./i18n.js";
 import { appHome, home, exec, hc, readTextFile, writeTextFile } from "herdr";
 import { terminals, spaces, panes } from "./live.js";
 import { chatPane } from "./core/spaces.js";
@@ -59,7 +60,7 @@ export function levels(address) {
   const out = [];
   if (space) out.push({ scope: "space", machine: null, space, label: spaceName(space) });
   out.push({ scope: "machine", machine, space: null, label: machineName(machine) });
-  out.push({ scope: "everywhere", machine: null, space: null, label: "Everywhere" });
+  out.push({ scope: "everywhere", machine: null, space: null, label: tr("Everywhere") });
   return out;
 }
 

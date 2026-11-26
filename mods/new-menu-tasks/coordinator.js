@@ -217,7 +217,7 @@ export async function newSpace(space) {
   const machine = asked && !machineReady(asked) ? null : asked;
   const choosing = machines().some((m) => m.name && m.layout === "ready");
   const [recent, at] = await Promise.all([recentFolders(machine).catch(() => []), homeOf(machine).catch(() => null)]);
-  if (!at) return toast({ title: `Couldn't reach ${machine}`, body: "Try New space again once it's connected.", level: "error" });
+  if (!at) return toast({ title: `Couldn't reach ${machine}`, body: tr("Try New space again once it's connected."), level: "error" });
   // The dialog draws its own panel (frame "none"), centered and as tall as what it shows now:
   // the overlay is the panel at its tallest.
   openOverlay({ mod: "newspace", kind: "dialog", frame: "none", width: 460, height: newSpaceHeight(recent.length, choosing), props: { recent, machine, home: at } });
@@ -509,7 +509,7 @@ export function closeSpace(id) {
   const name = allSpaces().find((s) => s.id === id)?.name;
   openOverlay({ mod: "confirm-chat", kind: "dialog", width: 400, height: 168, props: {
     title: name && name !== "~" ? `Close \u201c${name}\u201d?` : "Close this space?",
-    detail: "Its tabs close and every program in them ends.", verb: tr("Close space"),
+    detail: tr("Its tabs close and every program in them ends."), verb: tr("Close space"),
     command: { name: "space.close", args: { id, confirmed: true } } } });
   logSpace("close", id, "coordinator.js closeSpace (asks in confirm-chat)");
 }

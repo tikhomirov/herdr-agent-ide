@@ -48,8 +48,8 @@ export class MachinePopup {
       .on_key_down((e, cx) => { if (e.key === "escape") { closeOverlay(p.overlay); cx.stop_propagation(); } })
       .child(h_flex().flex_none().h(HEAD).px(14).gap(8).items_center().border_b(1).border_color(t.border)
         .child(svg(`mods/workspace-chrome/${m ? "server" : "monitor"}.svg`).size(16).flex_none().text_color(t.muted))
-        .child(div().flex_1().min_w(0).truncate().text_size(TEXT.body).font_semibold().text_color(t.foreground).child(look.name))
-        .child(div().flex_none().text_size(TEXT.label).text_color(t.dim).child(fresh)))
+        .child(div().flex_1().min_w(0).truncate().text_size(TEXT.body).font_semibold().text_color(t.foreground).child(tr(look.name)))
+        .child(div().flex_none().text_size(TEXT.label).text_color(t.dim).child(tr(fresh))))
       // A popup is as tall as what it draws: the body gets the rest of its height, and scrolls.
       .child(div().id("machine-popup-body").w_full().h(MACHINE_POPUP.height - HEAD - FOOT).flex_none().overflow_y_scrollbar().mode("always")
         .child(div().px(14).py(12).child(machineDetails(t, m))))

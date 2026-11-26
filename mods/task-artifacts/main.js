@@ -3,6 +3,7 @@
 // the artifact viewer (its versions, Mark up) over the task's chat. A child of the Tasks panel's task view, beside
 // Files, Changes and Browser; the header finds them (mods/chat/panel.js loadArts, core/task-artifacts.js, as the web's
 // Artifacts tab) into shared "tasks.thread.artifacts" and counts them on its switch. None: a quiet line.
+import { tr } from "./i18n.js";
 import { View, div, svg } from "gpui-kit";
 import { v_flex, h_flex } from "gpui-base";
 import { theme, shared } from "herdr";
@@ -48,8 +49,8 @@ export default class TaskArtifacts extends View {
   note(t, title, text) {
     return v_flex().flex_1().items_center().justify_center().px(24).gap(6)
       .child(svg(ICON).size(18).flex_none().text_color(t.dim))
-      .child(div().pt(2).text_size(13).font_medium().text_color(t.muted).child(title))
-      .when(Boolean(text), (el) => el.child(div().max_w(260).text_center().text_size(TEXT.label).text_color(t.dim).child(text)));
+      .child(div().pt(2).text_size(13).font_medium().text_color(t.muted).child(tr(title)))
+      .when(Boolean(text), (el) => el.child(div().max_w(260).text_center().text_size(TEXT.label).text_color(t.dim).child(tr(text))));
   }
 
   row(t, a, ref, machine, i) {
@@ -62,7 +63,7 @@ export default class TaskArtifacts extends View {
         .child(h_flex().min_w(0).gap(8).items_center()
           .child(div().min_w(0).truncate().text_size(13).text_color(t.foreground).child(titleInTask(a.title, ref, a.proof)))
           .when(Boolean(a.proof), (el) => el.child(div().flex_none().h(18).px(7).flex().items_center().rounded(9).bg(t.selected)
-            .text_size(11).font_medium().text_color(t.muted).child("Proof"))))
+            .text_size(11).font_medium().text_color(t.muted).child(tr("Proof")))))
         .child(div().min_w(0).truncate().text_size(TEXT.label).text_color(t.dim)
           .child(busy ? "Opening…" : [`${a.v} ${a.v === 1 ? "version" : "versions"}`, a.at ? ago(a.at) : null].filter(Boolean).join(" · "))));
   }

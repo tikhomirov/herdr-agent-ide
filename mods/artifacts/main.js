@@ -10,6 +10,7 @@
 // placeholder before one is picked (props.blank), and the title bar of an artifact window kept
 // from before windows were cut (props.bar), so it can still be closed.
 
+import { tr } from "./i18n.js";
 import { View, div, svg } from "gpui-kit";
 import { v_flex, h_flex, InputState, Input } from "gpui-base";
 import { spaces, panes, agents, readTextFile, watchFolder, home, theme, closeOverlay, props, shared, setShared } from "herdr";
@@ -43,7 +44,7 @@ export default class Artifacts extends View {
     this.opening = null;
     // The search field (Agent IDE's "Filter artifacts"): by title or the task that made them, as
     // you type. Esc clears it; F gets to it while the list holds the keyboard.
-    this.query = InputState.new({ placeholder: "Filter artifacts" });
+    this.query = InputState.new({ placeholder: tr("Filter artifacts") });
     this.query.on("change", (_e, cx) => cx.notify());
     this.query.on("focus", (_e, cx) => { this.searching = true; cx.notify(); });
     this.query.on("blur", (_e, cx) => { this.searching = false; cx.notify(); });
@@ -142,7 +143,7 @@ export default class Artifacts extends View {
         mod = (await cli(null, ["pull", a.id, ...(machine ? ["--from", machine] : [])])).mod ?? mod;
         how(mod);
       } catch (e) {
-        toast({ title: "Artifact didn't open", body: plainError(e), level: "error" });
+        toast({ title: tr("Artifact didn't open"), body: plainError(e), level: "error" });
       }
       this.opening = null;
       cx.notify();
@@ -169,8 +170,8 @@ export default class Artifacts extends View {
     const shown = q ? this.items.filter((a) => this.found(a, q)) : this.items;
     return v_flex().id("artifacts").size_full().min_h(0).rounded(RADIUS.card).overflow_hidden().bg(t.background).border_1().border_color(t.border).text_color(t.foreground).text_size(TEXT.body)
       .child(h_flex().h(42).flex_none().pl(14).pr(8).gap(8).items_center().border_b(1).border_color(t.border)
-        .child(div().font_semibold().child("Artifacts"))
-        .child(div().flex_1().min_w(0).truncate().text_size(TEXT.label).text_color(t.dim).child(this.all ? "All folders" : this.store?.name ?? ""))
+        .child(div().font_semibold().child(tr("Artifacts")))
+        .child(div().flex_1().min_w(0).truncate().text_size(TEXT.label).text_color(t.dim).child(this.all ? tr("All folders") : this.store?.name ?? ""))
         .child(this.toggle("art-all", "All", this.all, t, (cx) => { this.all = !this.all; this.loaded = null; cx.spawn(async (cx) => this.load(cx)); })))
       .when(Boolean(this.store), (el) => el.child(this.searchField(t)))
       // A press in the list gives it the keyboard: F then goes to the search field.
@@ -180,8 +181,8 @@ export default class Artifacts extends View {
         .on_key_down((e, cx) => { if (e.keystroke === "f" && !this.searching) { cx.stop_propagation(); this.query.focus(); cx.notify(); } })
         .when(Boolean(this.error), (el) => el.child(h_flex().m(6).p(10).gap(8).items_start().rounded(8).bg(t.surface).border_1().border_color(t.border)
           .child(div().size(8).mt(5).flex_none().rounded(4).bg(t.blocked))
-          .child(div().flex_1().text_size(12).text_color(t.muted).child(this.error))))
-        .when(!this.store && !this.error, (el) => el.child(div().px(18).py(28).text_center().text_size(TEXT.label).text_color(t.dim).child("Finding this space's folder…")))
+          .child(div().flex_1().text_size(12).text_color(t.muted).child(tr(this.error)))))
+        .when(!this.store && !this.error, (el) => el.child(div().px(18).py(28).text_center().text_size(TEXT.label).text_color(t.dim).child(tr("Finding this space's folder…"))))
         .when(empty, (el) => el.child(this.emptyView(t)))
         .when(Boolean(q) && !empty && !shown.length, (el) => el.child(div().px(18).py(28).text_center().text_size(TEXT.label).text_color(t.dim)
           .child(`No artifacts match “${q}”.`)))
@@ -223,9 +224,9 @@ export default class Artifacts extends View {
   emptyView(t) {
     return v_flex().px(18).py(28).gap(6).items_center()
       .child(svg(ICON).size(16).flex_none().text_color(t.dim))
-      .child(div().pt(4).font_medium().child("No artifacts."))
+      .child(div().pt(4).font_medium().child(tr("No artifacts.")))
       .child(div().max_w(250).text_center().text_size(TEXT.label).text_color(t.muted)
-        .child(this.all ? "Reports, boards and forms agents make show here."
+        .child(this.all ? tr("Reports, boards and forms agents make show here.")
           : `Reports, boards and forms agents make for ${this.store.name} show here. Ask an agent to make one.`));
   }
 
@@ -234,7 +235,7 @@ export default class Artifacts extends View {
       .bg(on ? t.selected : t.background).text_color(on ? t.foreground : t.muted)
       .hover((s) => s.bg(on ? t.selected : t.hover).text_color(t.foreground))
       .on_click((_e, cx) => { fn(cx); cx.notify(); })
-      .child(label);
+      .child(tr(label));
   }
 
   // Which version, who made it and when: "v3 · Claude Code · 2h ago".
@@ -258,7 +259,7 @@ export default class Artifacts extends View {
       .child(h_flex().h(18).flex_none().items_center()
         .child(svg(ICON).size(14).flex_none().text_color(shown || open ? t.accent : t.dim)))
       .child(v_flex().flex_1().min_w(0).gap(2)
-        .child(div().min_w(0).truncate().child(a.title))
+        .child(div().min_w(0).truncate().child(tr(a.title)))
         .child(h_flex().min_w(0).gap(8).text_size(TEXT.label).text_color(t.dim)
           .child(div().flex_1().min_w(0).truncate().child(busy ? "Opening…" : open ? `Open · ${this.detail(a)}` : this.detail(a)))
           // With All: its folder, dimmed, at the right (as task rows show where they ran).
@@ -304,7 +305,7 @@ export default class Artifacts extends View {
           if (marking) setShared("artifacts.markup", null);
           await showInSidebar({ mod: out.mod, base, id: v.id, title: v.title, version: n ?? latest, latest, machine: v.machine });
         } catch (e) {
-          toast({ title: "That version didn't open", body: plainError(e), level: "error" });
+          toast({ title: tr("That version didn't open"), body: plainError(e), level: "error" });
         }
         hv.busy = false;
         cx.notify();
@@ -322,19 +323,19 @@ export default class Artifacts extends View {
         .text_size(TEXT.label).text_color(t.muted).hover((s) => s.bg(t.hover).text_color(t.foreground))
         .on_click((_e, cx) => { cx.stop_propagation(); if (marking) setShared("artifacts.markup", null); backToList(); })
         .child(svg("mods/workspace-chrome/chevron-left.svg").size(14).flex_none())
-        .child("Artifacts"))
-      .child(div().flex_1().min_w(0).truncate().font_semibold().child(title))
+        .child(tr("Artifacts")))
+      .child(div().flex_1().min_w(0).truncate().font_semibold().child(tr(title)))
       .when(Boolean(v), (el) => el.child(h_flex().flex_none().items_center()
         .when(kept.length > 1 || older, (row) => row.child(arrow("art-v-prev", "mods/workspace-chrome/chevron-left.svg", prev)))
         .child(div().id("art-v").px(2).flex_none().text_size(TEXT.label).text_color(older ? t.foreground : t.dim)
-          .child(hv.busy ? "Opening…" : kept.length > 1 || older ? `v${shown} of ${latest}` : `v${shown}`))
+          .child(tr(hv.busy ? "Opening…" : kept.length > 1 || older ? `v${shown} of ${latest}` : `v${shown}`)))
         .when(kept.length > 1 || older, (row) => row.child(arrow("art-v-next", "mods/workspace-chrome/chevron-right.svg", next)))
         // An older one: "v2 of 5 · Latest ›".
         .when(older && !hv.busy, (row) => row.child(div().px(4).text_size(TEXT.label).text_color(t.dim).child("·"))
           .child(h_flex().id("art-latest").h(24).px(6).flex_none().items_center().rounded(RADIUS.control).cursor_pointer()
             .text_size(TEXT.label).font_medium().text_color(t.accent).hover((s) => s.bg(t.hover))
             .on_click((_e, cx) => { cx.stop_propagation(); step(null, cx); })
-            .child("Latest ›")))))
+            .child(tr("Latest ›"))))))
       // Mark up / Done, as the viewer's bar (chat-image/artifact-bar.js) and the web's: a pointer clicking a spot; while
       // marking, Done with a tick, tinted the accent of the frame round what you mark (square-cornered, as the window's other bar buttons)
       .when(Boolean(v), (el) => el.child(h_flex().id("art-markup").h(24).pl(5).pr(8).gap(5).flex_none().items_center().rounded(RADIUS.control).cursor_pointer()
@@ -342,13 +343,13 @@ export default class Artifacts extends View {
         .hover((s) => s.bg(marking ? `${t.accent}33` : t.hover).text_color(t.foreground))
         .on_click((_e, cx) => { cx.stop_propagation(); setShared("artifacts.markup", marking ? null : { mod: v.mod, where: "panel", at: Date.now() }); cx.notify(); })
         .child(marking ? svg("mods/artifacts/check.svg").size(14).flex_none().text_color(t.accent) : svg("mods/artifacts/markup.svg").size(14).flex_none())
-        .child(marking ? "Done" : "Mark up")));
+        .child(marking ? tr("Done") : tr("Mark up"))));
   }
 
   blankView() {
     const t = theme();
     return v_flex().size_full().items_center().justify_center().px(18).bg(t.background).text_size(TEXT.label).text_color(t.dim)
-      .child("Pick an artifact to see it here.");
+      .child(tr("Pick an artifact to see it here."));
   }
 
   // A window's title bar: its title, and a close button. Pressing elsewhere drags the window.
@@ -357,7 +358,7 @@ export default class Artifacts extends View {
     const titles = shared("artifacts.titles") ?? {};
     return h_flex().id("art-bar").size_full().px(12).gap(8).items_center().bg(t.chrome).border_b(1).border_color(t.border).text_size(12.5)
       .child(svg(ICON).size(14).flex_none().text_color(t.dim))
-      .child(div().flex_1().min_w(0).truncate().font_medium().child(titles[bar.mod] ?? `${bar.title} · v${bar.version}`))
+      .child(div().flex_1().min_w(0).truncate().font_medium().child(tr(titles[bar.mod] ?? `${bar.title} · v${bar.version}`)))
       .child(div().id("art-close").p(4).flex_none().rounded(5).cursor_pointer().text_color(t.dim).hover((s) => s.bg(t.hover).text_color(t.foreground))
         .on_mouse_down("left", (_e, cx) => cx.stop_propagation())
         .on_click(() => closeOverlay(props().overlay))

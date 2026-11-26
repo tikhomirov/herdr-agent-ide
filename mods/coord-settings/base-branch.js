@@ -3,6 +3,7 @@
 // a change touches only new tasks); empty, they take the branch the folder has checked out. The
 // branch is checked before it's saved: here, or on origin as git last fetched it.
 
+import { tr } from "./i18n.js";
 import { div } from "gpui-kit";
 import { v_flex, InputState, Input } from "gpui-base";
 import { exec } from "herdr";
@@ -69,7 +70,7 @@ export function baseRow(view, t) {
     .when(empty, (el) => el.child(div().absolute().top(6).left(11).right(11).truncate().text_size(13).text_color(t.dim)
       .child(BASE.empty(now))));
   // A branch that isn't there says so under the box, in its words, and isn't saved.
-  const control = v_flex().items_end().gap(5).child(box)
-    .when(Boolean(b.err), (el) => el.child(div().w(200).text_size(12).line_height("17px").text_color(t.blocked).child(b.err)));
+  const control = v_flex().items_end().gap(5).child(tr(box))
+    .when(Boolean(b.err), (el) => el.child(div().w(200).text_size(12).line_height("17px").text_color(t.blocked).child(tr(b.err))));
   return view.row(t, BASE.title, BASE.about, control, view.scoped("tasks", "base", (v) => v || BASE.follows));
 }

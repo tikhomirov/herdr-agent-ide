@@ -12,6 +12,7 @@
 // here in a small box, saved a moment after typing stops and on leaving it.
 // Words and picks: core/autopilot.js (the web's too).
 
+import { tr } from "./i18n.js";
 import { div } from "gpui-kit";
 import { v_flex, h_flex, InputState, Input, TextareaState, Textarea } from "gpui-base";
 import { exec, appHome, home, readTextFile } from "herdr";
@@ -106,7 +107,7 @@ function saveBeat(view, cx) {
 // `view`: the settings window (its title, row pieces and the level's values).
 export function autopilotSection(view, t, cx) {
   const ap = view.ap;
-  if (!ap.base) return v_flex().child(view.title(t, AP.TITLE)).child(div().text_size(TEXT.label).text_color(t.dim).child("Loading…"));
+  if (!ap.base) return v_flex().child(view.title(t, AP.TITLE)).child(div().text_size(TEXT.label).text_color(t.dim).child(tr("Loading…")));
   const a = now(view);
 
   // The boxes show what applies at this level: when it changes (a save, a Reset, another level, an
@@ -149,21 +150,21 @@ export function autopilotSection(view, t, cx) {
         const next = picked ? [...events].filter((e) => e !== id) : [...events, id];
         view.set("autopilot", "events", AP.eventsIn(next), cx);
       })
-      .child(label);
+      .child(tr(label));
   };
   const customBox = preset === CUSTOM ? v_flex().gap(6)
     .child(div().w_full().h(H.lg).px(9).flex().items_center().rounded(RADIUS.control).border_1().border_color(ap.err ? t.blocked : t.input).bg(t.background)
       .child(Input.new(ap.every).w_full().text_size(TEXT.body).text_color(t.foreground)))
-    .child(div().text_size(TEXT.label).line_height("17px").text_color(ap.err ? t.blocked : t.dim).child(ap.err || AP.CUSTOM_HINT)) : null;
+    .child(div().text_size(TEXT.label).line_height("17px").text_color(ap.err ? t.blocked : t.dim).child(tr(ap.err || AP.CUSTOM_HINT))) : null;
   // The heartbeat: "Saved" a moment after a save, the words in a small monospace box that grows a little.
   const beatBox = Textarea.new(b.box).w_full().px(10).py(8).rounded(RADIUS.control).border(1)
     .border_color(b.focus ? t.accent : t.input).bg(t.background)
     .font_family(MONO).text_size(TEXT.label).line_height("18px").text_color(t.foreground);
-  const savedWord = Date.now() - b.savedAt < 2000 ? div().text_size(TEXT.label).text_color(t.dim).child(AP.SAVED) : null;
+  const savedWord = Date.now() - b.savedAt < 2000 ? div().text_size(TEXT.label).text_color(t.dim).child(tr(AP.SAVED)) : null;
 
   return v_flex()
     .child(view.title(t, AP.TITLE))
-    .child(div().pb(8).text_size(TEXT.label).line_height("17px").text_color(t.dim).child(AP.ABOUT))
+    .child(div().pb(8).text_size(TEXT.label).line_height("17px").text_color(t.dim).child(tr(AP.ABOUT)))
     // a space's Direction: the one line it steers toward (Everywhere has none: each space works out its own)
     .when(Boolean(view.scope), (el) => el.child(view.row(t, AP.ROWS.direction.label, AP.ROWS.direction.about, null, null,
       div().w_full().h(H.lg).px(9).flex().items_center().rounded(RADIUS.control).border_1().border_color(t.input).bg(t.background)

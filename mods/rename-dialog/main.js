@@ -76,21 +76,21 @@ export default class Rename extends View {
     const tab = ([name], i) => div().id(`cat-${name}`).h(26).px(10).flex().items_center().rounded(13).text_size(12)
       .bg(i === cat ? t.selected : t.popover).text_color(i === cat ? t.foreground : t.muted).cursor_pointer()
       .hover((s) => s.bg(i === cat ? t.selected : t.hover))
-      .on_click((_e, cx) => { this.cat = i; cx.notify(); }).child(name);
+      .on_click((_e, cx) => { this.cat = i; cx.notify(); }).child(tr(name));
     const cell = (e) => div().id(`e-${e}`).size(35).flex().items_center().justify_center().rounded(8).text_size(19).cursor_pointer()
       .bg(e === lead ? t.selected : t.popover).hover((s) => s.bg(t.hover))
-      .on_click((_e, cx) => this.setEmoji(e, cx)).child(e);
+      .on_click((_e, cx) => this.setEmoji(e, cx)).child(tr(e));
     const button = (id, label, primary, onClick) => h_flex().id(id).h(32).px(14).items_center().rounded(8)
       .border_1().border_color(primary ? t.solid : t.input).bg(primary ? t.solid : t.raised)
       .text_color(primary ? t.solid_foreground : t.foreground).text_size(12.5).font_medium().cursor_pointer()
-      .hover((s) => s.opacity(0.88)).on_click(onClick).child(label);
+      .hover((s) => s.opacity(0.88)).on_click(onClick).child(tr(label));
     return v_flex().id("rename").track_focus(this.handle).on_key_down((e, cx) => this.key(e, cx))
       .size_full().min_h(0).p(18).gap(12).bg(t.popover).text_color(t.foreground)
       .child(h_flex().items_center().child(div().flex_1().text_size(15).font_semibold().child(tr("Rename tab")))
         .child(div().text_size(11).text_color(t.dim).child("Esc")))
       .child(h_flex().gap(8).items_center()
         .child(div().size(36).flex_none().flex().items_center().justify_center().rounded(9).border_1().border_color(t.input).bg(t.background)
-          .text_size(19).text_color(lead ? t.foreground : t.dim).child(lead ?? "🙂"))
+          .text_size(19).text_color(lead ? t.foreground : t.dim).child(tr(lead ?? "🙂")))
         .child(div().flex_1().min_w(0).child(Input.new(this.input).h(36).w_full().px(10).rounded(9).border_1()
           .border_color(this.focused ? t.accent : t.input).bg(t.background).text_size(12.8).text_color(t.foreground))))
       .child(h_flex().gap(4).items_center().flex_wrap().children(names.map((n, i) => tab(n, i)))
@@ -98,7 +98,7 @@ export default class Rename extends View {
         .when(Boolean(lead), (el) => el.child(div().id("no-emoji").h(26).px(10).flex().items_center().rounded(13).text_size(12).text_color(t.dim)
           .cursor_pointer().hover((s) => s.bg(t.hover).text_color(t.foreground)).on_click((_e, cx) => this.setEmoji(null, cx)).child(tr("No emoji")))))
       .child(h_flex().id("grid").flex_1().min_h(0).flex_wrap().content_start().gap(2).overflow_y_scrollbar().children(shown.map((e) => cell(e))))
-      .child(div().text_size(11.5).text_color(t.dim).child("The emoji becomes the first character of the name. Empty name: the tab's number."))
+      .child(div().text_size(11.5).text_color(t.dim).child(tr("The emoji becomes the first character of the name. Empty name: the tab's number.")))
       .child(h_flex().gap(8).justify_end()
         .child(button("rn-cancel", "Cancel", false, () => closeOverlay(p.overlay)))
         .child(button("rn-save", "Save", true, () => this.submit())));

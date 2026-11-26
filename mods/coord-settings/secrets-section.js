@@ -5,6 +5,7 @@
 // waiting on one (herdr-secret ask) are listed first, and giving it here answers them too.
 // The vault itself is lib/secrets.js's (its copy here: ./secrets.js).
 
+import { tr } from "./i18n.js";
 import { div, svg } from "gpui-kit";
 import { v_flex, h_flex, InputState, Input } from "gpui-base";
 import { machines, exec, home } from "herdr";
@@ -69,24 +70,24 @@ export function secretsSection(view, t) {
     .when(kind === "secondary", (el) => el.border_1().border_color(t.border).bg(t.raised).text_color(t.foreground).hover((st) => st.bg(t.hover)))
     .when(kind === "danger", (el) => el.bg(t.blocked).text_color(t.background).hover((st) => st.opacity(0.88)))
     .when(kind === "ghost", (el) => el.text_color(t.muted).hover((st) => st.bg(t.hover).text_color(t.foreground)))
-    .on_click((_e, cx) => { cx.stop_propagation(); fn(cx); cx.notify(); }).child(label);
+    .on_click((_e, cx) => { cx.stop_propagation(); fn(cx); cx.notify(); }).child(tr(label));
   const all = scopes();
   const picked = all.find((x) => vault.scopeKey(x) === vault.scopeKey(s.scope)) ?? all[0];
   const item = (x) => h_flex().id(`sec-scope-${vault.scopeKey(x)}`).h(29).px(9).gap(10).rounded(7).items_center().cursor_pointer()
     .hover((st) => st.bg(t.selected))
     .on_click((_e, cx) => { s.scope = { scope: x.scope, machine: x.machine, space: x.space }; s.open = false; cx.notify(); })
-    .child(div().flex_1().min_w(0).truncate().text_size(13).text_color(t.foreground).child(x.label))
-    .child(div().text_size(11).text_color(t.dim).child(x.sub ?? ""))
+    .child(div().flex_1().min_w(0).truncate().text_size(13).text_color(t.foreground).child(tr(x.label)))
+    .child(div().text_size(11).text_color(t.dim).child(tr(x.sub ?? "")))
     .child(div().size(14).flex_none().when(vault.scopeKey(x) === vault.scopeKey(s.scope), (el) => el.child(svg("mods/workspace-chrome/check.svg").size(14).text_color(t.foreground))));
   const group = (g) => all.filter((x) => x.group === g);
   const picker = h_flex().id("sec-scope").h(H.lg).pl(10).pr(6).gap(6).items_center().rounded(RADIUS.control).border_1().border_color(t.border).bg(t.raised)
     .cursor_pointer().hover((st) => st.bg(t.hover)).on_click((_e, cx) => { s.open = !s.open; cx.notify(); })
-    .child(div().max_w(150).truncate().text_size(TEXT.body).text_color(t.foreground).child(picked.group === W.space ? `Space ${picked.label}` : picked.label))
+    .child(div().max_w(150).truncate().text_size(TEXT.body).text_color(t.foreground).child(tr(picked.group === W.space ? `Space ${picked.label}` : picked.label)))
     .child(svg("mods/workspace-chrome/chevron-down.svg").size(12).text_color(t.dim));
   const menu = v_flex().id("sec-scope-menu").absolute().top(66).right(0).w(260).max_h(300).overflow_y_scroll().p(5).rounded(8).bg(t.popover)
     .border_1().border_color(t.border).shadow_md()
     .child(item(all[0]))
-    .children([W.machine, W.space].flatMap((g) => [div().px(9).pt(8).pb(3).text_size(11).font_medium().text_color(t.dim).child(g), ...group(g).map(item)]));
+    .children([W.machine, W.space].flatMap((g) => [div().px(9).pt(8).pb(3).text_size(11).font_medium().text_color(t.dim).child(tr(g)), ...group(g).map(item)]));
 
   // Agents waiting on one: the form fills with its name and their narrowest scope.
   const asks = vault.allAsks();
@@ -95,7 +96,7 @@ export function secretsSection(view, t) {
     .child(div().size(7).flex_none().rounded(4).bg(t.blocked))
     .child(v_flex().flex_1().min_w(0).gap(2)
       .child(div().text_size(TEXT.body).text_color(t.foreground).child(W.asks(who(a), a.name)))
-      .when(Boolean(a.why), (el) => el.child(div().text_size(TEXT.label).text_color(t.dim).child(a.why))))
+      .when(Boolean(a.why), (el) => el.child(div().text_size(TEXT.label).text_color(t.dim).child(tr(a.why)))))
     .child(small(`sec-give-${a.address}-${a.name}`, W.give, (cx) => {
       const lv = vault.levels(a.address)[0];
       s.name.set_value(a.name);
@@ -105,17 +106,17 @@ export function secretsSection(view, t) {
 
   const form = v_flex().relative().gap(8).py(12).border_b(1).border_color(t.border)
     .child(h_flex().gap(8).items_center()
-      .child(v_flex().gap(4).child(div().text_size(TEXT.label).text_color(t.dim).child(W.name)).child(field(s.name, 190, true)))
-      .child(v_flex().flex_1().min_w(0).gap(4).child(div().text_size(TEXT.label).text_color(t.dim).child(W.value)).child(field(s.value, null, false)))
-      .child(v_flex().gap(4).child(div().text_size(TEXT.label).text_color(t.dim).child(W.for)).child(picker)))
+      .child(v_flex().gap(4).child(div().text_size(TEXT.label).text_color(t.dim).child(tr(W.name))).child(field(s.name, 190, true)))
+      .child(v_flex().flex_1().min_w(0).gap(4).child(div().text_size(TEXT.label).text_color(t.dim).child(tr(W.value))).child(field(s.value, null, false)))
+      .child(v_flex().gap(4).child(div().text_size(TEXT.label).text_color(t.dim).child(tr(W.for))).child(tr(picker))))
     .child(h_flex().gap(8).items_center()
       .child(div().flex_1().min_w(0).text_size(TEXT.label).line_height("17px").text_color(s.err ? t.blocked : t.dim)
-        .child(s.err || s.note || W.hint))
+        .child(tr(s.err || s.note || W.hint)))
       .child(h_flex().id("sec-save").h(H.sm).px(8).flex_none().items_center().rounded(RADIUS.control).text_size(TEXT.label).font_medium()
         .when(Boolean(s.name.value().trim() && s.value.value()) && !s.busy, (el) => el.cursor_pointer().bg(t.solid).text_color(t.solid_foreground).hover((st) => st.opacity(0.88))
           .on_click((_e, cx) => save(s, cx)))
         .when(!(s.name.value().trim() && s.value.value()) || s.busy, (el) => el.bg(t.raised).text_color(t.dim))
-        .child(s.busy ? W.saving : W.save)));
+        .child(tr(s.busy ? W.saving : W.save))));
 
   const list = s.list ?? [];
   const sorted = [...list].sort((a, b) => a.name.localeCompare(b.name) || a.scope.localeCompare(b.scope));
@@ -123,7 +124,7 @@ export function secretsSection(view, t) {
     const k = `${e.name}|${vault.scopeKey(e)}`;
     return h_flex().id(`sec-row-${k}`).w_full().gap(12).py(9).items_center().border_b(1).border_color(t.border)
       .child(svg("mods/coord-settings/key.svg").size(14).flex_none().text_color(t.dim))
-      .child(div().flex_1().min_w(0).truncate().text_size(TEXT.body).font_family("JetBrains Mono").text_color(t.foreground).child(e.name))
+      .child(div().flex_1().min_w(0).truncate().text_size(TEXT.body).font_family("JetBrains Mono").text_color(t.foreground).child(tr(e.name)))
       .child(div().max_w(180).truncate().text_size(TEXT.label).text_color(t.muted).child(vault.where(e)))
       .child(small(`sec-replace-${k}`, W.replace, () => {
         s.name.set_value(e.name);
@@ -144,15 +145,15 @@ export function secretsSection(view, t) {
 
   return v_flex()
     .child(view.title(t, SECTIONS.find((x) => x.id === "secrets").title))
-    .child(div().text_size(TEXT.label).line_height("17px").text_color(t.dim).child(W.about))
+    .child(div().text_size(TEXT.label).line_height("17px").text_color(t.dim).child(tr(W.about)))
     // Each menu is drawn after the rows under it (over.js, #1002), measured from the row it opens from.
     .child(over(div(), [
       ...(asks.length > 0 ? [view.heading(t, W.asked), ...askRows] : []),
       view.heading(t, W.add),
       over(form, [
         view.heading(t, W.kept),
-        ...(s.list === null ? [div().py(10).text_size(TEXT.body).text_color(t.dim).child(W.loading)] : []),
-        ...(s.list !== null && !rows.length ? [div().py(10).text_size(TEXT.body).text_color(t.dim).child(W.none)] : []),
+        ...(s.list === null ? [div().py(10).text_size(TEXT.body).text_color(t.dim).child(tr(W.loading))] : []),
+        ...(s.list !== null && !rows.length ? [div().py(10).text_size(TEXT.body).text_color(t.dim).child(tr(W.none))] : []),
         ...rows,
       ], s.open ? menu : null),
     ], null));

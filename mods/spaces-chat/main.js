@@ -94,9 +94,9 @@ export function tone(t, status) {
 // nothing beside it moves when it turns bold.
 function nameText(text, fresh, color, t) {
   return div().relative().min_w(0)
-    .child(div().invisible().font_semibold().truncate().child(text))
+    .child(div().invisible().font_semibold().truncate().child(tr(text)))
     .child(div().absolute().top(0).left(0).right(0).truncate().text_color(fresh ? t.foreground : color)
-      .when(fresh, (el) => el.font_semibold()).child(text));
+      .when(fresh, (el) => el.font_semibold()).child(tr(text)));
 }
 
 // A machine's Autopilot file (herdr-task's .autopilot.json there), read over herdr-core. None there: no Autopilot ({});
@@ -247,7 +247,7 @@ export default class Spaces extends View {
     const tab = sp ? coordinatorTab(sp, undefined, ps) : null;
     const chatIn = (id) => ps.find((p) => p.mod === "chat" && p.tab === id)?.pane ?? null;
     const at = tab && chatIn(tab.id) ? tab.id : (sp?.tabs ?? []).map((t) => t.id).find((id) => chatIn(id)) ?? null;
-    if (!at) return toast({ title: tr("Voice call"), body: "This space has no chat to run the call from: open its Assistant first.", level: "info" });
+    if (!at) return toast({ title: tr("Voice call"), body: tr("This space has no chat to run the call from: open its Assistant first."), level: "info" });
     if (!sp.tabs.some((t) => t.id === at && t.active)) run("tab.select", { id: at });
     setShared("chat.callreq", { pane: chatIn(at), at: Date.now(), action: "start" });
   }
@@ -459,7 +459,7 @@ export default class Spaces extends View {
       return layout === "loading" || (!layout && this.machines.some(k => k.name === m && k.state === "connected"))
         || spaces().some(s => (s.machine ?? null) === m && !this.shown.has(s.id));
     };
-    const loadingRow = m => div().id(`machine-loading-${m ?? "local"}`).h(28).flex_none().px(8).flex().items_center().text_size(TEXT.label).text_color(t.dim).child(collapsed ? "…" : "Loading…");
+    const loadingRow = m => div().id(`machine-loading-${m ?? "local"}`).h(28).flex_none().px(8).flex().items_center().text_size(TEXT.label).text_color(t.dim).child(collapsed ? "…" : tr("Loading…"));
     const pinned = this.pinned(visible, pins, Boolean(remote.length), t);
     if (!remote.length) return [...pinned, ...(loading(null) && !rows.length && !pinned.length ? [loadingRow(null)] : body(null, rows))];
     // in the order the person dragged them into, the same on every device and in the web app (SHEP-153)
@@ -504,7 +504,7 @@ export default class Spaces extends View {
           ? div().w(14).flex_none().flex().justify_center().text_size(12).when(offline, el => el.opacity(0.5)).child(machineLook(m).icon)
           : svg(`mods/workspace-chrome/${m ? "server" : "monitor"}.svg`).size(14).flex_none().text_color(offline ? t.dim : t.muted))
         .when(!collapsed, el => el.child(div().flex_1().min_w(0).truncate().child(machineLook(m).name))
-          .when(offline, el => el.child(div().flex_none().font_normal().child(state === "connecting" ? "Connecting\u2026" : "Offline")))
+          .when(offline, el => el.child(div().flex_none().font_normal().child(state === "connecting" ? "Connecting\u2026" : tr("Offline"))))
           // + (New space or New section, there) hugging its one meter. HERD-70.
           .when(connected, el => el.child(h_flex().flex_none().gap(2).items_center()
             .child(div().id(`machine-add-${m ?? "local"}`).size(20).flex_none().flex().items_center().justify_center().rounded(RADIUS.control)
@@ -598,8 +598,8 @@ export default class Spaces extends View {
       .on_mouse_move((_e, cx) => this.drag(`section:${s.id}`, s.machine, cx))
       // Its icon in the spaces' "#" column: the folder, or the emoji picked for it.
       .child(div().w(18).flex_none().flex().justify_center()
-        .child(s.icon ? div().text_size(13).child(s.icon) : svg("mods/workspace-chrome/folder.svg").size(14)))
-      .child(div().flex_1().min_w(0).truncate().child(s.name))
+        .child(s.icon ? div().text_size(13).child(tr(s.icon)) : svg("mods/workspace-chrome/folder.svg").size(14)))
+      .child(div().flex_1().min_w(0).truncate().child(tr(s.name)))
       .when(needs > 0 || ready > 0, (el) => el.child(countBadge(needs, ready, t.chrome)))
       .child(svg(`mods/workspace-chrome/chevron-${open ? "down" : "right"}.svg`).size(12).flex_none())
       .when(line, (el) => el.child(this.line(t, "bottom")));
@@ -753,7 +753,7 @@ export default class Spaces extends View {
       .items_center()
       .text_size(TEXT.label)
       .text_color(t.dim)
-      .when(Boolean(where), (el) => el.child(div().min_w(0).truncate().child(where)));
+      .when(Boolean(where), (el) => el.child(div().min_w(0).truncate().child(tr(where))));
   }
 
   // `pinned`: in Pinned, `tag` its machine there; `end`: the drag key (a section's, Pinned) a
@@ -802,7 +802,7 @@ export default class Spaces extends View {
           .child(nameText(name, fresh, quiet ? t.dim : w.active ? t.foreground : t.muted, t))
           .when(Boolean(this.pilotMark(w, t)), (el) => el.child(this.pilotMark(w, t)))
           .child(g ? this.gitTail(g, tree, name, t, label) : h_flex().flex_1().min_w(0).justify_end().text_size(TEXT.label).text_color(t.dim)
-            .when(Boolean(label), (el) => el.child(div().min_w(0).truncate().child(label))))
+            .when(Boolean(label), (el) => el.child(div().min_w(0).truncate().child(tr(label)))))
           .when(quiet, (el) => el.child(svg("mods/spaces-chat/bell-off.svg").size(13).flex_none().text_color(t.dim)))
           // What needs the person in this space (the Inbox's items in its tabs), red, and its
           // tasks in Ready, green.
@@ -860,7 +860,7 @@ export default class Spaces extends View {
     // null on a wide sidebar (SHEP-135) or with voice off: child(null) throws (GitHub #869)
     const voice = this.voiceRow(t, collapsed);
     return v_flex().size_full().min_h(0).bg(t.chrome).text_size(13)
-      .when(Boolean(voice), (el) => el.child(voice))
+      .when(Boolean(voice), (el) => el.child(tr(voice)))
       .child(h_flex().h(31).pl(16).pr(10).items_center().justify_between().text_size(TEXT.label).font_medium().text_color(t.dim)
         .when(!collapsed, el => el.child(tr("Spaces")))
         // As a machine's +: New space, New section, on the shown space's machine.

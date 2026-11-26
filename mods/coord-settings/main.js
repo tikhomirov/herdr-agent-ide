@@ -14,6 +14,7 @@
 // herdr-task. Agents use the chat's own model button (settings.js and agent.js from lib/).
 // The window draws its own frame (frame: "none"), most of Herdr's height, at most 900.
 
+import { tr } from "./i18n.js";
 import { View, div, svg } from "gpui-kit";
 import { v_flex, h_flex, Scrollbar, TextareaState, Textarea, InputState, Input } from "gpui-base";
 import { props, theme, machines, home, exec, readTextFile, writeTextFile, closeOverlay, openOverlay, shared } from "herdr";
@@ -401,12 +402,12 @@ export default class ShepherdrSettings extends View {
   // Pieces --------------------------------------------------------------------
 
   title(t, text) {
-    return div().pb(6).text_size(TEXT.title).font_semibold().text_color(t.foreground).child(text);
+    return div().pb(6).text_size(TEXT.title).font_semibold().text_color(t.foreground).child(tr(text));
   }
 
   // A small dim heading over a group of rows, in sentence case.
   heading(t, text) {
-    return div().pt(22).pb(2).text_size(TEXT.label).font_medium().text_color(t.dim).child(text);
+    return div().pt(22).pb(2).text_size(TEXT.label).font_medium().text_color(t.dim).child(tr(text));
   }
 
   // One setting: its name and one line on the left, the control on the right, the scope line
@@ -416,12 +417,12 @@ export default class ShepherdrSettings extends View {
     return v_flex().w_full().gap(10).py(12).border_b(1).border_color(t.border)
       .child(h_flex().w_full().gap(16).items_center()
         .child(v_flex().flex_1().min_w(0).gap(3)
-          .child(div().text_size(TEXT.body).font_medium().text_color(t.foreground).child(title))
+          .child(div().text_size(TEXT.body).font_medium().text_color(t.foreground).child(tr(title)))
           .when(Boolean(about), (el) => el.child(typeof about === "string"
-            ? div().text_size(TEXT.label).line_height("17px").text_color(t.dim).child(about) : about))
-          .when(Boolean(line), (el) => el.child(line)))
-        .when(Boolean(control), (el) => el.child(div().flex_none().child(control))))
-      .when(Boolean(below), (el) => el.child(below));
+            ? div().text_size(TEXT.label).line_height("17px").text_color(t.dim).child(tr(about)) : about))
+          .when(Boolean(line), (el) => el.child(tr(line))))
+        .when(Boolean(control), (el) => el.child(div().flex_none().child(tr(control)))))
+      .when(Boolean(below), (el) => el.child(tr(below)));
   }
 
   // In a space: "Set for this space · Reset" or "Inherited from Everywhere". On Everywhere: "2
@@ -430,9 +431,9 @@ export default class ShepherdrSettings extends View {
     const line = h_flex().gap(6).items_center().text_size(TEXT.label);
     if (this.scope) {
       return sc.mine
-        ? line.child(div().text_color(t.muted).child(CHANGED_HERE)).child(div().text_color(t.dim).child("·"))
+        ? line.child(div().text_color(t.muted).child(tr(CHANGED_HERE))).child(div().text_color(t.dim).child("·"))
           .child(div().child(link(`reset-${sc.id}`, RESET, (_e, cx) => sc.reset(cx))))
-        : line.child(div().text_color(t.dim).child(sc.from));
+        : line.child(div().text_color(t.dim).child(tr(sc.from)));
     }
     if (!sc.others?.length) return null;
     const open = this.listOpen === sc.id;
@@ -442,12 +443,12 @@ export default class ShepherdrSettings extends View {
         () => { this.listOpen = open ? null : sc.id; })))
       .when(open, (el) => el.child(h_flex().flex_wrap().gap(12).children(sc.others.map((o) => spaceById(o.id)
         ? link(`own-${sc.id}-${o.id}`, o.name, (_e, cx) => this.pickScope(o.id, cx))
-        : div().text_size(TEXT.label).text_color(t.dim).child(o.name)))));
+        : div().text_size(TEXT.label).text_color(t.dim).child(tr(o.name))))));
   }
 
   stepper(t, id, value, onMinus, onPlus) {
     const b = (k, label, f) => div().id(`${id}-${k}`).w(H.sm).h_full().flex().items_center().justify_center().cursor_pointer()
-      .text_size(TEXT.body).text_color(t.muted).hover((s) => s.bg(t.hover).text_color(t.foreground)).on_click(f).child(label);
+      .text_size(TEXT.body).text_color(t.muted).hover((s) => s.bg(t.hover).text_color(t.foreground)).on_click(f).child(tr(label));
     return h_flex().h(H.sm).items_center().rounded(RADIUS.control).border_1().border_color(t.input).bg(t.background).overflow_hidden()
       .child(b("minus", "−", onMinus))
       .child(div().min_w(48).px(6).text_size(TEXT.label).text_color(t.foreground).flex().justify_center().whitespace_nowrap().child(String(value)))
@@ -496,7 +497,7 @@ export default class ShepherdrSettings extends View {
     const c = this.roles[r.id];
     const label = r.id === "reviewer" && c?.unset ? otherCliWords(this.otherCli()) : undefined;
     const control = h_flex().gap(8).items_center()
-      .child(c?.sel ? models.modelButton(t, c, { label }, cx) : div().text_size(TEXT.label).text_color(t.dim).child(LOADING_AGENTS))
+      .child(c?.sel ? models.modelButton(t, c, { label }, cx) : div().text_size(TEXT.label).text_color(t.dim).child(tr(LOADING_AGENTS)))
       .when(!this.scope && r.id === "reviewer" && c && !c.unset,
         (el) => el.child(button("reviewer-other", USE_OTHER_CLI, { kind: "plain", onClick: (_e, cx) => this.reset("reviewer", null, cx) })))
       .when(!this.scope, (el) => el.child(button(`edit-${r.id}`, EDIT_INSTRUCTIONS,
@@ -531,8 +532,8 @@ export default class ShepherdrSettings extends View {
       this.set("backup", "agent", inh !== "off" ? inh : this.otherCli(), cx);
     };
     return this.row(t, BACKUP.title, problem ? v_flex().gap(2)
-      .child(div().text_size(TEXT.label).line_height("17px").text_color(t.dim).child(about))
-      .child(div().text_size(TEXT.label).line_height("17px").text_color(t.dim).child(problem)) : about,
+      .child(div().text_size(TEXT.label).line_height("17px").text_color(t.dim).child(tr(about)))
+      .child(div().text_size(TEXT.label).line_height("17px").text_color(t.dim).child(tr(problem))) : about,
       toggleSwitch("backup", on, flip), this.scoped("backup", "agent"));
   }
 
@@ -571,8 +572,8 @@ export default class ShepherdrSettings extends View {
       .child(this.row(t, rowTitle("tasks.worktrees"), ABOUT["tasks.worktrees"],
         toggleSwitch("worktrees", k.worktrees !== false, (next, _e, cx) => this.set("tasks", "worktrees", next, cx)),
         this.scoped("tasks", "worktrees")))
-      .when(Boolean(base), (el) => el.child(base))
-      .when(Boolean(branch), (el) => el.child(branch))
+      .when(Boolean(base), (el) => el.child(tr(base)))
+      .when(Boolean(branch), (el) => el.child(tr(branch)))
       .child(this.row(t, rowTitle("automations.enabled"), ABOUT["automations.enabled"],
         toggleSwitch("auto", autoOn, (next, _e, cx) => this.set("automations", "enabled", next, cx)),
         this.scoped("automations", "enabled")))
@@ -591,8 +592,8 @@ export default class ShepherdrSettings extends View {
         .border_color(this.noteFocus === n.id ? t.accent : t.input).bg(t.background)
         .text_size(TEXT.body).line_height("19px").text_color(t.foreground)))
       .when(!note.box.value(), (el) => el.child(mono(div().absolute().top(9).left(11).right(11)
-        .text_size(TEXT.body).line_height("19px").text_color(t.dim)).child(n.example)));
-    return this.row(t, n.title, n.about, saved ? div().text_size(TEXT.label).text_color(t.dim).child(SAVED) : null, sc, box);
+        .text_size(TEXT.body).line_height("19px").text_color(t.dim)).child(tr(n.example))));
+    return this.row(t, n.title, n.about, saved ? div().text_size(TEXT.label).text_color(t.dim).child(tr(SAVED)) : null, sc, box);
   }
 
   // The level switch, at the top of a page a space can set its own of: "Applies to" and a picker
@@ -600,7 +601,7 @@ export default class ShepherdrSettings extends View {
   // machine and folder). A page that is one for every space says so instead.
   levelBar(t) {
     if (!SECTIONS.find((s) => s.id === this.section)?.space) {
-      return div().pb(14).text_size(TEXT.label).line_height("17px").text_color(t.dim).child(LEVEL.global);
+      return div().pb(14).text_size(TEXT.label).line_height("17px").text_color(t.dim).child(tr(LEVEL.global));
     }
     const sp = this.scope ? spaceById(this.scope) : null;
     const where = machineLabel(machineOfSpace(this.scope ?? ""));
@@ -618,11 +619,11 @@ export default class ShepherdrSettings extends View {
       .child(svg("mods/workspace-chrome/chevron-down.svg").size(12).flex_none().text_color(t.dim));
     return v_flex().relative().w_full().mb(18).px(12).py(10).gap(6).rounded(RADIUS.card).bg(t.raised)
       .child(h_flex().gap(10).items_center()
-        .child(div().flex_none().text_size(TEXT.label).text_color(t.muted).child(LEVEL.label))
-        .child(picker))
+        .child(div().flex_none().text_size(TEXT.label).text_color(t.muted).child(tr(LEVEL.label)))
+        .child(tr(picker)))
       .child(div().text_size(TEXT.label).line_height("17px").text_color(t.dim)
         .child(this.scope ? LEVEL.space(where) : LEVEL.everywhere))
-      .when(Boolean(folder), (el) => el.child(div().truncate().font_family("JetBrains Mono").text_size(TEXT.id).text_color(t.dim).child(folder)));
+      .when(Boolean(folder), (el) => el.child(div().truncate().font_family("JetBrains Mono").text_size(TEXT.id).text_color(t.dim).child(tr(folder))));
   }
 
   // Every space the picker offers, by machine (this computer's first): [{ id, name, machine }].
@@ -658,7 +659,7 @@ export default class ShepherdrSettings extends View {
           return menuRow(`level-${s.id}`, s.name, { icon: I("hash"), hint: n ? `${n} own` : null, check: this.scope === s.id, onClick: pick(s.id) });
         }),
       ]))
-      .when(!shown.length, (el) => el.child(div().px(8).py(8).text_size(TEXT.label).text_color(t.dim).child(LEVEL.none)));
+      .when(!shown.length, (el) => el.child(div().px(8).py(8).text_size(TEXT.label).text_color(t.dim).child(tr(LEVEL.none))));
   }
 
   // One copy of Herdr's live lists for the whole render (live.js): past ~50 ms Herdr stops it.
@@ -673,10 +674,10 @@ export default class ShepherdrSettings extends View {
       .when(!on, (el) => el.cursor_pointer().hover((st) => st.bg(t.hover)))
       .on_click(onClick)
       .child(svg(icon).size(15).text_color(on ? t.accent : t.dim))
-      .child(div().flex_1().text_size(TEXT.body).text_color(on ? t.foreground : t.muted).child(title));
+      .child(div().flex_1().text_size(TEXT.body).text_color(on ? t.foreground : t.muted).child(tr(title)));
     const nav = v_flex().flex_none().w(190).h_full().p(10).gap(2).border_r(1).border_color(t.border)
       .child(div().px(10).pt(6).pb(12).text_size(TEXT.title).font_semibold().text_color(t.foreground)
-        .child(this.scope ? SPACE_TITLE : TITLE))
+        .child(tr(this.scope ? SPACE_TITLE : TITLE)))
       .children(SECTIONS.filter((s) => this.shows(s.id)).map((s) => navRow(s.id, s.title, I(s.icon), s.id === this.section, (_e, cx) => {
         this.section = s.id;
         note("view", { view: "settings", section: s.id });
@@ -700,12 +701,12 @@ export default class ShepherdrSettings extends View {
         else if (this.sec?.open) { this.sec.open = false; cx.stop_propagation(); cx.notify(); }
         else this.close();
       })
-      .child(nav)
+      .child(tr(nav))
       .child(div().relative().flex_1().min_w(0).h_full()
         .child(div().id("sh-body").size_full().overflow_y_scroll()
           .child(div().px(28).py(22)
             .child(over(this.levelBar(t), [body], this.levelOpen && SECTIONS.find((sc) => sc.id === this.section)?.space ? this.levelMenu(t) : null))))
         .child(Scrollbar.vertical("sh-body").absolute().inset_0()));
-    return div().id("sh-root").size_full().flex().items_center().justify_center().on_click(() => this.close()).child(card);
+    return div().id("sh-root").size_full().flex().items_center().justify_center().on_click(() => this.close()).child(tr(card));
   }
 }

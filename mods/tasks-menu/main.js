@@ -12,6 +12,7 @@
 //             refuses shows as a toast.
 // ↑/↓ move, Enter picks, Esc closes.
 
+import { tr } from "./i18n.js";
 import { View, div } from "gpui-kit";
 import { v_flex } from "gpui-base";
 import { props, closeOverlay, theme, shared, setShared, exec, appHome } from "herdr";
@@ -20,7 +21,7 @@ import { taskMenu } from "./core/menus.js";
 import { detach, settle } from "./core/pending.js";
 
 // Agent IDE's GROUP_WORDS (core/tasks.js GROUP_BY).
-const GROUPS = [{ key: "you", label: "For you" }, { key: "space", label: "Space" }, { key: "status", label: "Status" }];
+const GROUPS = [{ key: "you", label: tr("For you") }, { key: "space", label: tr("Space") }, { key: "status", label: tr("Status") }];
 
 // The menu's sections, each a title (or none), its items, which is checked and what a pick does.
 function sections() {
@@ -29,7 +30,7 @@ function sections() {
   if (p.menu === "filter") return [{ title: null, items: p.items ?? [], current: p.current,
     pick: (key) => setShared("tasks.filterreq", { key, at: Date.now() }) }];
   const current = GROUPS.some((g) => g.key === p.current) ? p.current : "you";
-  return [{ title: "Group by", items: GROUPS, current, pick: (key) => setShared("tasks.group", key) }];
+  return [{ title: tr("Group by"), items: GROUPS, current, pick: (key) => setShared("tasks.group", key) }];
 }
 
 // A row's menu (core/menus.js taskMenu, the web's too): its sections between the lines, a heading

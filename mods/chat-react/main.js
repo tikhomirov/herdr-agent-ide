@@ -6,6 +6,7 @@
 // on it), frequent (your most used, from the chat's data/chat-emoji-uses.json), overlay }.
 // The pick goes back through shared "chat.reactreq" = { pane, at, target, text, emoji }.
 
+import { tr } from "./i18n.js";
 import { View, div, svg } from "gpui-kit";
 import { h_flex, v_flex, InputState, Input, VirtualListScrollHandle, v_virtual_list, Scrollbar } from "gpui-base";
 import { theme, props, setShared, closeOverlay, appHome, settings } from "herdr";
@@ -37,7 +38,7 @@ export default class EmojiPicker extends View {
     this.range = null;
     this.pressX = null;
     this.scroll = VirtualListScrollHandle.new();
-    this.search = InputState.new({ placeholder: "Search all emoji" });
+    this.search = InputState.new({ placeholder: tr("Search all emoji") });
     this.search.on("change", (_e, cx) => { this.scroll.scroll_to_item(0, "top"); cx.notify(); });
     this.toneFile = `${appHome()}/data/chat-emoji-tone.json`;
     cx.timer.after(0, () => this.search.focus());
@@ -126,8 +127,8 @@ export default class EmojiPicker extends View {
         .child(v_virtual_list("emoji-list", rows.length, sizes, (i) => rows[i].key, (range) => {
           this.range = range;
           return rows.slice(range.start, range.end).map((r) => {
-            if (r.kind === "head") return div().w_full().h(HEAD).px(4).pt(9).text_size(11).text_color(t.dim).child(r.name);
-            if (r.kind === "none") return div().w_full().h(CELL).px(4).flex().items_center().text_color(t.dim).child("No emoji found");
+            if (r.kind === "head") return div().w_full().h(HEAD).px(4).pt(9).text_size(11).text_color(t.dim).child(tr(r.name));
+            if (r.kind === "none") return div().w_full().h(CELL).px(4).flex().items_center().text_color(t.dim).child(tr("No emoji found"));
             return h_flex().w_full().h(CELL).children(r.list.map((x) => div().size(CELL).flex_none().flex().items_center().justify_center().rounded(7)
               .text_size(21).cursor_pointer().when(mine.has(withTone(x.e, x.tone ? this.tone : 0)), (el) => el.bg(t.selected))
               .hover((s) => s.bg(t.hover))
@@ -148,7 +149,7 @@ export default class EmojiPicker extends View {
         .when(this.toneOpen, (el) => el.children(TONES.map((h, i) => div().id(`tone-${i}`).size(30).flex_none().flex().items_center().justify_center()
           .rounded(6).cursor_pointer().text_size(17).when(i === this.tone, (el) => el.bg(t.selected)).hover((s) => s.bg(t.hover))
           .on_click((_e, cx) => { cx.stop_propagation(); this.setTone(i); cx.notify(); })
-          .child(h))))
+          .child(tr(h)))))
         .when(!this.toneOpen, (el) => el.child(div().id("tone").size(30).flex_none().flex().items_center().justify_center().rounded(6)
           .cursor_pointer().text_size(17).hover((s) => s.bg(t.hover))
           .on_click((_e, cx) => { cx.stop_propagation(); this.toneOpen = true; cx.notify(); })

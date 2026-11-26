@@ -32,6 +32,7 @@
 // Shared: the source is lib/inbox.js; bin/sync-shared copies it into each mod in lib/COPIES.
 // Edit lib/inbox.js, never a mod's copy, then run bin/sync-shared.
 
+import { tr } from "./i18n.js";
 import { LINE_MAX, REASONS, fit, reqReason, reportReason } from "./core/needs.js";
 import { SH } from "./core/paths.js";
 import { dirsReady } from "./dirs.js";
@@ -274,7 +275,7 @@ async function readRetries() {
   for (const r of over) if (!told.has(`${r.terminal}:${r.cut}`)) {
     told.add(`${r.terminal}:${r.cut}`);
     if (settings()?.sounds?.enabled !== false) playSound("blocked");
-    toast({ title: `${whoOf(terminals().find((k) => k.address === r.terminal))} · ${r.why}`, body: "Write to it to carry on, or restart it.", level: "alert",
+    toast({ title: `${whoOf(terminals().find((k) => k.address === r.terminal))} · ${r.why}`, body: tr("Write to it to carry on, or restart it."), level: "alert",
       action: { name: "tabs-ide-tasks.inbox", args: {} } });
   }
   put("inbox.provider", over);

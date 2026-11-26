@@ -205,7 +205,7 @@ export default class ChatAcp extends View {
     return div().id(id).h(26).max_w(220).px(8).flex().items_center().rounded(6).text_size(12).border_1().border_color(on ? t.accent : t.border)
       .bg(on ? t.selected : t.background).text_color(t.foreground).cursor_pointer()
       .hover((style) => style.bg(t.hover))
-      .on_click((_event, cx) => { onClick(cx); cx.notify(); }).child(div().truncate().child(label));
+      .on_click((_event, cx) => { onClick(cx); cx.notify(); }).child(div().truncate().child(tr(label)));
   }
 
   async copy(text) {
@@ -241,8 +241,8 @@ export default class ChatAcp extends View {
       ? tr("It plans the work, starts a task for each part and keeps you posted.")
       : tr("It reads this folder, edits files and runs commands."));
     return v_flex().flex_1().w_full().items_center().justify_center().px(24).gap(8)
-      .child(div().text_size(16).font_medium().text_color(t.foreground).child(title))
-      .child(div().max_w(420).text_size(13).text_color(t.muted).text_center().child(body));
+      .child(div().text_size(16).font_medium().text_color(t.foreground).child(tr(title)))
+      .child(div().max_w(420).text_size(13).text_color(t.muted).text_center().child(tr(body)));
   }
 
   statusLine(t, state) {
@@ -262,7 +262,7 @@ export default class ChatAcp extends View {
       const hot = this.hover === index;
       return v_flex().id(`m-${index}`).w_full().max_w(COLUMN).mx_auto().px(16).gap(4).items_end()
         .on_hover((on, cx) => { this.hover = on ? index : (this.hover === index ? null : this.hover); cx.notify(); })
-        .child(div().max_w(520).px(12).py(8).rounded(12).bg(t.selected).text_size(13).whitespace_normal().child(item.text || ""))
+        .child(div().max_w(520).px(12).py(8).rounded(12).bg(t.selected).text_size(13).whitespace_normal().child(tr(item.text || "")))
         .when(hot, (el) => el.child(h_flex().gap(10)
           .child(this.link(`copy-${index}`, tr("Copy"), () => this.copy(item.text)))
           .child(this.link(`retry-${index}`, tr("Retry"), () => this.ctl({ op: "prompt", text: item.text, files: item.files || [] })))
@@ -274,10 +274,10 @@ export default class ChatAcp extends View {
       return v_flex().id(`tool-${item.id}`).w_full().max_w(COLUMN).mx_auto().px(16).gap(4)
         .child(h_flex().id(`tool-h-${item.id}`).h(28).px(8).gap(8).items_center().rounded(8).bg(t.popover).cursor_pointer()
           .on_click((_event, cx) => { open ? this.thoughts.delete(item.id) : this.thoughts.add(item.id); cx.notify(); })
-          .child(div().flex_1().min_w(0).truncate().text_size(12).child(title))
-          .child(div().text_size(11).text_color(t.muted).child(item.status || "")))
+          .child(div().flex_1().min_w(0).truncate().text_size(12).child(tr(title)))
+          .child(div().text_size(11).text_color(t.muted).child(tr(item.status || ""))))
         .when(open && Boolean(item.command || item.diff), (el) => el.child(div().px(8).py(6).rounded(8).bg(t.popover).text_size(12).whitespace_normal()
-          .child(item.diff ? `${item.path || ""}\n- ${item.diff.oldText}\n+ ${item.diff.newText}` : item.command)));
+          .child(tr(item.diff ? `${item.path || ""}\n- ${item.diff.oldText}\n+ ${item.diff.newText}` : item.command))));
     }
     if (isBanner(item.text)) {
       const open = this.banners.has(item.id);
@@ -287,12 +287,12 @@ export default class ChatAcp extends View {
           .hover((style) => style.bg(t.hover))
           .on_click((_event, cx) => { open ? this.banners.delete(item.id) : this.banners.add(item.id); cx.notify(); })
           .child(`${version} · ${open ? tr("Hide thought") : tr("Show thought")}`))
-        .when(open, (el) => el.child(div().px(8).py(6).rounded(8).bg(t.popover).text_size(12).text_color(t.muted).whitespace_normal().child(item.text)));
+        .when(open, (el) => el.child(div().px(8).py(6).rounded(8).bg(t.popover).text_size(12).text_color(t.muted).whitespace_normal().child(tr(item.text))));
     }
     const open = this.thoughts.has(item.id);
     return v_flex().id(`a-${index}`).w_full().max_w(COLUMN).mx_auto().px(16).gap(4)
       .when(Boolean(item.thought), (el) => el.child(this.link(`th-${index}`, open ? tr("Hide thought") : tr("Show thought"), () => { open ? this.thoughts.delete(item.id) : this.thoughts.add(item.id); })))
-      .when(open, (el) => el.child(div().px(8).py(6).rounded(8).bg(t.popover).text_size(12).text_color(t.muted).whitespace_normal().child(item.thought)))
+      .when(open, (el) => el.child(div().px(8).py(6).rounded(8).bg(t.popover).text_size(12).text_color(t.muted).whitespace_normal().child(tr(item.thought))))
       .child(div().text_size(13).whitespace_normal().child(item.text || (this.transcript.status === "working" ? tr("Working…") : "")));
   }
 
@@ -309,7 +309,7 @@ export default class ChatAcp extends View {
     const t = theme();
     return div().id(id).text_size(11).text_color(t.muted).cursor_pointer()
       .hover((style) => style.text_color(t.foreground))
-      .on_click((_event, cx) => { onClick(cx); cx.notify(); }).child(label);
+      .on_click((_event, cx) => { onClick(cx); cx.notify(); }).child(tr(label));
   }
 
   round(id, icon, t, fill, fn) {
@@ -343,7 +343,7 @@ export default class ChatAcp extends View {
           .child(h_flex().id("chat-agent-pick").h(ROUND).pl(8).pr(5).gap(4).items_center().rounded(6).text_size(12).font_medium().text_color(t.muted).cursor_pointer()
             .hover((style) => style.bg(t.hover).text_color(t.foreground))
             .on_click((_event, cx) => { this.menu = this.menu === "picker" ? null : "picker"; this.permOpen = false; cx.notify(); })
-            .child(div().whitespace_nowrap().child(label))
+            .child(div().whitespace_nowrap().child(tr(label)))
             .child(svg("mods/workspace-chrome/chevron-down.svg").size(12).flex_none()))
           .child(this.round("chat-send", "mods/chat/send.svg", t, canSend ? "solid" : "off", canSend ? (cx) => this.send(cx) : null))));
   }
@@ -360,7 +360,7 @@ export default class ChatAcp extends View {
     const row = (id, label, on, fn) => h_flex().id(id).h(31).px(9).gap(8).items_center().rounded(7)
       .cursor_pointer().hover((style) => style.bg(t.selected))
       .on_click((_event, cx) => { fn(); cx.notify(); })
-      .child(div().flex_1().min_w(0).truncate().text_size(13).child(label))
+      .child(div().flex_1().min_w(0).truncate().text_size(13).child(tr(label)))
       .when(on, (el) => el.child(svg("mods/workspace-chrome/check.svg").size(14).text_color(t.foreground)));
     return v_flex().id("model-menu").w(340).p(6).gap(2).rounded(12).bg(t.popover).border_1().border_color(t.border)
       .child(div().h(32).mx(4).px(8).flex().items_center().rounded(8).border_1().border_color(t.input).bg(t.background)
@@ -393,7 +393,7 @@ export default class ChatAcp extends View {
         .on_click((_event, cx) => { this.permOpen = !this.permOpen; cx.notify(); })
         .child(svg("mods/chat-models/shield.svg").size(14).text_color(t.dim))
         .child(div().flex_1().text_size(13).child(tr("Permissions")))
-        .child(div().text_size(12).text_color(t.muted).child(accessLabel))
+        .child(div().text_size(12).text_color(t.muted).child(tr(accessLabel)))
         .child(svg("mods/workspace-chrome/chevron-down.svg").size(12).text_color(t.dim)))
       .when(this.permOpen, (el) => el.child(v_flex().id("perm-menu").gap(2).px(4).pb(4).children(["read", "ask", "full"].map((id) => row(
         `perm-${id}`,
@@ -476,7 +476,7 @@ export default class ChatAcp extends View {
         .child(this.chip("refresh-models", tr("Refresh models"), false, (cx) => cx.spawn(async (cx) => { await this.refreshModels(draft); cx.notify(); })))
         .when(!builtin, (el) => el.child(this.chip("save-provider", tr("Save"), true, (cx) => cx.spawn(async (cx) => { await this.saveProvider(); cx.notify(); }))))
         .when(!builtin, (el) => el.child(this.chip("delete-provider", tr("Delete"), false, (cx) => cx.spawn(async (cx) => { await this.deleteProvider(draft.id); cx.notify(); })))))
-      .child(div().text_size(12).text_color(t.muted).child(this.note || ""))
+      .child(div().text_size(12).text_color(t.muted).child(tr(this.note || "")))
       .children((draft.models || []).map((model, index) => h_flex().id(`mdl-${index}`).gap(8).items_center()
         .child(this.chip(`en-${index}`, model.enabled === false ? "○" : "●", model.enabled !== false, (cx) => { model.enabled = model.enabled === false; cx.notify(); }))
         .child(div().flex_1().text_size(12).child(`${model.name} · ${model.contextWindow || "?"} ${tr("Context")}`))
@@ -591,7 +591,7 @@ function blankProvider() {
 }
 
 function labeled(t, label, child) {
-  return v_flex().gap(4).child(div().text_size(12).text_color(t.muted).child(label)).child(child);
+  return v_flex().gap(4).child(div().text_size(12).text_color(t.muted).child(tr(label))).child(tr(child));
 }
 
 function boxInput(t, state) {

@@ -5,6 +5,7 @@
 // A mod can't draw a terminal, so while the tab is shown the layout's "browser" column holds this mod's block and a
 // layout terminal block ("browser-view") running viewer.js, written into the layout's file (as mods/task-browser
 // does). The viewer starts when the tab shows and ends when it hides or the space changes; the browser stays open.
+import { tr } from "./i18n.js";
 import { View, div } from "gpui-kit";
 import { v_flex } from "gpui-base";
 import { hc, exec, terminals, theme, appHome, home, shared, setShared, layout, readTextFile, writeTextFile, spaces } from "herdr";
@@ -143,6 +144,6 @@ export default class IdeBrowser extends View {
     }
     return v_flex().id("ide-browser").size_full().min_h(0).items_center().justify_center().px(24).gap(10)
       .bg(t.background).text_size(12.5).text_color(t.dim)
-      .child(div().text_center().max_w(380).child(this.why || "The browser opens here."));
+      .child(div().text_center().max_w(380).child(this.why || tr("The browser opens here.")));
   }
 }

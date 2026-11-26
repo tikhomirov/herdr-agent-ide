@@ -13,6 +13,7 @@
 // A row's dropdown opens mods/chat-models in pick mode; its answer comes back through shared
 // "newspace.pick" = { key, field, value, at }, which the rows apply on the next render.
 
+import { tr } from "./i18n.js";
 import { div, svg, image } from "gpui-kit";
 import { h_flex, v_flex } from "gpui-base";
 import { knownAgents, openOverlay, shared, appHome } from "herdr";
@@ -73,7 +74,7 @@ function choose(coord, agentKey, id) {
 // The rows. `coord` = { sel, data }; disabled: dimmed and inert (no coordinator).
 export function settingsRows(t, coord, opts = {}, cx = null) {
   const { sel, data } = coord;
-  if (!sel || !data) return v_flex().h(ROW).justify_center().px(9).text_size(12.8).text_color(t.dim).child("Loading agents…");
+  if (!sel || !data) return v_flex().h(ROW).justify_center().px(9).text_size(12.8).text_color(t.dim).child(tr("Loading agents…"));
   coord.key ??= `ns-${Math.random().toString(36).slice(2, 8)}`;
   const off = Boolean(opts.disabled);
   // A dropdown's answer (shared "newspace.pick"): applied once, after this render.
@@ -86,8 +87,8 @@ export function settingsRows(t, coord, opts = {}, cx = null) {
     return ic.tint ? svg(ic.icon).size(14).flex_none().text_color(t.foreground) : image(ic.icon).size(14).flex_none();
   };
   const row = (label, control) => h_flex().h(ROW).flex_none().px(9).gap(10).items_center()
-    .child(div().w(LABEL).flex_none().text_color(t.muted).child(label))
-    .child(h_flex().flex_1().min_w(0).justify_end().child(control));
+    .child(div().w(LABEL).flex_none().text_color(t.muted).child(tr(label)))
+    .child(h_flex().flex_1().min_w(0).justify_end().child(tr(control)));
   const pickAt = (field, options, current) => openOverlay({ mod: "chat-models", kind: "popup", width: 260, height: 10 + ROW * options.length,
     props: { pick: field, key: coord.key, options, current, width: 260, height: 10 + ROW * options.length } });
   const select = (id, content, fn) => h_flex().id(id).h(26).max_w(260).pl(8).pr(6).gap(6).items_center().rounded(7).border_1().border_color(t.input)
@@ -103,19 +104,19 @@ export function settingsRows(t, coord, opts = {}, cx = null) {
     .child(div().id(`${id}-knob`).absolute().top(2).left(sel.fast === value ? 14 : 2).size(12).rounded(6).bg(t.background).transition("left", 120)));
   const perm = menu?.perms?.find((p) => p.id === sel.perm);
   return v_flex().w_full().text_size(12.8).text_color(t.foreground).when(off, (el) => el.opacity(0.45))
-    .child(row("Agent", select("ns-model", [icon(sel.agent), div().min_w(0).truncate().child(m?.name ?? sel.model ?? "Choose")],
+    .child(row("Agent", select("ns-model", [icon(sel.agent), div().min_w(0).truncate().child(m?.name ?? sel.model ?? tr("Choose"))],
       () => pickAt("model", models, `${sel.agent}:${sel.model}`))))
     .child(row("Reasoning", h_flex().h(26).p(2).gap(2).rounded(7).bg(t.raised).children(levels.map((e) =>
       h_flex().id(`ns-level-${e}`).h_full().px(7).justify_center().items_center().rounded(5).text_size(11.5)
         .when(level === e, (el) => el.bg(t.background).text_color(t.foreground).font_medium())
         .when(level !== e, (el) => el.text_color(t.muted).when(!off, (el) => el.cursor_pointer().hover((s) => s.text_color(t.foreground))
           .on_click((_e, cx) => { cx.stop_propagation(); coord.sel = { ...coord.sel, effort: e }; cx.notify(); })))
-        .child(LEVEL[e] ?? e)))))
+        .child(tr(LEVEL[e] ?? e))))))
     .when(fastOk, (el) => el.child(speedRow("Fast", "ns-fast", true)))
     // Codex's Ultrafast tier where the model has it (SHEP-258): one speed with Fast, so on turns Fast off
     .when(Boolean(m?.ultrafast), (el) => el.child(speedRow("Ultrafast", "ns-ultrafast", "ultrafast")))
     .when(Boolean(menu?.perms?.length), (el) => el.child(row("Permissions", select("ns-perm",
-      [svg("mods/chat-models/shield.svg").size(14).flex_none().text_color(t.dim), div().min_w(0).truncate().child(perm?.label ?? "Default")],
+      [svg("mods/chat-models/shield.svg").size(14).flex_none().text_color(t.dim), div().min_w(0).truncate().child(perm?.label ?? tr("Default"))],
       () => pickAt("perm", menu.perms.map((p) => ({ id: p.id, label: p.label })), sel.perm)))));
 }
 

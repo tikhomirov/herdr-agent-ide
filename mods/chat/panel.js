@@ -20,6 +20,7 @@
 // (ui.js segmented); Pull request only once the task has one. They show the task the header
 // publishes (shared "tasks.thread.where", from its record: lib/taskwhere.js).
 
+import { tr } from "./i18n.js";
 import { div, svg } from "gpui-kit";
 import { h_flex, v_flex } from "gpui-base";
 import { shared, setShared, run, theme, exec, appHome, home, readTextFile, writeTextFile, notify, layout, openOverlay } from "herdr";
@@ -261,7 +262,7 @@ export class PanelHost {
         run("layout.select", { stack: BODY, child: TERM });
         run("pane.focus", { terminal: addr });
       } catch (e) {
-        toast({ title: "Terminal didn't open", body: plainError(e), level: "error" });
+        toast({ title: tr("Terminal didn't open"), body: plainError(e), level: "error" });
       }
       this.busy = false;
       cx.notify();
@@ -296,7 +297,7 @@ export class PanelHost {
     }
     const t = theme();
     return this.entity
-      ? v_flex().id("task-thread").size_full().min_h(0).bg(t.background).text_color(t.foreground).text_size(13).child(this.entity)
+      ? v_flex().id("task-thread").size_full().min_h(0).bg(t.background).text_color(t.foreground).text_size(13).child(tr(this.entity))
       : v_flex().id("task-thread").size_full().items_center().justify_center().px(18).bg(t.background).text_size(TEXT.label).text_color(t.dim)
         .child(want?.note ?? (want ? "Opening…" : "Pick a task to see its chat."));
   }
@@ -323,7 +324,7 @@ export class PanelHost {
     }
     if (!text) return null;
     return h_flex().id("thread-report").w_full().min_w(0).gap(4).items_center().text_size(TEXT.label).text_color(paused ? t.dim : t.muted)
-      .child(div().min_w(0).truncate().child(text))
+      .child(div().min_w(0).truncate().child(tr(text)))
       .when(Boolean(end), (el) => el.child(div().flex_none().text_color(t.dim).child(`· ${end}`)));
   }
 
@@ -366,14 +367,14 @@ export class PanelHost {
     // Pull request only once the task has one; shown while it lost it, back to its chat.
     if (shownNow === PR && !hasPr && this.rec) cx.timer.after(0, () => showWorkerChat());
     const segs = [
-      { key: "chat", label: "Chat", on: shownNow === CHAT, fn: () => showWorkerChat() },
-      { key: "term", label: "Terminal", on: shownNow === TERM, dead: !live, fn: (cx) => this.toTerminal(addr, cx) },
+      { key: "chat", label: tr("Chat"), on: shownNow === CHAT, fn: () => showWorkerChat() },
+      { key: "term", label: tr("Terminal"), on: shownNow === TERM, dead: !live, fn: (cx) => this.toTerminal(addr, cx) },
       // No Files or Changes (SHEP-143): the space's side panels show those; a task's changes are its pull request's.
-      ...(hasPr ? [{ key: "pr", label: "Pull request", on: shownNow === PR, fn: pick(PR) }] : []),
+      ...(hasPr ? [{ key: "pr", label: tr("Pull request"), on: shownNow === PR, fn: pick(PR) }] : []),
       // What its agent made (mods/task-artifacts): always there, counted once it has some.
       ...(find(layout(), ARTIFACTS) && addonOn("artifacts") ? [{ key: "artifacts", label: this.artsLabel(want), on: shownNow === ARTIFACTS, fn: pick(ARTIFACTS) }] : []),
       // The task's own browser, watched live (mods/task-browser), when the layout has it.
-      ...(find(layout(), BROWSER) && addonOn("browser") ? [{ key: "browser", label: "Browser", on: shownNow === BROWSER, fn: pick(BROWSER) }] : []),
+      ...(find(layout(), BROWSER) && addonOn("browser") ? [{ key: "browser", label: tr("Browser"), on: shownNow === BROWSER, fn: pick(BROWSER) }] : []),
     ];
     // Three rows on one left edge (EDGE): a slim bar (‹ Tasks; base, Accept), the task (its
     // dot, id and title, and under them what its agent is doing), then the switcher.
@@ -402,7 +403,7 @@ export class PanelHost {
         .text_size(TEXT.label).text_color(t.muted).hover((s) => s.bg(t.hover).text_color(t.foreground))
         .on_click((_e, cx) => { cx.stop_propagation(); backToTasks(); })
         .child(svg("mods/workspace-chrome/chevron-left.svg").size(14).flex_none())
-        .child("Tasks"))
+        .child(tr("Tasks")))
       .child(div().flex_1())
       // A task's own base (herdr-task add --base), where it merges into; the folder's default isn't shown.
       .when(Boolean(this.rec?.base_set && this.rec?.base), (el) => el.child(div().id("thread-base").flex_none().max_w(160).truncate().pr(4)
@@ -424,9 +425,9 @@ export class PanelHost {
       .child(h_flex().w(16).h(22).flex_none().items_center().justify_center().child(this.dot(st, addr)))
       .child(v_flex().flex_1().min_w(0).gap(2)
         .child(h_flex().h(22).min_w(0).gap(8).items_center()
-          .when(Boolean(want?.task), (el) => el.child(div().flex_none().font_family(ID_FONT).text_size(TEXT.label).text_color(t.dim).child(want.task)))
-          .child(div().id("thread-title").flex_1().min_w(0).truncate().text_size(TEXT.title).font_medium().child(title)))
+          .when(Boolean(want?.task), (el) => el.child(div().flex_none().font_family(ID_FONT).text_size(TEXT.label).text_color(t.dim).child(tr(want.task))))
+          .child(div().id("thread-title").flex_1().min_w(0).truncate().text_size(TEXT.title).font_medium().child(tr(title))))
         .child(h_flex().h(16).min_w(0).items_center()
-          .child(div().flex_1().min_w(0).when(Boolean(report), (el) => el.child(report)))));
+          .child(div().flex_1().min_w(0).when(Boolean(report), (el) => el.child(tr(report))))));
   }
 }

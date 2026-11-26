@@ -9,6 +9,7 @@
 // Every ask's header ends with "Dismiss" (Esc too, once the card is pressed): closed without an
 // answer, as Esc in Claude's prompt; the agent hears it was declined and carries on.
 
+import { tr } from "./i18n.js";
 import { div } from "gpui-kit";
 import { InputState } from "gpui-base";
 import { allow, deny, answer, answers, annotationsOf, chatAbout, dismiss, release } from "./core/asks.js";
@@ -199,7 +200,7 @@ export class AskCards {
     q.other[i] = q.other[i] ?? "";
     if (!ask.words.questions[i].multi) q.picks[i] = new Set();
     if (!q.boxes[i]) {
-      const b = q.boxes[i] = InputState.new({ placeholder: "Your answer" });
+      const b = q.boxes[i] = InputState.new({ placeholder: tr("Your answer") });
       b.on("change", (_e, cx) => cx.notify());
       // which card box holds the keyboard: the chat's refocus() leaves it there (GitHub #1224)
       b.on("focus", () => { this.typing = b; });
@@ -221,7 +222,7 @@ export class AskCards {
     const out = [headStrip({ who: opts.who, links })];
     if (many) {
       out.push({ key: "title", kind: "title", text: `${n} questions` });
-      out.push({ key: "steps", kind: "controls", align: "start", ctls: [...w.questions.map((qq, i) => ({ label: qq.header || `Question ${i + 1}`, i })), { label: "Submit", i: n }]
+      out.push({ key: "steps", kind: "controls", align: "start", ctls: [...w.questions.map((qq, i) => ({ label: qq.header || `Question ${i + 1}`, i })), { label: tr("Submit"), i: n }]
         .map(({ label, i }) => ({ id: `q-step-${id}-${i}`, label, look: "pill", on: i === step, done: i < n && Boolean(this.answerOf(ask, q, i)), fn: () => this.go(ask, i) })) });
     }
     if (step === n) {
@@ -233,7 +234,7 @@ export class AskCards {
     } else {
       const qq = w.questions[step];
       out.push({ key: `q${step}`, kind: "title", text: qq.text });
-      if (qq.multi) out.push({ key: `multi${step}`, kind: "text", tone: "dim", gap: 2, text: "Pick any that apply." });
+      if (qq.multi) out.push({ key: `multi${step}`, kind: "text", tone: "dim", gap: 2, text: tr("Pick any that apply.") });
       qq.options.forEach((o, k) => out.push({ key: `q${step}-${k}`, kind: "option", gap: k ? 2 : 6, on: q.picks[step].has(k), multi: qq.multi,
         label: o.name, desc: o.description, tag: o.recommended ? "Recommended" : null, fn: () => this.pick(ask, step, k) }));
       // The picked option's preview (else the first one's), as Claude's prompt shows the one in focus (SHEP-139).
@@ -242,15 +243,15 @@ export class AskCards {
         out.push({ key: `q${step}-preview-label`, kind: "text", tone: "dim", gap: 6, text: `Preview · ${qq.options[shown].name}` });
         out.push({ key: `q${step}-preview`, kind: "detail", gap: 2, lines: qq.options[shown].preview.split("\n"), clip: null });
       }
-      out.push({ key: `q${step}-other`, kind: "option", gap: 2, on: q.other[step] !== null, multi: qq.multi, label: "Other…", fn: (cx) => this.openOther(ask, step, cx) });
-      if (q.other[step] !== null) out.push({ key: `q${step}-box`, kind: "input", gap: 2, indent: 32, state: q.boxes[step] ?? null, placeholder: "Your answer" });
-      out.push({ key: `q${step}-chat`, kind: "option", gap: 2, label: "Chat about this", desc: opts.chatHint ?? "Or type your answer below.",
+      out.push({ key: `q${step}-other`, kind: "option", gap: 2, on: q.other[step] !== null, multi: qq.multi, label: tr("Other…"), fn: (cx) => this.openOther(ask, step, cx) });
+      if (q.other[step] !== null) out.push({ key: `q${step}-box`, kind: "input", gap: 2, indent: 32, state: q.boxes[step] ?? null, placeholder: tr("Your answer") });
+      out.push({ key: `q${step}-chat`, kind: "option", gap: 2, label: tr("Chat about this"), desc: opts.chatHint ?? "Or type your answer below.",
         fn: (cx) => { this.drop(ask); this.host.reply(ask, chatAbout(), cx); this.host.chatAbout(ask, cx); } });
-      if (many && (step < n - 1 || shown >= 0)) out.push({ key: `next${step}`, kind: "controls", align: "end", gap: 4, ctls: [{ id: `q-next-${id}-${step}`, label: "Next", look: "plain", fn: () => this.go(ask, step + 1) }] });
+      if (many && (step < n - 1 || shown >= 0)) out.push({ key: `next${step}`, kind: "controls", align: "end", gap: 4, ctls: [{ id: `q-next-${id}-${step}`, label: tr("Next"), look: "plain", fn: () => this.go(ask, step + 1) }] });
     }
     if (!many || step === n) {
       const ready = this.done(ask, q);
-      out.push({ key: "submit", kind: "controls", align: "end", ctls: [{ id: `q-submit-${id}`, label: "Submit", look: "primary", disabled: !ready, fn: ready ? (cx) => this.submit(ask, cx) : null }] });
+      out.push({ key: "submit", kind: "controls", align: "end", ctls: [{ id: `q-submit-${id}`, label: tr("Submit"), look: "primary", disabled: !ready, fn: ready ? (cx) => this.submit(ask, cx) : null }] });
     }
     return out;
   }

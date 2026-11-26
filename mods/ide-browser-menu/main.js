@@ -43,7 +43,7 @@ export default class IdeBrowserMenu extends View {
         ? div().h(1).my(4).mx(4).bg(t.border)
         : h_flex().id(`bm-${i}`).h(28).px(10).gap(8).flex_none().items_center().rounded(6).text_size(12.5).text_color(t.foreground)
           .cursor_pointer().hover(s => s.bg(t.hover)).on_click(() => this.pick(it.cmd))
-          .child(div().flex_1().min_w(0).truncate().child(it.label))
-          .when(Boolean(it.hint), el => el.child(div().flex_none().text_size(11).text_color(t.dim).child(it.hint)))));
+          .child(div().flex_1().min_w(0).truncate().child(tr(it.label)))
+          .when(Boolean(it.hint), el => el.child(div().flex_none().text_size(11).text_color(t.dim).child(tr(it.hint))))));
   }
 }

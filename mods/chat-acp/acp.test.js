@@ -1,3 +1,4 @@
+import { tr } from "./i18n.js";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { createParser, frame, freshTranscript, reduceUpdate, pushUser, decidePermission, applySession, scrubError, optionGroups } from "./acp.js";
@@ -26,7 +27,7 @@ test("streaming text, thought and tool diffs become a transcript", () => {
     sessionUpdate: "tool_call_update", toolCallId: "t1", status: "completed",
     content: [{ type: "diff", path: "a.js", oldText: "a", newText: "b" }],
   });
-  reduceUpdate(state, { sessionUpdate: "agent_message_chunk", content: { type: "text", text: "Done" } });
+  reduceUpdate(state, { sessionUpdate: "agent_message_chunk", content: { type: "text", text: tr("Done") } });
   assert.deepEqual(state.items.map((item) => item.kind), ["user", "assistant", "tool", "assistant"]);
   assert.equal(state.items[1].text, "Hi there");
   assert.equal(state.items[1].thought, "plan");

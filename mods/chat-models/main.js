@@ -20,6 +20,7 @@
 // Settings mode (settings.js settingsButton): the whole menu without Restart; every change
 // goes back at once as { key, field: "settings", value: { agent, model, effort, fast, perm } }.
 
+import { tr } from "./i18n.js";
 import { View, div, svg, image } from "gpui-kit";
 import { h_flex, v_flex, InputState, Input, VirtualListScrollHandle, v_virtual_list, Scrollbar } from "gpui-base";
 import { theme, props, setShared, closeOverlay, home, readTextFile, writeTextFile } from "herdr";
@@ -151,7 +152,7 @@ export default class ModelMenu extends View {
   }
 
   head(t, label) {
-    return div().h(HEAD).flex_none().px(9).pt(8).text_size(11).text_color(t.dim).child(label);
+    return div().h(HEAD).flex_none().px(9).pt(8).text_size(11).text_color(t.dim).child(tr(label));
   }
 
   row(t, id, enabled, fn) {
@@ -176,7 +177,7 @@ export default class ModelMenu extends View {
         .when(on === e, (el) => el.bg(t.background).text_color(t.foreground).font_medium())
         .when(on !== e, (el) => el.text_color(t.muted).cursor_pointer().hover((s) => s.text_color(t.foreground))
           .on_click((_e, cx) => { cx.stop_propagation(); this.sel = { ...this.sel, effort: e }; cx.notify(); }))
-        .child(div().truncate().child(LEVEL[e] ?? e)))));
+        .child(div().truncate().child(tr(LEVEL[e] ?? e))))));
   }
 
   // A small switch: on is the accent, the knob slides.
@@ -192,7 +193,7 @@ export default class ModelMenu extends View {
     return v_flex().id("perm-menu").absolute().right(5).bottom(bottom).w(180).p(5).rounded(8).bg(t.popover).border_1().border_color(t.border).shadow_md()
       .on_mouse_down("left", (_e, cx) => cx.stop_propagation())
       .children(perms.map((x) => this.row(t, `perm-${x.id}`, true, () => { this.sel = { ...this.sel, perm: x.id }; this.permOpen = false; })
-        .child(div().flex_1().child(x.label))
+        .child(div().flex_1().child(tr(x.label)))
         .child(this.check(t, this.sel.perm === x.id))));
   }
 
@@ -207,7 +208,7 @@ export default class ModelMenu extends View {
       .track_focus(this.handle)
       .children((p.options ?? []).map((o) => this.row(t, `pick-${o.id}`, true, () => pick(o))
         .when(Boolean(o.icon), (el) => el.child(o.tint ? svg(o.icon).size(14).flex_none().text_color(t.foreground) : image(o.icon).size(14).flex_none()))
-        .child(div().flex_1().min_w(0).truncate().child(o.label))
+        .child(div().flex_1().min_w(0).truncate().child(tr(o.label)))
         .child(this.check(t, o.id === p.current))));
   }
 
@@ -240,7 +241,7 @@ export default class ModelMenu extends View {
     this.cursor = Math.max(0, Math.min(this.cursor, rows.length - 1));
     const cur = rows[this.cursor];
     const newChat = changes.length > 0 && this.sel.agent !== this.was.agent;
-    const quiet = (text, h = NOTE) => div().min_h(h).flex_none().px(9).py(3).text_size(11.5).text_color(t.dim).child(text);
+    const quiet = (text, h = NOTE) => div().min_h(h).flex_none().px(9).py(3).text_size(11.5).text_color(t.dim).child(tr(text));
     // The list's items, each its height and how it draws: headings, models, "N more" lines.
     const items = sections.flatMap((s) => [
       ...(s.title ? [{ key: `h-${s.key}`, h: HEAD, draw: () => this.head(t, s.title) }] : []),
@@ -287,20 +288,20 @@ export default class ModelMenu extends View {
       .when(Boolean(m?.efforts?.length), (el) => el.child(this.head(t, "Reasoning")).child(this.levels(t)))
       .when(fast, (el) => el.child(this.row(t, "fast", true, () => { this.sel = { ...this.sel, fast: this.sel.fast !== true }; })
         .child(svg("mods/chat-models/zap.svg").size(14).flex_none().text_color(t.dim))
-        .child(div().flex_1().child("Fast"))
+        .child(div().flex_1().child(tr("Fast")))
         .child(this.toggle(t, this.sel.fast === true))))
       // Codex's Ultrafast tier where the model has it (SHEP-258): one speed with Fast, so on turns Fast off
       .when(Boolean(m?.ultrafast), (el) => el.child(this.row(t, "ultrafast", true, () => { this.sel = { ...this.sel, fast: this.sel.fast === "ultrafast" ? false : "ultrafast" }; })
         .child(svg("mods/chat-models/zap.svg").size(14).flex_none().text_color(t.dim))
-        .child(div().flex_1().child("Ultrafast"))
+        .child(div().flex_1().child(tr("Ultrafast")))
         .child(this.toggle(t, this.sel.fast === "ultrafast", "ultrafast-knob"))))
       // its own press too: else the menu's closes it and the click opens it again
       .when(Boolean(menu?.perms?.length), (el) => el.child(this.row(t, "perms", true, () => { this.permOpen = !this.permOpen; })
         .on_mouse_down("left", (_e, cx) => cx.stop_propagation())
         .when(this.permOpen, (el) => el.bg(t.selected))
         .child(svg("mods/chat-models/shield.svg").size(14).flex_none().text_color(t.dim))
-        .child(div().flex_1().child("Permissions"))
-        .child(div().flex_none().text_size(12).text_color(t.dim).child(perm?.label ?? ""))
+        .child(div().flex_1().child(tr("Permissions")))
+        .child(div().flex_none().text_size(12).text_color(t.dim).child(tr(perm?.label ?? "")))
         .child(svg("mods/workspace-chrome/chevron-right.svg").size(12).flex_none().text_color(t.dim))))
       // another agent can't carry this conversation on: said before the press, not after
       .when(newChat, (el) => el.child(quiet(`${this.p.menus?.[this.sel.agent]?.name ?? "It"} starts a new conversation. This one stays in ${this.p.menus?.[this.was.agent]?.name ?? "its old agent"}’s history.`, 2 * NOTE)))
@@ -326,7 +327,7 @@ export default class ModelMenu extends View {
         cx.notify();
       })
       .on_mouse_down("left", (_e, cx) => { if (this.permOpen) { this.permOpen = false; cx.notify(); } })
-      .child(box);
+      .child(tr(box));
   }
 
   // One model in the list: its agent's mark, its name (a typed id: "Use <id>"), the check on the one
@@ -339,8 +340,8 @@ export default class ModelMenu extends View {
       .cursor_pointer().hover((s) => s.bg(t.selected))
       .when(at, (el) => el.bg(t.selected))
       .child(this.icon(x.agent, t))
-      .child(div().flex_1().min_w(0).truncate().child(x.typed ? `Use ${x.id}` : x.name))
-      .when(Boolean(x.typed), (el) => el.child(div().flex_none().text_size(11).text_color(t.dim).child(`${this.p.menus?.[x.agent]?.name ?? x.agent} id`)))
+      .child(div().flex_1().min_w(0).truncate().child(tr(x.typed ? `Use ${x.id}` : x.name)))
+      .when(Boolean(x.typed), (el) => el.child(div().flex_none().text_size(11).text_color(t.dim).child(tr(`${this.p.menus?.[x.agent]?.name ?? x.agent} id`))))
       .child(this.check(t, chosen))
       .when(!x.typed, (el) => el.child(div().size(STAR).flex_none().flex().items_center().justify_center()
         .child(svg(x.pinned ? "mods/chat-models/star-on.svg" : "mods/chat-models/star.svg").size(13).text_color(x.pinned ? t.muted : at ? t.dim : t.border))));

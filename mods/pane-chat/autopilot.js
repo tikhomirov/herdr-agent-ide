@@ -124,8 +124,8 @@ export function apGroup(view, t, space, pane, compact) {
     .rounded(RADIUS.control).bg(t.raised).text_size(TEXT.label)
     .when(Boolean(words), (el) => el.child(div().flex_none().whitespace_nowrap().text_color(t.dim)
       .when(Boolean(a?.inflight), (el) => el.loop("opacity", { from: 0.35, to: 1, period: 1200 }))
-      .child(words)))
-    .when(Boolean(run), (el) => el.child(run))
+      .child(tr(words))))
+    .when(Boolean(run), (el) => el.child(tr(run)))
     .child(apChip(view, t, space, pane, compact));
 }
 
@@ -163,7 +163,7 @@ function apRunNow(view, t, space, pane, compact) {
     .when(!busy, (el) => el.cursor_pointer().hover((s) => s.bg(t.background).text_color(t.foreground))
       .on_click((_e, cx) => { cx.stop_propagation(); apRun(view, space, cx); }))
     .child(svg("mods/pane-chat/play.svg").size(11).flex_none())
-    .when(!compact, (el) => el.child(words));
+    .when(!compact, (el) => el.child(tr(words)));
 }
 
 function apRun(view, space, cx) {
@@ -172,7 +172,7 @@ function apRun(view, space, cx) {
   cx.notify();
   cx.spawn(async (cx) => {
     try { view.ap = await ap(["run-now"], space); }
-    catch (e) { toast({ title: "Autopilot didn't wake", body: plainError(e), level: "error" }); }
+    catch (e) { toast({ title: tr("Autopilot didn't wake"), body: plainError(e), level: "error" }); }
     view.apRunning = false;
     setShared("autopilot.at", Date.now());
     cx.notify();

@@ -9,6 +9,7 @@
 // Shared: the source is lib/coordinator.js; bin/sync-shared copies it into each mod in lib/COPIES.
 // Edit lib/coordinator.js, never a mod's copy, then run bin/sync-shared.
 
+import { tr } from "./i18n.js";
 import { appHome, exec, hc, run, openOverlay, shared, setShared, home, machines, focused, readTextFile } from "herdr";
 import { dirs } from "./dirs.js";
 import { isWorktreePath } from "./core/paths.js";
@@ -179,7 +180,7 @@ function runningAssistant(space, ps = panes()) {
 export async function openCoordinator(space, show = true, settings = null) {
   if (space.machine && !machineReady(space.machine)) {
     setShared("coordinator.pending", { ...(shared("coordinator.pending") ?? {}), [space.id]: { settings, at: Date.now() } });
-    toast({ title: `${space.machine} is offline`, body: "Its Assistant starts when it's back." });
+    toast({ title: `${space.machine} is offline`, body: tr("Its Assistant starts when it's back.") });
     return;
   }
   const folder = folderOf(space);
@@ -202,7 +203,7 @@ export async function openCoordinator(space, show = true, settings = null) {
       run("tab.select", { id: out.tab });
     } else if (was?.pane) run("pane.focus", { pane: was.pane }); // tab.new shows the new tab: back to where the person was.
   } catch (e) {
-    toast({ title: "Assistant didn't open", body: plainError(e), level: "error" });
+    toast({ title: tr("Assistant didn't open"), body: plainError(e), level: "error" });
   }
 }
 
@@ -216,7 +217,7 @@ export async function newSpace(space) {
   const machine = asked && !machineReady(asked) ? null : asked;
   const choosing = machines().some((m) => m.name && m.layout === "ready");
   const [recent, at] = await Promise.all([recentFolders(machine).catch(() => []), homeOf(machine).catch(() => null)]);
-  if (!at) return toast({ title: `Couldn't reach ${machine}`, body: "Try New space again once it's connected.", level: "error" });
+  if (!at) return toast({ title: `Couldn't reach ${machine}`, body: tr("Try New space again once it's connected."), level: "error" });
   // The dialog draws its own panel (frame "none"), centered and as tall as what it shows now:
   // the overlay is the panel at its tallest.
   openOverlay({ mod: "newspace", kind: "dialog", frame: "none", width: 460, height: newSpaceHeight(recent.length, choosing), props: { recent, machine, home: at } });
@@ -410,14 +411,14 @@ export function watchNewSpaces(spaces) {
   if (make) {
     setShared("newspace.createreq", null);
     if (Date.now() - make.at < 10000) createSpace(make.folder, make.settings ?? null, make.machine ?? null, make.icon ?? null)
-      .catch((e) => toast({ title: "Space wasn't made", body: plainError(e), level: "error" }));
+      .catch((e) => toast({ title: tr("Space wasn't made"), body: plainError(e), level: "error" }));
   }
   // Settings > Machines turned a machine's Home Assistant on: its home space, made if missing.
   const home = shared("home.makereq");
   if (home) {
     setShared("home.makereq", null);
     if (Date.now() - home.at < 10000) makeHomeSpace(home.machine ?? null)
-      .catch((e) => toast({ title: "Home space wasn't made", body: plainError(e), level: "error" }));
+      .catch((e) => toast({ title: tr("Home space wasn't made"), body: plainError(e), level: "error" }));
   }
   const fresh = watchRemoteSpaces(spaces);
   const mine = spaces.filter((s) => !s.machine && !s.id.includes("/"));
@@ -495,7 +496,7 @@ export function closeTab(tabId) {
 // Rename a tab: our prompt (mods/prompt-chat, the app's one dialog footer), its field holding the
 // name given (empty when nobody named it: it keeps its number).
 export function renameTab(tab) {
-  openOverlay({ mod: "prompt-chat", kind: "dialog", width: 400, height: 196, props: { title: "Rename tab",
+  openOverlay({ mod: "prompt-chat", kind: "dialog", width: 400, height: 196, props: { title: tr("Rename tab"),
     value: tab?.named ? tab.name : "", placeholder: tab?.name ?? "", command: { name: "tab.rename", args: { id: tab?.id } } } });
 }
 
@@ -508,7 +509,7 @@ export function closeSpace(id) {
   const name = allSpaces().find((s) => s.id === id)?.name;
   openOverlay({ mod: "confirm-chat", kind: "dialog", width: 400, height: 168, props: {
     title: name && name !== "~" ? `Close \u201c${name}\u201d?` : "Close this space?",
-    detail: "Its tabs close and every program in them ends.", verb: "Close space",
+    detail: tr("Its tabs close and every program in them ends."), verb: tr("Close space"),
     command: { name: "space.close", args: { id, confirmed: true } } } });
   logSpace("close", id, "coordinator.js closeSpace (asks in confirm-chat)");
 }

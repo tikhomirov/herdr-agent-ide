@@ -8,6 +8,7 @@
 // spot outlined. A note with no spot is about the whole artifact. Esc drops the spot, then ends.
 // A custom panel (not a recipe) also leaves its picture for the web app each time it's shown (picture()).
 
+import { tr } from "./i18n.js";
 import { div, svg } from "gpui-kit";
 import { v_flex, h_flex, InputState, Input } from "gpui-base";
 import { theme, shared, setShared, props, exec, appHome, home, agents } from "herdr";
@@ -25,7 +26,7 @@ const stop = () => setShared(KEY, null);
 
 export function markupInit(_cx) {
   const m = { spot: null, press: null, origin: null, size: null, shot: null, sending: false, said: "", failed: false, was: false, pictured: false };
-  m.input = InputState.new({ placeholder: "What should change?" });
+  m.input = InputState.new({ placeholder: tr("What should change?") });
   m.input.on("submit", (_e, cx) => send(m, cx));
   m.input.on("change", (_e, cx) => { if (m.said && !m.sending) { m.said = ""; m.failed = false; cx.notify(); } });
   return m;
@@ -43,7 +44,7 @@ export function markupWrap(m, inner, cx) {
       if (e.local_position) m.origin = { x: e.position.x - e.local_position.x, y: e.position.y - e.local_position.y };
       picture(m, cx);
     }))
-    .child(inner)
+    .child(tr(inner))
     .when(on, (el) => el.child(layer(m, theme())));
 }
 
@@ -151,11 +152,11 @@ function card(m, t) {
     })
     // The hint wraps, so it's never cut at a narrow width.
     .child(h_flex().min_h(16).gap(8).items_start().px(2)
-      .child(div().flex_1().min_w(0).text_color(m.failed ? t.blocked : t.muted).child(line))
+      .child(div().flex_1().min_w(0).text_color(m.failed ? t.blocked : t.muted).child(tr(line)))
       .when(Boolean(m.spot) && !m.said, (el) => el.child(div().id("art-mark-clear").flex_none().cursor_pointer().font_medium()
         .text_color(t.accent).hover((s) => s.underline())
         .on_click((_e, cx) => { m.spot = null; m.shot = null; cx.notify(); })
-        .child("Clear spot"))))
+        .child(tr("Clear spot")))))
     .child(h_flex().gap(6).items_center()
       .child(Input.new(m.input).flex_1().min_w(0).h(32).px(10).rounded(8).border_1().border_color(t.input).bg(t.background)
         .text_size(13).text_color(t.foreground))
