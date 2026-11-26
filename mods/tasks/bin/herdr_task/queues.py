@@ -13,7 +13,7 @@ from .store import parse_ref, prefixes_in_use, read_list, store_path
 
 # ---- queues ---------------------------------------------------------------------------------
 
-# Another machine's task, as Shepherdr names it: its machine first ("vm-b:SHE-12", or "vm-b/SHE-12").
+# Another machine's task, as Agent IDE names it: its machine first ("vm-b:SHE-12", or "vm-b/SHE-12").
 REMOTE = re.compile(r"(.+?)[:/]([A-Za-z]+[0-9]*-[0-9]+)")
 EXT_EVERY = 60000  # how often a queue asks another machine about a task it waits for (ms)
 
@@ -175,7 +175,7 @@ def queue_reason(s, task):
 
 # ---- the machine's room (HERD-40) -------------------------------------------------------------
 # New tasks wait while this machine's memory, CPU load or disk is over its start limit (Settings
-# > Machines, as Shepherdr's). Herdr's tick on another machine passes that machine's name and
+# > Machines, as Agent IDE's). Herdr's tick on another machine passes that machine's name and
 # limits (--machine, --hold: the settings live where the window is); they're kept in
 # machine-hold.json so a start or the scheduler's tick there use them too, until this machine's
 # settings file is saved after them (#768).

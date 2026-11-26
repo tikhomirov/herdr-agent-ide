@@ -1,4 +1,4 @@
-// Accept shows what you approve (as Shepherdr's merge card): a Ready task's Accept (the Tasks
+// Accept shows what you approve (as Agent IDE's merge card): a Ready task's Accept (the Tasks
 // panel's row, the task chat's header, the Assistant chat's live row) opens this dialog first.
 // Props { ref, folder, machine?, title? }. It reads `herdr-task show --evidence` (from Git,
 // GitHub and the task's artifacts, never the agent's own words but its summary and details): the

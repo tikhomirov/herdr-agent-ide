@@ -1,4 +1,4 @@
-// The Web page (Shepherdr 3.1): Shepherdr in a browser on phone, tablet and desktop, private to the tailnet. Its link
+// The Web page (Agent IDE 3.1): Agent IDE in a browser on phone, tablet and desktop, private to the tailnet. Its link
 // and a QR code to open it on a phone, as the service last wrote them (~/.local/state/herdr-ide/service/web.json: the service shares
 // /shepherdr with tailscale serve and draws the QR picture under data/). On or off: the Web add-on, under Window.
 // Serve from (core/host.js): the machine that serves it, picked from this computer and every linked one (its line says
@@ -36,17 +36,17 @@ function current(view) {
 // Asks this machine's service to move it (the same as the web app's Settings › Web).
 async function move(label) {
   const token = await localToken();
-  if (!token) return "Shepherdr's service isn't running here.";
-  // its port, and that Shepherdr's own service answers there (not another app), before the token goes out
+  if (!token) return "Agent IDE's service isn't running here.";
+  // its port, and that Agent IDE's own service answers there (not another app), before the token goes out
   const svc = await localService().catch(() => null);
-  if (!svc) return "Shepherdr's service isn't answering here.";
+  if (!svc) return "Agent IDE's service isn't answering here.";
   try {
     const r = await fetch(`${svc.base}/api/action`, { method: "POST", headers: { authorization: `Bearer ${token}`, "content-type": "application/json" },
       body: JSON.stringify({ type: "setting", key: "web.serve", value: label }) });
     const j = await r.json().catch(() => null);
     return j?.ok === false ? j.error ?? "It could not be moved." : "";
   } catch {
-    return "Shepherdr's service isn't answering here.";
+    return "Agent IDE's service isn't answering here.";
   }
 }
 

@@ -61,14 +61,14 @@ def slug_of(folder):
 
 def project_id(folder, make=False):
     """The repo's id (None outside git); make: give it one when it has none."""
-    ok, out, _ = git(folder, "config", "--local", "--get", "shepherdr.id")
+    ok, out, _ = git(folder, "config", "--local", "--get", "herdr-ide.id")
     if ok and out.strip():
         return out.strip()
     if not make:
         return None
     import uuid
     new = str(uuid.uuid4())
-    return new if git(folder, "config", "--local", "shepherdr.id", new)[0] else None
+    return new if git(folder, "config", "--local", "herdr-ide.id", new)[0] else None
 
 
 def moved_list(folder):

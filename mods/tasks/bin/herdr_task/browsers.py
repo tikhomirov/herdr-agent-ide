@@ -84,7 +84,7 @@ def _close(bp, key):
 
 
 def _agent_browser(bp):
-    """The agent-browser herdr-browser runs (Shepherdr's own copy, or the PATH's), else the PATH's."""
+    """The agent-browser herdr-browser runs (Agent IDE's own copy, or the PATH's), else the PATH's."""
     try:
         r = subprocess.run([bp, "--bin"], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, universal_newlines=True, timeout=20)
         if r.returncode == 0 and r.stdout.strip():

@@ -2,7 +2,7 @@
 """herdr-artifact: Herdr's artifacts, the one way to make and change them.
 
 An artifact is what an agent shows the person: a report, a dashboard, a form, a proof. It is a
-recipe (recipe.json and its pictures, Shepherdr 3.1), drawn natively by the window and by the web
+recipe (recipe.json and its pictures, Agent IDE 3.1), drawn natively by the window and by the web
 app; only a rare custom one (a game, a live tool: --custom) is a Herdr mod the window runs
 (main.js), which the web shows as the picture the window last took of it. It belongs to one folder, like
 a task: the repo root in git (a linked worktree counts as its main repo), else the folder itself.
@@ -44,7 +44,7 @@ if not __import__("shutil").which("hc"):
     os.environ["PATH"] = os.pathsep.join([p for p in os.environ.get("PATH", "").split(os.pathsep) if p] + [
         d for d in (os.path.join(HOME, ".local", "bin"), "/opt/homebrew/bin", "/usr/local/bin")
         if d not in os.environ.get("PATH", "").split(os.pathsep)])
-# ---- SHEP: Shepherdr's own folders (a copy of herdr_task/layout.py's PY; test/test_layout.py checks it) ----
+# ---- SHEP: Agent IDE's own folders (a copy of herdr_task/layout.py's PY; test/test_layout.py checks it) ----
 def SHEP(rel, _t={'.herdr/shepherdr.json': ('config', 'settings.json'), '.herdr/model-picks.json': ('config', 'model-picks.json'), '.herdr/tasks': ('data', 'tasks'), '.herdr/artifacts': ('data', 'artifacts'), '.herdr/vault.json': ('data', 'secrets/vault.json'), '.herdr/secret-remote': ('data', 'secrets/remote'), '.herdr/tools.json': ('data', 'tools.json'), '.herdr/shepherdr': ('state', 'service'), '.herdr/browser': ('state', 'browser'), '.herdr/secret-drop': ('state', 'secret-drop'), '.herdr/secret-served': ('state', 'secret-served'), '.herdr/cli-check.json': ('state', 'cli-check.json'), '.herdr/machine-hold.json': ('state', 'machine-hold.json')}):
     H, E = os.path.expanduser("~"), os.environ
     a = lambda v: E.get(v) if (E.get(v) or "").startswith("/") else None
@@ -65,7 +65,7 @@ def SHEP(rel, _t={'.herdr/shepherdr.json': ('config', 'settings.json'), '.herdr/
     return os.path.join(H, rel)
 # ---- end SHEP ----
 
-# Shepherdr's own folders (~/.local/share/herdr-ide/artifacts) once this machine's data moved there,
+# Agent IDE's own folders (~/.local/share/herdr-ide/artifacts) once this machine's data moved there,
 # else the old ~/.herdr/artifacts (which then links to the new place).
 STORE = SHEP(".herdr/artifacts")
 FILES = os.path.join(STORE, "files")
@@ -75,7 +75,7 @@ GUIDE = os.path.join(os.path.dirname(os.path.realpath(__file__)), "..", "ARTIFAC
 MARKUP = os.path.join(os.path.dirname(os.path.realpath(__file__)), "..", "markup.js")
 # What Mark up imports beside it (markup.js's dirs.js, and dirs.js's core/paths.js): each copy carries them too (#870).
 MARKUP_HELPERS = ("dirs.js", os.path.join("core", "paths.js"))
-# A recipe artifact (recipe.json, Shepherdr 3.1) is drawn by the shared recipe view: copied into its installed mod.
+# A recipe artifact (recipe.json, Agent IDE 3.1) is drawn by the shared recipe view: copied into its installed mod.
 RECIPE_VIEW = os.path.join(os.path.dirname(os.path.realpath(__file__)), "..", "recipe-view.js")
 RECIPE_CORE = os.path.join(os.path.dirname(os.path.realpath(__file__)), "..", "core", "recipe.js")
 RECIPE_TYPES = {"heading", "text", "list", "table", "chart", "stats", "image", "video", "audio", "pdf", "pair", "code", "callout",
@@ -1612,7 +1612,7 @@ def cmd_picture(o):
 
 
 # ---- convert: an older GPUI artifact into a recipe -------------------------------------------------
-# Shepherdr 3.1 draws artifacts from recipes on both sides. An artifact made before is drawn once by
+# Agent IDE 3.1 draws artifacts from recipes on both sides. An artifact made before is drawn once by
 # herdr-app check (its element tree, as the window builds it), and that tree becomes recipe blocks:
 # headings, text, lists, code, pictures, and a bordered card as a callout. Interactive ones (a game)
 # keep only their words and pictures; the old version stays, viewable in the window.
@@ -1871,7 +1871,7 @@ def cmd_pull(o):
 # Wherever the person is: the web app's page they use (a phone, a browser) opens it, else the window here; and a
 # link always works. The machine that serves the web app writes its link in herdr-core's document shepherdr.web on
 # every machine it links (core/host.js WEB_DOC), so an agent on a machine with no web app of its own has it too.
-WEB_DOC = "shepherdr.web"
+WEB_DOC = "herdr-ide.web"
 WEB_JSON = SHEP(".herdr/shepherdr/web.json")
 # The core label an agent's terminal asks with: the serving machine's service hears it (service/show.ts).
 SHOW = "herdr.show"
@@ -1916,7 +1916,7 @@ def web_link(aid):
     return f"{base}?artifact={urllib.parse.quote(aid, safe='')}" if base else None
 
 
-NO_LINK = ("No web link is known here yet: Shepherdr's web app isn't served, or the machine serving it hasn't "
+NO_LINK = ("No web link is known here yet: Agent IDE's web app isn't served, or the machine serving it hasn't "
            "linked this one (`shepherdr web status` there says).")
 
 
@@ -1991,7 +1991,7 @@ def cmd_open(o):
 # browser (herdr-browser) at a phone's or a desktop's width and takes screenshots.
 HERE = os.path.dirname(os.path.realpath(__file__))
 VIEWERS = (os.path.join(HERE, "..", "viewer.html"),                                   # beside it: installed or synced (#1214)
-           os.path.join(HOME, ".local", "share", "shepherdr", "web", "dist", "artifact-viewer.html"),  # the installed web app's
+           os.path.join(HOME, ".local", "share", "herdr-ide", "web", "dist", "artifact-viewer.html"),  # the installed web app's
            os.path.join(HERE, "..", "..", "..", "web", "dist", "artifact-viewer.html"))  # a checkout's own build
 PREVIEW_STATE = os.path.join(STORE, ".preview")
 PREVIEW_IDLE = 1800
@@ -2025,7 +2025,7 @@ def viewer_page():
     return next((os.path.realpath(p) for p in VIEWERS if os.path.isfile(p)), None)
 
 
-NO_VIEWER = ("The artifact viewer isn't on this machine yet: it comes with Shepherdr's artifacts add-on from its next "
+NO_VIEWER = ("The artifact viewer isn't on this machine yet: it comes with Agent IDE's artifacts add-on from its next "
              "update (`shepherdr update`), on another machine with the next sync (`herdr-task machines sync` on the main "
              "machine), or build it in a checkout: `bun run build`.")
 
@@ -2307,14 +2307,14 @@ def cmd_guide(_o):
         with open(GUIDE) as f:
             sys.stdout.write(f.read())
     except FileNotFoundError:
-        raise Fail(f"The guide isn't installed here ({os.path.realpath(GUIDE)}). Update Shepherdr: `shepherdr update`.")
+        raise Fail(f"The guide isn't installed here ({os.path.realpath(GUIDE)}). Update Agent IDE: `shepherdr update`.")
     return 0
 
 
 # ---- another machine ------------------------------------------------------------------------
 
-# Shepherdr's installer holds every copy of the helpers to other machines (this file, removed by
-# `shepherdr doctor` once the install is whole), as herdr-task's base.sync_held.
+# Agent IDE's installer holds every copy of the helpers to other machines (this file, removed by
+# `herdr-task where` once the install is whole), as herdr-task's base.sync_held.
 # Its state folder's, or an older installer's in ~/.herdr: either holds.
 SYNC_HOLDS = (os.path.join(os.path.dirname(SHEP(".herdr/secret-drop")), "sync-hold"), os.path.join(HOME, ".herdr", "sync-hold"))
 
@@ -2324,7 +2324,7 @@ def sync_held():
     for p in SYNC_HOLDS:
         try:
             with open(p) as f:
-                return f.readline().strip() or "held by Shepherdr's installer"
+                return f.readline().strip() or "held by Agent IDE's installer"
         except OSError:
             continue
     return None
@@ -2348,7 +2348,7 @@ def remote(machine, argv):
         held = sync_held()
         if held:
             raise Fail(f"herdr-artifact isn't current on {machine}, and copies to other machines wait: {held}. "
-                       "Run `shepherdr doctor` once the install is whole.")
+                       "Run `herdr-task where` once the install is whole.")
         r = subprocess.run(["hc", "file", "write", "--on", machine, target], input=body, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         if r.returncode != 0:
             raise Fail(f"Couldn't install herdr-artifact on {machine}: {r.stderr.decode().strip()}")

@@ -68,7 +68,7 @@ const ITEMS = {
     // No Assistant's tab yet (on any machine): the tab bar opens it, on the space's machine, taking
     // one already running there (coordinator.js openCoordinator); the view goes to it.
     assistant: () => requestCoordinator({ id: p.space }),
-    // Its Assistant's Notify (notify.js), as Shepherdr's: picked in place, the menu stays open.
+    // Its Assistant's Notify (notify.js), as Agent IDE's: picked in place, the menu stays open.
     notify: { notify: p.space },
     read: () => markRead(assistantOf({ id: p.space, machine: p.machine })),
     pin: () => pin(p.space), unpin: () => pin(p.space, false),

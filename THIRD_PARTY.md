@@ -6,7 +6,7 @@ Agent IDE vendors the Coordinator, chat, and task engine so a machine with only 
 
 Copyright (c) 2026 Elias Stravik. MIT licensed. Upstream: https://github.com/eliasstravik/shepherdr
 
-The license text is `third_party/shepherdr/LICENSE`. `third_party/shepherdr/REVISION` is the commit this tree was taken from. Refresh with `tools/vendor.py` from a checkout (`SHEPHERDR_SRC`).
+The license text is `third_party/shepherdr/LICENSE`. `third_party/shepherdr/REVISION` is the commit this tree was taken from. The code began as a copy of that commit and is now maintained here on its own; it is not refreshed from upstream.
 
 Shipped from that tree, under `mods/`: `accept-card`, `artifacts`, `chat`, `chat-image`, `chat-models`, `chat-react`, `confirm-chat`, `coordinator`, `menu-tasks`, `new-menu-tasks`, `newspace`, `pane-chat`, `prompt-chat`, `spaces-chat`, `tabs-tasks` (input to `tabs-ide-tasks`), `task-artifacts`, `task-browser`, `task-pr`, `tasks` (includes `herdr-task`), `tasks-menu`, `toasts`, `workspace-status-chat`, and `coord-settings` (upstream `shepherdr-settings`, renamed). Helpers: `bin/herdr-browser`, `bin/herdr-secret`. Role templates: `templates/assistant.md`, `worker.md`, `reviewer.md`.
 

@@ -28,7 +28,7 @@ function label(tab, lead) {
   return (tab.name === prog || !tab.named) && telling ? live : base;
 }
 
-// Claude Code and Codex are the agents Shepherdr's chat can show.
+// Claude Code and Codex are the agents Agent IDE's chat can show.
 const chatty = (p) => Boolean(p?.terminal) && (["claude-code", "codex", "pi"].includes(p.app) || ["claude", "codex", "pi"].includes(p.program?.key));
 
 // One app command, waited for: its JSON answer.
@@ -194,7 +194,7 @@ export default class Tabs extends View {
           else { run("layout.select", { stack: "panel-body", child: id }); run("layout.show", { id: "panel" }); }
         }).child(svg(icon).size(14)).child(label);
     };
-    // Chat / Terminal for the focused agent: only when the layout's pane header is `pane-chat` (Shepherdr's).
+    // Chat / Terminal for the focused agent: only when the layout's pane header is `pane-chat` (Agent IDE's).
     const chatHeader = find(root, "main")?.content?.pane?.header?.content?.mod === "pane-chat";
     const chatButton = h_flex().id("chat-toggle").h(26).px(8).gap(5).flex_none().items_center().rounded(6)
       .text_size(12).bg(t.chrome).text_color(t.muted).hover(s => s.bg(t.hover)).on_mouse_down("left", stop)

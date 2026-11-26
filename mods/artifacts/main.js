@@ -41,7 +41,7 @@ export default class Artifacts extends View {
     this.error = null;
     this.all = true;      // every folder's, like Tasks; the toggle narrows it to this space's
     this.opening = null;
-    // The search field (Shepherdr's "Filter artifacts"): by title or the task that made them, as
+    // The search field (Agent IDE's "Filter artifacts"): by title or the task that made them, as
     // you type. Esc clears it; F gets to it while the list holds the keyboard.
     this.query = InputState.new({ placeholder: "Filter artifacts" });
     this.query.on("change", (_e, cx) => cx.notify());
@@ -375,7 +375,7 @@ function folderName(folder) {
 // Esc in the search field clears it (bound once: the art_search_clear action).
 let bound = false;
 
-// Whether every word typed is in one of these, any case (Shepherdr's matches(): its lists' filters).
+// Whether every word typed is in one of these, any case (Agent IDE's matches(): its lists' filters).
 function matches(q, ...fields) {
   const words = String(q).toLowerCase().split(/\s+/).filter(Boolean);
   const all = fields.filter((f) => f != null && f !== "").join(" ").toLowerCase();

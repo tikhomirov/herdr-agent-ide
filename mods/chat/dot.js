@@ -1,10 +1,10 @@
-// A task's status mark: Shepherdr's task dots (src/ui.tsx Dot, src/styles.css .dot.*), every one
+// A task's status mark: Agent IDE's task dots (src/ui.tsx Dot, src/styles.css .dot.*), every one
 // in a 14px box so nothing moves when a status changes.
 // Shared: the source is lib/dot.js; bin/sync-shared copies it into each mod in lib/COPIES.
 // Edit lib/dot.js, never a mod's copy, then run bin/sync-shared.
 //   working  the ring in amber, a pie inside filling with the % done (5% steps,
 //            min 5%; half full while it reports none)
-//   needs    a 10px red dot (halo: a faint ring around it, as Shepherdr's chat header)
+//   needs    a 10px red dot (halo: a faint ring around it, as Agent IDE's chat header)
 //   ready    green, a white tick        done     the same in grey
 //   merging  the green ring with a quarter gap, turning
 //   queued   the grey ring with a clock's two hands      todo  the grey ring      off  dashed
@@ -14,13 +14,13 @@ import { theme } from "herdr";
 import { terminals } from "./live.js";
 import { red, green, amber } from "./ui.js";
 
-// Shepherdr's own red, green and amber, light and dark: one source for the app, in ui.js. The
+// Agent IDE's own red, green and amber, light and dark: one source for the app, in ui.js. The
 // greys are the theme's.
 const needColor = red;
 const readyColor = green;
 
 // The pie: the ring with a solid wedge inside, from twelve o'clock clockwise, radius 3.5 of 14
-// (Shepherdr's inset 3.5px), one picture per 5% in mods/tasks/pie/. Pictures, not paint_path: its
+// (Agent IDE's inset 3.5px), one picture per 5% in mods/tasks/pie/. Pictures, not paint_path: its
 // arcs drew only the wedge's outline at this size, which read as a clock's hands.
 const pie = (pct) => `mods/tasks/pie/${Math.min(100, Math.max(5, Math.round(pct / 5) * 5))}.svg`;
 

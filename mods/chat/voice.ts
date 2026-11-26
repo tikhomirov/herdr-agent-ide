@@ -1,8 +1,8 @@
 // A voice call with an agent's chat: an ElevenLabs voice agent talks with the person and reads,
-// opens and changes Shepherdr for them through its tools (core/voice.js: look, open, send, act),
-// which this machine's Shepherdr service answers (POST /api/voice/tool, service/voice-tools.ts:
+// opens and changes Agent IDE for them through its tools (core/voice.js: look, open, send, act),
+// which this machine's Agent IDE service answers (POST /api/voice/tool, service/voice-tools.ts:
 // the reach of the person's web app); without the service, only this chat (send, look at it).
-// SHEP-105: the call is with Shepherdr itself, not this chat: the service says what it hears (POST
+// SHEP-105: the call is with Agent IDE itself, not this chat: the service says what it hears (POST
 // /api/voice/hear: the chats it sent to, the one on screen, needs anywhere), once the person and the
 // voice are quiet. Without the service, the chat feeds it its own agent's replies and status. Started by
 // the chat mod (a mod has no audio or sockets); one process per call, nothing recorded or kept.
@@ -125,13 +125,13 @@ async function agentId(key: string, made = "") {
 }
 
 // ---- the service: the tools ---------------------------------------------------------------
-// This machine's Shepherdr service answers the tools as for the web app, told this call's agent and what the window
+// This machine's Agent IDE service answers the tools as for the web app, told this call's agent and what the window
 // shows; what it asks to show goes to the chat (nav/). Its token is the local callers' (token in the service's folder).
 
 const DATA = process.env.SHEPHERDR_DATA || shepPaths().service;
 const TOKEN = join(DATA, "token");
 
-/** The service's address, only when Shepherdr's own service answers there (service.json's port and id, as the window's
+/** The service's address, only when Agent IDE's own service answers there (service.json's port and id, as the window's
  *  lib/local.js): never the token to another app on its port. */
 async function service(): Promise<string | null> {
   try {
@@ -269,7 +269,7 @@ function readChat() {
   try { return readFileSync(join(dir, "recent.txt"), "utf8").slice(-12000) || "Nothing yet."; } catch { return "Nothing yet."; }
 }
 
-const NO_SERVICE = "Shepherdr's service isn't running on this machine, so on this call I can only read and write this chat.";
+const NO_SERVICE = "Agent IDE's service isn't running on this machine, so on this call I can only read and write this chat.";
 /** Without the service: this chat only (send here, look at it). */
 async function localTool(name: string, p: any): Promise<{ result: string; nav?: any; then?: unknown; shows?: string; error?: boolean }> {
   const here = !p?.to || /^(here|this|this chat)$/i.test(String(p.to).trim());

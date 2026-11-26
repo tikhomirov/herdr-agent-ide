@@ -1,4 +1,4 @@
-// A machine's details (HERD-40), as Shepherdr's health and plan-limits popovers: opened from the
+// A machine's details (HERD-40), as Agent IDE's health and plan-limits popovers: opened from the
 // meter on its header in the sidebar, this mod as a popup with props { view: "machine", machine }.
 // Its CPU, memory and disk, then what is left of each agent CLI's plan there (machines.js), read
 // again on opening when more than a minute old. Its header says how fresh it is ("Updated 2 min

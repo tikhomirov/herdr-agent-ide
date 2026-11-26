@@ -2,7 +2,7 @@
 
 Since 3.1.35 herdr-task obeys the add-ons switched off (Everywhere's "off" in the settings file: base.addon_off), so
 tell-assistant, assistants, autopilot and the sync say when one they need is off (off_note) instead of going quiet.
-A flip goes through this machine's Shepherdr service when it runs (it writes the settings file and the window's shared
+A flip goes through this machine's Agent IDE service when it runs (it writes the settings file and the window's shared
 list together, as the web app's switch does); without one, straight into the settings file.
 """
 
@@ -21,7 +21,7 @@ NAMES = {"machines": "Other machines", "autopilot": "Autopilot", "browser": "Tas
 
 def manifest():
     """lib/addons.json's add-ons as installed here (the window's, else the web-only install's), or []."""
-    for p in (os.path.join(APP_HOME, "lib", "addons.json"), os.path.join(os.path.expanduser("~"), ".local", "share", "shepherdr", "lib", "addons.json")):
+    for p in (os.path.join(APP_HOME, "lib", "addons.json"), os.path.join(os.path.expanduser("~"), ".local", "share", "herdr-ide", "lib", "addons.json")):
         try:
             with open(p) as f:
                 return json.load(f).get("addons") or []
@@ -76,7 +76,7 @@ def _service_flip(addon_id, on):
 def _file_flip(addon_id, on, addons):
     d = read_settings()
     if d.get("pushed_from"):
-        raise Fail("This machine's Shepherdr settings are a copy from the machine whose window sets them: switch it there.")
+        raise Fail("This machine's Agent IDE settings are a copy from the machine whose window sets them: switch it there.")
     off = off_list()
     by = {a.get("id"): a for a in addons}
     if on:

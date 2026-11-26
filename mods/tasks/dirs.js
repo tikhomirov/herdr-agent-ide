@@ -1,4 +1,4 @@
-// Where Shepherdr keeps its data on this computer, for the window's mods (core/paths.js; the move:
+// Where Agent IDE keeps its data on this computer, for the window's mods (core/paths.js; the move:
 // mods/tasks/bin/herdr_task/layout.py): ~/.local/share/herdr-ide/tasks, ~/.config/herdr-ide/settings.json, ... once
 // this computer's data moved there, else the old ~/.herdr paths. A mod has no environment of its own, so the first use
 // asks a shell once (HERDR_IDE_HOME, XDG_*, the LAYOUT file); until it answers, dirs() gives the old paths, which link

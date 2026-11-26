@@ -1,4 +1,4 @@
-// This machine's Shepherdr service, found and checked before the window talks to it (GitHub #635). The service writes
+// This machine's Agent IDE service, found and checked before the window talks to it (GitHub #635). The service writes
 // where it listens and a fresh id each start into its service.json (~/.local/state/herdr-ide/service; service/main.ts); its health answers
 // that id to this machine's callers. So the port is never written in here (SHEPHERDR_PORT, `install --port` move it),
 // and another app on that port (the service didn't start) never gets the token or the shared state.
@@ -16,7 +16,7 @@ export async function serviceFile() {
   return f && Number.isInteger(f.port) && f.port > 0 && typeof f.id === "string" && f.id ? f : null;
 }
 
-/** The service's health and the address to call it on, only when it is really Shepherdr's service answering:
+/** The service's health and the address to call it on, only when it is really Agent IDE's service answering:
  *  { base, health } or null. With cx, gives up after 1.5 s. */
 export async function localService(cx) {
   const f = await serviceFile();

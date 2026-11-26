@@ -12,7 +12,7 @@ from .launch import brief, launch, parent_for
 
 
 # ---- which CLIs a machine can run -----------------------------------------------------------
-# As Shepherdr's machine-check: each CLI's own status command says whether it is installed and
+# As Agent IDE's machine-check: each CLI's own status command says whether it is installed and
 # signed in (an API key, a keychain or a login file all count), every CHECK_EVERY on each machine
 # the scheduler reaches. Only yes or no is kept: their status also names the account. An answer
 # that can't be read leaves that CLI unknown (None), never signed out. Settings reads the file to
@@ -96,7 +96,7 @@ def here_state(kind):
 
 
 # ---- the backup takes over ------------------------------------------------------------------
-# As Shepherdr's providerFallback: when a task's agent can't go on (out of allowance, signed out,
+# As Agent IDE's providerFallback: when a task's agent can't go on (out of allowance, signed out,
 # its provider still down after the retries: retry_pass's row is "over"), its backup agent takes
 # over, once per task. Settings → Agents → Backup (`backup.agent`): unless set, the other CLI when
 # it's installed and signed in here, else off. A task never fails over to the CLI it runs on. The

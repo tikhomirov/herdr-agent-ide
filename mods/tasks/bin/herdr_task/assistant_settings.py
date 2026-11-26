@@ -22,7 +22,7 @@ LABEL = "herdr.settings"
 STATE = os.path.join(STORE, ".assistant-settings.json")
 EVERY_MS = 60000  # looked at again this often (Autopilot's switch is in its own file), and at once when the settings file changes
 
-HEAD = ("Your settings: (Shepherdr settings for this space, the truth for every task you add; a task's own --set wins, "
+HEAD = ("Your settings: (Agent IDE settings for this space, the truth for every task you add; a task's own --set wins, "
         "and `herdr-task show <id>` says what one task has)")
 MERGE_SHORT = {"ask": "ask the person first (they accept it in the Tasks panel, which merges it)",
                "checks": "after checks (Herdr merges a ready task once its checks pass)",
@@ -131,8 +131,8 @@ def rows(space, d=None, auto=None):
              else "off (never react to the person's messages)", "on" if reacting else "off", [("agents", "reactions")]),
             ("suggestions", "Suggested next message", "on (end each reply with the message you'd likely send next, greyed out in the box)"
              if suggesting else "off (no suggested next message)", "on" if suggesting else "off", [("agents", "suggestions")]),
-            ("feedback", "Feedback offers", f"on (offer once to file a Shepherdr problem as an issue on {repo}, only on the person's yes)"
-             if offering else "off (never offer feedback for Shepherdr; file nothing)", "on" if offering else "off",
+            ("feedback", "Feedback offers", f"on (offer once to file a Agent IDE problem as an issue on {repo}, only on the person's yes)"
+             if offering else "off (never offer feedback for Agent IDE; file nothing)", "on" if offering else "off",
              [("agents", "feedback"), ("agents", "feedback_repo")]),
         ]
     have = lines(resolve(ls), (on, every, direction))

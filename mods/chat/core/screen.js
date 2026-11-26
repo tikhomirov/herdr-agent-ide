@@ -1,4 +1,4 @@
-// A voice call's screen (SHEP-51): the voice agent's fallback for whatever its Shepherdr tools (look, open, send, act)
+// A voice call's screen (SHEP-51): the voice agent's fallback for whatever its Agent IDE tools (look, open, send, act)
 // can't do. The app that started the call (the web page, or the Herdr window) reads what it shows as a short list of
 // numbered things, as a screen reader would ("e7 tab "Artifacts" selected"), and does one action on one of them (click,
 // type, select, scroll, a key, back, close), then reads its screen again: the voice agent hears the new list. Refs

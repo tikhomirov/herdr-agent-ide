@@ -42,7 +42,7 @@ export function changedFiles(names, nums, fresh) {
 
 export const PR_FIELDS = "number,title,state,isDraft,url,headRefName,baseRefName,additions,deletions,changedFiles,statusCheckRollup";
 
-// A check, as Shepherdr sorts them: pass, fail, pending (running or waiting) or skip.
+// A check, as Agent IDE sorts them: pass, fail, pending (running or waiting) or skip.
 export function checkOf(c) {
   if (c.__typename === "StatusContext") {
     const s = String(c.state ?? "").toUpperCase();

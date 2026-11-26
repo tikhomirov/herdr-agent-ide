@@ -86,11 +86,11 @@ def _hold_package(archive):
 if os.path.isfile(os.path.dirname(os.path.realpath(__file__))):
     _hold_package(os.path.dirname(os.path.realpath(__file__)))
 
-# Shepherdr's data in its own folders: moved there once, before anything reads a path (herdr_task/layout.py).
+# Agent IDE's data in its own folders: moved there once, before anything reads a path (herdr_task/layout.py).
 from herdr_task import layout  # noqa: E402
 
 if layout.ensure() == "newer":
-    sys.exit("herdr-task: this machine's Shepherdr data is on a newer layout than this herdr-task knows: update Shepherdr.")
+    sys.exit("herdr-task: this machine's Agent IDE data is on a newer layout than this herdr-task knows: update Agent IDE.")
 
 from herdr_task.cli import main  # noqa: E402
 

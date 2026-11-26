@@ -73,7 +73,7 @@ def remote_run(machine, argv, timeout=None):
         held = sync_held()
         if held:
             raise Fail(f"herdr-task isn't current on {machine}, and copies to other machines wait: {held}. "
-                       "Run `shepherdr doctor` once the install is whole.")
+                       "Run `herdr-task where` once the install is whole.")
         guard(["hc"])
         # A machine with Herdr's own install (its window's) holds herdr-task's source: copies come from there, it's
         # never written to (machines.py, the same rule). Its link ~/.local/bin/herdr-task leads into that install.
@@ -203,7 +203,7 @@ def main():
         c.add_argument("--model", help="its agent's model, an id or alias (default: Settings'; \"default\": the CLI's own)")
         c.add_argument("--effort", help="its agent's effort: low, medium, high, xhigh, max... (default: Settings')")
         c.add_argument("--flags", help="extra flags for its agent's CLI, as you'd type them, e.g. --flags=\"--advisor opus\": only real Claude Code or "
-                                       "Codex flags, none Shepherdr sets itself (default: its space's Settings › Tasks; \"none\": none; \"default\": the space's again)")
+                                       "Codex flags, none Agent IDE sets itself (default: its space's Settings › Tasks; \"none\": none; \"default\": the space's again)")
         c.add_argument("--reviewer", help="the CLI its agent's review uses (default: Settings' Reviewer, else the other CLI)")
         c.add_argument("--reviewer-model", help="the reviewer's model")
         c.add_argument("--reviewer-effort", help="the reviewer's effort")
@@ -272,7 +272,7 @@ def main():
                                 "instead of a new one, and ready pushes to its branch (\"\" lets go)")
     c.add_argument("--pr-title", help="the pull request's title, when the repo wants its own form (#1087; default: "
                                       "\"<task ref>: <task title>\"); a later ready with it renames the open one")
-    c.add_argument("--pr-body", help="the pull request's description, as written (#1087; default: Shepherdr's summary, "
+    c.add_argument("--pr-body", help="the pull request's description, as written (#1087; default: Agent IDE's summary, "
                                      "details and proof); a later ready with it replaces the open one's")
     c.add_argument("--draft", action="store_true", help="open its pull request as a draft (#1155); Accept marks it ready "
                                                         "for review before merging")
@@ -289,7 +289,7 @@ def main():
     c.add_argument("title", help="what can't wait, a few words")
     c.add_argument("--body", help="why, a line or two")
     c.add_argument("--task", help="the task it's about (an Assistant's alert about one of its tasks always reaches the person)")
-    c = cmd("feedback", cmd_feedback, "a problem in Shepherdr itself (not the project's): feedback \"<one line>\" --details \"goal, what "
+    c = cmd("feedback", cmd_feedback, "a problem in Agent IDE itself (not the project's): feedback \"<one line>\" --details \"goal, what "
             "was tried, what went wrong, expected, suggested fix\" returns at once and your Assistant offers the person to file it "
             "on GitHub; an Assistant gets whether to offer, and files it only on the person's yes (--file)", id=False)
     c.add_argument("line", nargs="?", default="", help="the problem in one line")
@@ -304,7 +304,7 @@ def main():
                      ("expected", "what should have happened"), ("fix", "a suggested fix"), ("repro", "minimal steps to reproduce")):
         c.add_argument(f"--{f}", help=f"--file: {words}")
     c.add_argument("--title", help="--file: the issue's title (default: the one line)")
-    c.add_argument("--surface", choices=["web", "window", "both"], help="--file: where the person used Shepherdr")
+    c.add_argument("--surface", choices=["web", "window", "both"], help="--file: where the person used Agent IDE")
     c.add_argument("--repo", help=argparse.SUPPRESS)  # a test's throwaway repo; Settings' otherwise
     h = c.add_mutually_exclusive_group()
     h.add_argument("--new", action="store_true", help="--file: file it even though duplicates are open")
@@ -386,8 +386,8 @@ def main():
     auto_cmd("feed", "this folder's tasks as events read them, as JSON (asked by another machine's --from)", id=False)
     auto_cmd("pause", "stop it firing")
     auto_cmd("resume", "let it fire again")
-    c = sub.add_parser("flags", help="check extra flags for a task's agent (#1222) and print them as Shepherdr keeps them: "
-                       "only real Claude Code or Codex flags, none Shepherdr sets itself")
+    c = sub.add_parser("flags", help="check extra flags for a task's agent (#1222) and print them as Agent IDE keeps them: "
+                       "only real Claude Code or Codex flags, none Agent IDE sets itself")
     c.add_argument("--agent", default="claude", choices=["claude", "codex"], help="the CLI they're for (default: claude)")
     c.add_argument("--json", action="store_true")
     c.add_argument("words", nargs=argparse.REMAINDER, help="the flags, after -- (e.g. -- --advisor opus), or as one quoted line")
@@ -415,7 +415,7 @@ def main():
     ap_cmd("on", "turn it on in this space (makes the heartbeat file)")
     ap_cmd("off", "turn it off in this space")
     c = ap_cmd("set", "when this space's Autopilot wakes and from what (--everywhere: every space that doesn't set its own); "
-               "kept in Shepherdr settings", everywhere=True)
+               "kept in Agent IDE settings", everywhere=True)
     c.add_argument("--every", help=HOW + ' "" or off: no schedule; default: follow Everywhere\'s.')
     c.add_argument("--on", help="task events that wake it, comma-separated (\"\": none; default: Everywhere's): " + ", ".join(EVENTS))
     c.add_argument("--heartbeat", help="its heartbeat's words (default: Everywhere's)")
@@ -473,7 +473,7 @@ def main():
     c.add_argument("--to", help="send everything to this Assistant instead (a test's own)")
     c.add_argument("--json", action="store_true")
     c.set_defaults(fn=cmd_home)
-    ad = sub.add_parser("addons", help="Shepherdr's add-ons: which are off (list), and switch one on or off as Settings › Add-ons does")
+    ad = sub.add_parser("addons", help="Agent IDE's add-ons: which are off (list), and switch one on or off as Settings › Add-ons does")
     ad.set_defaults(fn=cmd_addons, addons=None)
     ads = ad.add_subparsers(dest="addons")
     c = ads.add_parser("list")

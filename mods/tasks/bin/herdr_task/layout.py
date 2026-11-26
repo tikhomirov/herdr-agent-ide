@@ -1,6 +1,6 @@
-"""Where Shepherdr keeps its own data, and the one-time move there from ~/.herdr (SHEP-141).
+"""Where Agent IDE keeps its own data, and the one-time move there from ~/.herdr (SHEP-141).
 
-Shepherdr's data lives in its own `shepherdr` folders (XDG, on macOS too; caches in ~/Library/Caches
+Agent IDE's data lives in its own `shepherdr` folders (XDG, on macOS too; caches in ~/Library/Caches
 there), never under Herdr's name:
 
   config  ~/.config/herdr-ide/          settings.json, model-picks.json
@@ -19,7 +19,7 @@ The move (migrate()) runs once per machine, by itself: the installer runs it on 
 and herdr-task runs it on its first start after a sync brought a new copy to another machine. Each
 kind moves in one rename (same disk), with a link left at its old place (~/.herdr/tasks ->
 ~/.local/share/herdr-ide/tasks), so an older herdr-task, a Herdr window not yet reloaded, another
-machine on an older Shepherdr (which reads $HOME/.herdr/... over herdr-core) and absolute paths in
+machine on an older Agent IDE (which reads $HOME/.herdr/... over herdr-core) and absolute paths in
 old briefs all keep working. On another disk, a file (settings, the vault) is copied, checked,
 then swapped (the old copy kept beside as <old>.pre-layout2); a folder (tasks, artifacts, browsers) stays
 where it is and the new path links to it instead. LAYOUT (in data) is written last: until it says 2, every
@@ -52,8 +52,8 @@ import stat
 import sys
 import time
 
-LAYOUT = 2                      # the layout this code knows; a higher one stops it ("update Shepherdr")
-LEGACY = ".herdr"               # under home: the old place, Shepherdr's data under Herdr's name
+LAYOUT = 2                      # the layout this code knows; a higher one stops it ("update Agent IDE")
+LEGACY = ".herdr"               # under home: the old place, Agent IDE's data under Herdr's name
 ROLLBACK = ".layout-rollback"   # in LEGACY: rolled back; stay on the old paths until `shepherdr migrate`
 BACKUP = ".pre-layout2"         # a copied kind's old copy, kept beside it until cleanup
 FS_SHARED = {"nfs", "nfs4", "cifs", "smbfs", "smb3", "afpfs", "fuse.sshfs", "9p", "davfs", "fuse.rclone"}
@@ -358,7 +358,7 @@ class _Lock:
             except OSError:
                 if time.time() >= end:
                     self.f.close()
-                    raise Locked("another Shepherdr process is moving the data now")
+                    raise Locked("another Agent IDE process is moving the data now")
                 time.sleep(0.2)
 
     def __exit__(self, *_):
@@ -615,20 +615,20 @@ def _cache_tag(w):
     tag = os.path.join(c, "CACHEDIR.TAG")
     if not os.path.exists(tag):
         with open(tag, "w") as f:
-            f.write("Signature: 8a477f597d28d172789f06886806bc55\n# Shepherdr's cache: safe to delete, skipped by backups.\n")
+            f.write("Signature: 8a477f597d28d172789f06886806bc55\n# Agent IDE's cache: safe to delete, skipped by backups.\n")
 
 
 def migrate(home=None, env=None, mac=None, dry=False, force=False, wait=30, again=False):
     """Moves this home's data to the new layout. Safe to run again (and after a crash: it finishes).
     Returns {state, moved: {kind: how}, notes}. state: done (already), migrated, refused (why in notes),
     rolled-back (stays on the old paths until `again`: the person's own `shepherdr migrate`), newer (a later
-    layout: update Shepherdr). force: also on a network disk."""
+    layout: update Agent IDE). force: also on a network disk."""
     w = Where(home, env, mac)
     out = {"state": "done", "moved": {}, "notes": [], "roots": w.roots}
     n = w.layout()
     if n > LAYOUT:
         out["state"] = "newer"
-        out["notes"].append(f"this machine's data is on layout {n}, newer than this Shepherdr knows ({LAYOUT}): update Shepherdr")
+        out["notes"].append(f"this machine's data is on layout {n}, newer than this Agent IDE knows ({LAYOUT}): update Agent IDE")
         return out
     if w.rolled_back() and not again:
         out["state"] = "rolled-back"
@@ -689,10 +689,10 @@ def summary(res):
     if res["state"] == "migrated":
         moved = [k for k, how in res["moved"].items() if how in ("moved", "copied", "kept")]
         r = res["roots"]
-        return (f"Shepherdr's data moved to its own folders ({_short(r['config'])}, {_short(r['data'])}, {_short(r['state'])}). "
+        return (f"Agent IDE's data moved to its own folders ({_short(r['config'])}, {_short(r['data'])}, {_short(r['state'])}). "
                 f"{'Old paths in ~/.herdr link there; nothing to do.' if moved else 'Nothing to move.'}")
     if res["state"] in ("refused", "newer", "rolled-back"):
-        return "Shepherdr's data stays in ~/.herdr: " + "; ".join(res["notes"])
+        return "Agent IDE's data stays in ~/.herdr: " + "; ".join(res["notes"])
     return ""
 
 
@@ -766,7 +766,7 @@ def _replace_across(a, b):
 # ---- rollback and cleanup ---------------------------------------------------------------------
 
 def rollback(home=None, env=None, mac=None, wait=30):
-    """Everything back to ~/.herdr (an older Shepherdr then finds it as it left it). Marks the old
+    """Everything back to ~/.herdr (an older Agent IDE then finds it as it left it). Marks the old
     layout first, so readers switch to the old paths (still links) before anything moves."""
     w = Where(home, env, mac)
     out = {"state": "rolled-back", "moved": {}, "notes": []}
@@ -837,7 +837,7 @@ def cleanup_legacy(home=None, env=None, mac=None):
     return gone
 
 
-# ---- state, for `shepherdr where` and `shepherdr doctor` ------------------------------------------
+# ---- state, for `herdr-task where` and `herdr-task where` ------------------------------------------
 
 def status(home=None, env=None, mac=None):
     """{layout, migrated, rolled_back, roots, kinds: {kind: {path, old, state}}, worktrees, journal}."""
@@ -872,7 +872,7 @@ def status(home=None, env=None, mac=None):
 def ensure(quiet=True):
     """herdr-task's start: moves the data once (the first run after an update brought this code), and
     heals old-path writes. Never in a test's world (HERDR_TASK_STORE / SHEPHERDR_NO_MIGRATE) and never
-    fails the command: on any problem it stays on the old paths and `shepherdr doctor` says why."""
+    fails the command: on any problem it stays on the old paths and `herdr-task where` says why."""
     if os.environ.get("HERDR_TASK_STORE") or os.environ.get("SHEPHERDR_NO_MIGRATE") or os.environ.get("HERDR_TASK_SETTINGS"):
         return None
     try:

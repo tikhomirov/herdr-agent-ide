@@ -23,7 +23,7 @@ from .automations import EVENTS, events_in, HOW, next_run, parse_every, parse_on
 
 
 # ---- autopilot ------------------------------------------------------------------------------
-# How it wakes is a setting, kept with the others in Shepherdr settings (~/.config/herdr-ide/settings.json,
+# How it wakes is a setting, kept with the others in Agent IDE settings (~/.config/herdr-ide/settings.json,
 # which the window pushes to every machine and the web's host keeps in step): "autopilot" =
 # {"every" (an --every rule as written, "" for none), "events" ([--on events]), "heartbeat" (its
 # words)} in "everywhere", and a space's own in "spaces"[its id]: what a space sets wins, what it
@@ -181,7 +181,7 @@ def heartbeat_words(path):
 
 
 def heartbeat_of(space=None, cfg=None):
-    """(words, where) of the heartbeat a space works from (None: Everywhere's): its own in Shepherdr
+    """(words, where) of the heartbeat a space works from (None: Everywhere's): its own in Agent IDE
     settings ("space"), else Everywhere's there ("everywhere"), else Everywhere's file ("file"; the
     starter while there is none)."""
     every, own = autopilot_layers(read_settings() if cfg is None else cfg, space)
@@ -193,7 +193,7 @@ def heartbeat_of(space=None, cfg=None):
 
 
 def direction_of(space=None, cfg=None):
-    """The one line a space steers toward (Shepherdr settings' "direction"): its own, else
+    """The one line a space steers toward (Agent IDE settings' "direction"): its own, else
     Everywhere's; "" when none is set (it then works out what matters from the project)."""
     every, own = autopilot_layers(read_settings() if cfg is None else cfg, space)
     for layer in (own, every):
@@ -479,7 +479,7 @@ def rule_of(x):
 
 def resolve(d, a, space=None, cfg=None):
     """What applies in a space (its record `a` and id; None: Everywhere's own): {on, every, events,
-    own}: its own on/off (off until switched on); the schedule and events it sets in Shepherdr
+    own}: its own on/off (off until switched on); the schedule and events it sets in Agent IDE
     settings (cfg, read when not given), else Everywhere's there, else Everywhere's from before
     (.autopilot.json), else the defaults. own: the fields the space sets itself."""
     e = {**everywhere_default(), **{k: v for k, v in (d.get("everywhere") or {}).items() if k in ("every", "events")}}
@@ -668,14 +668,14 @@ def message(space, a, reasons, full=True):
     beat, where = heartbeat_of(space)
     beat = "" if blank(beat) else beat.strip()
     path = heartbeat_path()
-    src = {"space": "this space's own, Shepherdr settings > Autopilot",
-           "everywhere": "Everywhere's, Shepherdr settings > Autopilot"}.get(where, path.replace(HOME, "~", 1))
+    src = {"space": "this space's own, Agent IDE settings > Autopilot",
+           "everywhere": "Everywhere's, Agent IDE settings > Autopilot"}.get(where, path.replace(HOME, "~", 1))
     if len(beat) > HEARTBEAT_MAX:
         beat = beat[:HEARTBEAT_MAX] + (f"\n… (cut here: read the rest in {path})" if where == "file" else "\n… (cut here)")
     p = a.get("progress")
     prog = f"Saved progress ({when(p['at'])}):\n{p['text']}" if p else "Saved progress: none yet (this is the first wake)."
     aim = direction_of(space)
-    aim = (f"Direction (set by the person, Shepherdr settings > Autopilot): {aim}" if aim else
+    aim = (f"Direction (set by the person, Agent IDE settings > Autopilot): {aim}" if aim else
            "Direction: none set. Work out what matters most from the project itself: its README, docs and goals, "
            "recent commits and merged tasks, open issues and PRs, and what the person asked for lately.")
     body = (f"Autopilot wake: {why}, {when(now())}.\n"
@@ -685,7 +685,7 @@ def message(space, a, reasons, full=True):
             "yourself and unblock them. The one exception is a take-over: something irreversible or outside this "
             "space that can't wait (spending money, deploying or publishing, deleting data, credentials, a security "
             "problem) or being stuck after retrying twice: don't do it, send one herdr-task alert \"<what>\" "
-            "--body \"<why>\", say it in one line and carry on with other work. A problem in Shepherdr itself is no question either: note it with herdr-task feedback \"<one line>\" --details \"…\" --later "
+            "--body \"<why>\", say it in one line and carry on with other work. A problem in Agent IDE itself is no question either: note it with herdr-task feedback \"<one line>\" --details \"…\" --later "
             "and offer it once the person is back. While you're on Autopilot, task news (<herdr-news>) about this space's tasks is "
             "a wake too: act on it as on one; no separate wake comes for what news told you. Read the heartbeat, the "
             "direction and your saved progress below, look at the tasks (herdr-task list --json), and do the most "

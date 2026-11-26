@@ -60,7 +60,7 @@ export const WORDS = {
 // ---- a session that is gone ------------------------------------------------------------------
 // Claude Code: "No conversation found with session ID: …". Codex: "ERROR: No saved session found with ID …".
 export const LOST = /\bno (?:saved )?(?:conversation|session|rollout)\b.*\bfound\b|\b(?:conversation|session)\b.*\bnot found\b/i;
-// What a new agent hears when its earlier session is gone (Shepherdr's words); the chat shows it as one quiet row.
+// What a new agent hears when its earlier session is gone (Agent IDE's words); the chat shows it as one quiet row.
 export const FRESH = "Your earlier session is gone, so this is a new one that remembers none of it. Check what is already here and preserve existing work.";
 // The new agent's first message: the handover, its task (a worker's), and an Assistant's role again (its template's
 // words, after the front matter).

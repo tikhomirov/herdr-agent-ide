@@ -33,7 +33,7 @@ export const WORDS = {
 // The suggestions shown at most.
 export const SHOWN = 5;
 
-// A new repo, as Shepherdr's: main, one empty commit, no hooks or signing in the way.
+// A new repo, as Agent IDE's: main, one empty commit, no hooks or signing in the way.
 export const NEW_REPO = [["init", "-q", "--initial-branch=main"],
   ["-c", "user.useConfigOnly=false", "-c", "core.hooksPath=/dev/null", "-c", "commit.gpgsign=false", "commit", "-q", "--allow-empty", "-m", "First commit"]];
 

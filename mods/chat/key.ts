@@ -7,7 +7,7 @@ import { join } from "node:path";
 import { envLines, voiceKey } from "./core/voice.js";
 import { roots, pathsFrom, isMigrated, LEGACY, ROLLBACK } from "./core/paths.js";
 
-/** Shepherdr's paths on this machine (core/paths.js): the new ones once its data moved, else the old ~/.herdr ones. */
+/** Agent IDE's paths on this machine (core/paths.js): the new ones once its data moved, else the old ~/.herdr ones. */
 export function shepPaths() {
   const home = process.env.HOME ?? "";
   const r = roots(home, process.env, process.platform === "darwin");

@@ -1,12 +1,12 @@
-// Serve from (Shepherdr settings › Web, `shepherdr web serve-from <machine>`): which machine serves the web app, and
+// Serve from (Agent IDE settings › Web, `shepherdr web serve-from <machine>`): which machine serves the web app, and
 // how every machine keeps one truth with it.
 // - The host serves the web app and holds the truth: the shared document ("shepherdr": pins, the sidebar, Notify, the
 //   Window switches) and the settings file (~/.config/herdr-ide/settings.json, the role instructions). Another machine's service
 //   reads and writes them there, through herdr-core's link; its window goes on using its own copy, kept in step.
-// - Which machine it is: herdr-core document "shepherdr.host" = { id, at } on every machine (id: the host's herdr-core
+// - Which machine it is: herdr-core document "herdr-ide.host" = { id, at } on every machine (id: the host's herdr-core
 //   id, the same on every machine). The newest record wins and each service hands it on to the machines it links to,
 //   so a machine asleep at the move learns it when it wakes. No record: each machine serves itself (as before 3.1.1).
-// - Each service says who it is in "shepherdr.node" = { id, name, os, version, link, links: { name: id }, at }:
+// - Each service says who it is in "herdr-ide.node" = { id, name, os, version, link, links: { name: id }, at }:
 //   another machine reads the host's to know its names.
 // - Names are each machine's own: the laptop calls the mini "mac-mini", the mini calls the laptop "m3", and the shared
 //   data names spaces and machines that way ("mac-mini/sp1" there is "sp1" here). relocate() moves a value from one
@@ -14,11 +14,11 @@
 //   keeps what only the host knows when a change comes back.
 // Shared core: the source is core/host.js; bin/sync-shared copies it into the mods in lib/COPIES.
 
-export const HOST_DOC = "shepherdr.host";
-export const NODE_DOC = "shepherdr.node";
+export const HOST_DOC = "herdr-ide.host";
+export const NODE_DOC = "herdr-ide.node";
 // the web app's link, { link, id } (id: the host's), written by the host here and on every machine it links: an agent on
 // a machine with no service of its own (a VM) can still give the person a link (herdr-artifact link, SHEP-99)
-export const WEB_DOC = "shepherdr.web";
+export const WEB_DOC = "herdr-ide.web";
 // a node record older than this: that machine's service is gone (they write theirs every minute)
 export const NODE_STALE = 3 * 60_000;
 
@@ -204,7 +204,7 @@ export const SERVE = {
   confirm: (m, here) => (here ? "Serve the web app from this computer?" : `Serve the web app from ${m}?`),
   detail: (m, here) => (here
     ? "Its link moves here and the other machine stops sharing it. Pins and settings come along."
-    : `Shepherdr's web service is installed or updated on ${m}, its link moves there and this computer stops sharing it. Pins and settings come along.`),
+    : `Agent IDE's web service is installed or updated on ${m}, its link moves there and this computer stops sharing it. Pins and settings come along.`),
   verb: "Move it",
 };
 

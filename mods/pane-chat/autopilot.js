@@ -1,4 +1,4 @@
-// Autopilot in an Assistant's header (DECISIONS.md, "Shepherdr gaps being closed": a plain on/off
+// Autopilot in an Assistant's header (DECISIONS.md, "Agent IDE gaps being closed": a plain on/off
 // switch on the left, right after the agent name and folder). herdr-task keeps it (`herdr-task
 // autopilot ...`, its scheduler wakes the Assistant) in ~/.local/share/herdr-ide/tasks/.autopilot.json; this reads
 // that file and asks herdr-task to change it. Another machine's space ("vm/sp1") the same, from
@@ -6,7 +6,7 @@
 // it (its Assistant runs there).
 //
 // The switch: "Autopilot", and when on its next wake dim after it. No menu: the heartbeat, the
-// schedule and the events, Everywhere's or this space's own, live in Shepherdr settings › Autopilot
+// schedule and the events, Everywhere's or this space's own, live in Agent IDE settings › Autopilot
 // (core/autopilot.js pilotFor: this space's switch, its own or Everywhere's rest, from
 // ~/.config/herdr-ide/settings.json). It always turns on when clicked; while its heartbeat is still empty a
 // "Write a heartbeat" link after it opens that page, on this space. The switch, its words and Run
@@ -105,7 +105,7 @@ export function apWatch(view, space, cx) {
 // What follows "Autopilot" while on (core/autopilot.js, the web's header too).
 const detail = (a) => headerDetail(a);
 
-// The switch as Shepherdr settings draws its toggles, header-sized; the knob slides.
+// The switch as Agent IDE settings draws its toggles, header-sized; the knob slides.
 function knob(t, on, pane) {
   return div().relative().w(28).h(16).flex_none().rounded(8).bg(on ? t.accent : t.hover)
     .child(div().id(`ap-knob-${pane}`).absolute().top(2).left(on ? 14 : 2).size(12).rounded(6)

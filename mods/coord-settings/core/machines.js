@@ -50,7 +50,7 @@ export const READS = { claude: "Claude Code", codex: "Codex", elevenlabs: "Eleve
 export const OLD = 15 * 60000;
 export const leftOf = (w) => Math.max(0, Math.round(100 - w.used));
 export const liveWindow = (w, now) => !w.resets_at || w.resets_at > now;
-// Plan left: amber at a quarter, red at a tenth (Shepherdr's).
+// Plan left: amber at a quarter, red at a tenth (Agent IDE's).
 export const planLevelOf = (pct) => (pct <= 10 ? "over" : pct <= 25 ? "busy" : "ok");
 
 // Each installed agent CLI: { cli, name, read, pct (least left now), level }. One without a

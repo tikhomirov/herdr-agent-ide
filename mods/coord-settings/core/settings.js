@@ -1,4 +1,4 @@
-// Shepherdr settings' rows as data: each row's key in ~/.config/herdr-ide/settings.json, its words and its choices, and every
+// Agent IDE settings' rows as data: each row's key in ~/.config/herdr-ide/settings.json, its words and its choices, and every
 // title, line and button word the window's Settings say (mods/coord-settings), so the window, the service and the
 // web app's Settings say the same. herdr-task reads the file (herdr_task/settings.py: settings_for); its defaults are
 // DEFAULTS there and here.
@@ -106,16 +106,16 @@ export function upgradeReactions(cfg) {
   }
   return cfg;
 }
-// Feedback offers (herdr-task's feedback.py, SHEP-78): an agent that hits a problem in Shepherdr itself offers once to
+// Feedback offers (herdr-task's feedback.py, SHEP-78): an agent that hits a problem in Agent IDE itself offers once to
 // file it as a GitHub issue, filed only on your yes. Kept as agents.feedback (on unless turned off) and, Everywhere's
-// only, agents.feedback_repo (the repo it files to; empty: upstream Shepherdr's).
+// only, agents.feedback_repo (the repo it files to; empty: upstream Agent IDE's).
 export const FEEDBACK = {
   title: "Feedback offers",
-  about: "When Shepherdr itself misbehaves, agents offer once to file it as a GitHub issue, only with your yes.",
+  about: "When Agent IDE itself misbehaves, agents offer once to file it as a GitHub issue, only with your yes.",
   repoTitle: "Feedback repo",
-  repoAbout: "Where feedback issues go, as owner/name. Empty: Shepherdr's own repo.",
-  repo: "eliasstravik/shepherdr",
-  bad: "Write it as owner/name, like eliasstravik/shepherdr.",
+  repoAbout: "Where feedback issues go, as owner/name. Empty: Agent IDE's own repo.",
+  repo: "tikhomirov/herdr-agent-ide",
+  bad: "Write it as owner/name, like tikhomirov/herdr-agent-ide.",
 };
 // owner/name from what was typed (owner/name or a github.com link), "" for empty, null when it isn't one.
 export function feedbackRepo(v) {
@@ -227,7 +227,7 @@ export const BRANCH = {
   pattern: "task/{n}-{slug}",
 };
 // Extra flags (tasks.claude_flags, tasks.codex_flags, #1222): a CLI's own launch flags for a space's task agents, such
-// as --advisor opus. herdr-task checks them (`herdr-task flags`, flags.py: real flags only, none Shepherdr sets) and
+// as --advisor opus. herdr-task checks them (`herdr-task flags`, flags.py: real flags only, none Agent IDE sets) and
 // keeps them one word each (--advisor=opus); a task's own (--flags, --set flags=) replace them.
 export const FLAGS = {
   rows: [["claude", "Claude Code flags"], ["codex", "Codex flags"]],
@@ -356,11 +356,11 @@ export function addonAbout(about, now, stop) {
 }
 
 // ---- Web -------------------------------------------------------------------------------------------------------
-export const WEB = { title: "Shepherdr on the web", link: "Link", copy: "Copy", copied: "Copied", phone: "Open it on your phone" };
+export const WEB = { title: "Agent IDE on the web", link: "Link", copy: "Copy", copied: "Copied", phone: "Open it on your phone" };
 // The Web page's state line: off (the Web add-on), not read yet, no service, or what the service last said (web.json).
 // Served from another machine (Serve from, core/host.js): says which; a move under way says that first.
 export const webState = (off, loaded, w) => (off ? "Off. Turn it on under Window › Add-ons." : !loaded ? "Reading…"
-  : !w ? "Shepherdr's service isn't running here." : w.serve?.moving ? SERVE.moving(w.serve.moving)
+  : !w ? "Agent IDE's service isn't running here." : w.serve?.moving ? SERVE.moving(w.serve.moving)
   : w.serve?.host && !w.serve.reachable ? SERVE.unreachable(w.serve.host) : w.why ? w.why
   : w.serve?.host ? SERVE.elsewhere(w.serve.host) : "On, private to your tailnet.");
 
@@ -372,7 +372,7 @@ export const ARCHIVE = [[0, "Off"], [1, "1 day"], [3, "3 days"], [7, "1 week"], 
 export const ONOFF = [[true, "On"], [false, "Off"]];
 
 export const DEFAULTS = { tasks: { merge: "ask", review_rounds: 0, must_fix: "major", max_running: 10, worktrees: true, archive_after: 7, proof: true }, automations: { enabled: true },
-  agents: { reactions: true, suggestions: true, feedback: true, feedback_repo: "" } };
+  agents: { reactions: true, suggestions: true, feedback: false, feedback_repo: "" } };
 
 // [section, field, label, choices | { min, max }]
 export const TASK_ROWS = [

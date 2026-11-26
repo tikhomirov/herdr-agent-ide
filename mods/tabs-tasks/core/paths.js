@@ -1,4 +1,4 @@
-// Where Shepherdr keeps its own data (SHEP-141): its own `shepherdr` folders, never under Herdr's name. The one
+// Where Agent IDE keeps its own data (SHEP-141): its own `shepherdr` folders, never under Herdr's name. The one
 // source is mods/tasks/bin/herdr_task/layout.py (the move, healing, rollback); this is its table and its shell for
 // the window's mods, the service and the web app. test/test_layout.py checks both say the same.
 //   config ~/.config/herdr-ide        settings.json, model-picks.json
@@ -43,7 +43,7 @@ export function roots(home, env = {}, mac = false) {
 }
 
 /** The role templates' folder herdr-core reads (#1182): $XDG_CONFIG_HOME/herdr-core/templates when that is set
- *  (absolute), else ~/.config/herdr-core/templates. Herdr's, not Shepherdr's: HERDR_IDE_HOME doesn't move it. */
+ *  (absolute), else ~/.config/herdr-core/templates. Herdr's, not Agent IDE's: HERDR_IDE_HOME doesn't move it. */
 export const templatesDir = (home, env = {}) => `${abs(env.XDG_CONFIG_HOME) ?? `${home}/.config`}/herdr-core/templates`;
 
 // The same in a shell, on the machine the command runs on (the agent's machine): sets SHEP_TEMPLATES. Put it first in
@@ -79,7 +79,7 @@ export function pathsFrom(home, r, migrated = false) {
 /** Whether a LAYOUT file's text (and no rollback mark) means the new layout. */
 export const isMigrated = (layoutText, rolledBack = false) => !rolledBack && Number(String(layoutText ?? "").trim().split(/\s+/)[0]) >= LAYOUT;
 
-/** A task worktree's path (any machine, any root this or an older Shepherdr made them in): kept out of the lists of
+/** A task worktree's path (any machine, any root this or an older Agent IDE made them in): kept out of the lists of
  *  folders people work in. */
 export const WORKTREE_RE = /\/(\.herdr|herdr-ide)\/worktrees\//;
 export const isWorktreePath = (p) => !!p && WORKTREE_RE.test(`${p}/`);

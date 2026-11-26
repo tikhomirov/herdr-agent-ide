@@ -1,7 +1,7 @@
 // A task's Pull request: its PR on GitHub (state, checks, a link), as gh tells it, asked on the
 // task's machine. The PR herdr-task opened (the task's record), else the one for its branch.
 // Read only. A child of the Tasks panel's task view (taskwhere.js); it asks GitHub only while it
-// shows: on showing, then every 30 s. Shepherdr's PrView, the Herdr way.
+// shows: on showing, then every 30 s. Agent IDE's PrView, the Herdr way.
 import { View, div, svg } from "gpui-kit";
 import { v_flex, h_flex } from "gpui-base";
 import { exec, theme, shared, setShared } from "herdr";

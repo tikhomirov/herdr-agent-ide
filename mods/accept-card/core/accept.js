@@ -58,7 +58,7 @@ export function whereNow(x) {
   return `Not ready right now: it's in ${x.status_text ?? x.state}.`;
 }
 
-// herdr-task ready's SUMMARY_MAX (as Shepherdr's): an older, longer summary shows its first sentence and folds the
+// herdr-task ready's SUMMARY_MAX (as Agent IDE's): an older, longer summary shows its first sentence and folds the
 // rest under Details.
 export const SUMMARY_MAX = 160;
 

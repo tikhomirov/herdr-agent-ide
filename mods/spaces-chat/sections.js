@@ -4,7 +4,7 @@
 // survives restarts) = { sections: [{ id, machine, name, folded, spaces: [space ids], icon? (an emoji;
 // none: the folder) }], icons: { space: emoji }, pinned: [space ids], pinnedFolded, machines:
 // { [machine name, "" for this computer]: { name?, icon? } } }.
-// Pinned (as Shepherdr's, Slack's starred): spaces from any machine, in their own order, shown at
+// Pinned (as Agent IDE's, Slack's starred): spaces from any machine, in their own order, shown at
 // the top of the sidebar instead of under their machine. A pinned space keeps its section, so
 // Unpin puts it back where it was. A machine's name and emoji here are only what the sidebar
 // shows: its hc name stays.

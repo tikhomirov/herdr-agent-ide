@@ -352,11 +352,11 @@ def retry_line(r):
     return f"{r['reason']} · retrying"
 
 
-# A Needs-you reason or an agent's status line: at most this many characters (as Shepherdr's
+# A Needs-you reason or an agent's status line: at most this many characters (as Agent IDE's
 # STATUS_MAX), never the agent's message pasted, never a model's words.
 LINE_MAX = 40
 # A ready summary: at most this many characters of plain words on what the person now sees or can
-# do (as Shepherdr's SUMMARY_MAX); the rest goes in --details or the proof.
+# do (as Agent IDE's SUMMARY_MAX); the rest goes in --details or the proof.
 SUMMARY_MAX = 160
 REASONS = {"plan": "Plan to approve", "permission": "Asks permission", "question": "Question for you",
            "reply": "Waits for your reply", "signed_out": "Signed out", "trust": "Asks to trust this folder"}
@@ -487,7 +487,7 @@ def asking_sentence(text):
 
 def last_question(task, address=None):
     """Why an agent that ended its turn without saying ready waits: the question its last message
-    asks, cut to LINE_MAX (Shepherdr: a "?" anywhere in its last words), "Waits for your reply" when
+    asks, cut to LINE_MAX (Agent IDE: a "?" anywhere in its last words), "Waits for your reply" when
     no sentence can be told, or None when it didn't ask. Only the log's tail is read."""
     for d in reversed(log_tail(agent_log(task, address), 65536)):
         if from_person(d) is not None:

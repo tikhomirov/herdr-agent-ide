@@ -1,4 +1,4 @@
-// Machine health and plan limits (HERD-40), as Shepherdr's health and limits plugins: each
+// Machine health and plan limits (HERD-40), as Agent IDE's health and limits plugins: each
 // machine's CPU, memory and disk, and what is left of each agent CLI's plan there, read on the
 // machine itself by mods/tasks/bin/herdr_task/machine.py (sent with `hc exec --on`, nothing
 // installed). Health every 45 s, plan limits every 10 min (or when asked), never per render.
@@ -12,7 +12,7 @@
 //   bars(t, items, h)               thin upright bars, one per meter or plan
 //   machineDetails(t, machine)      the full block: health, then plan usage per CLI
 // Shared state "machines.stats" = { [machine name, "" for this computer]: stats }, written once
-// per round. Start limits (Settings > Machines) live in Shepherdr's settings file:
+// per round. Start limits (Settings > Machines) live in Agent IDE's settings file:
 // everywhere.machine and machines[name or "local"].machine, each { start_load (× cores),
 // start_memory, start_disk } (herdr-task's tick holds new tasks by them).
 

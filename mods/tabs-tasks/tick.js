@@ -15,7 +15,7 @@ const CLI = () => `${appHome()}/mods/tasks/bin/herdr-task`;
 let running = false, soon = false, seen = null, rounds = 0;
 
 async function tick() {
-  // Shepherdr's service ticks while it runs (lib/service.js).
+  // Agent IDE's service ticks while it runs (lib/service.js).
   if (running || serviceRuns()) return;
   running = true;
   try {

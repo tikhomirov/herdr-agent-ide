@@ -1,5 +1,5 @@
 // Agents in grouped or priority views; parents take their most urgent sub-agent's place.
-// Clone of the shipped `agents` mod with one change: an agent parked behind a chat pane (Shepherdr's Chat / Terminal
+// Clone of the shipped `agents` mod with one change: an agent parked behind a chat pane (Agent IDE's Chat / Terminal
 // switch) is listed too. Herdr lists agents through their panes, so a parked one would drop out otherwise.
 
 import { spaceTile } from "./tile.js";

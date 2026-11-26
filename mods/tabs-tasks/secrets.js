@@ -192,7 +192,7 @@ export async function remove(name, scope) {
 // ts: terminals(), when the caller has them already.
 const served = new Set();
 export function serveRemote(ts = terminals()) {
-  // Shepherdr's service answers them while it runs (lib/service.js); only the machine that keeps
+  // Agent IDE's service answers them while it runs (lib/service.js); only the machine that keeps
   // the secrets answers.
   if (serviceRuns() || !keptOn()?.here) return;
   for (const t of ts) {

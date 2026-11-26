@@ -15,7 +15,7 @@
 // merge, else done). The task's record is read from its list file (its herdr.task label).
 // Beside the chat and terminal the body stack holds the task's Pull request (mods/task-pr), its
 // Artifacts (mods/task-artifacts) and its Browser (mods/task-browser: a live viewer in a terminal
-// block of its own), picked in the header's second row, as Shepherdr's
+// block of its own), picked in the header's second row, as Agent IDE's
 // task side panel. All are one switcher (only one shows at a time), the main chat's header switch
 // (ui.js segmented); Pull request only once the task has one. They show the task the header
 // publishes (shared "tasks.thread.where", from its record: lib/taskwhere.js).

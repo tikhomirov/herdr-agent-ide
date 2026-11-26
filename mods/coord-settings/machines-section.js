@@ -1,4 +1,4 @@
-// Settings > Machines (HERD-40), as Shepherdr's Machine settings and its health and plan-limits
+// Settings > Machines (HERD-40), as Agent IDE's Machine settings and its health and plan-limits
 // views. Machine-only settings live here as rows (there is no machine scope any more):
 // - When new tasks wait, for all machines: start limits ("machine" in Everywhere's layer of
 //   ~/.config/herdr-ide/settings.json: { start_load (× cores, shown as a percent of all cores),
@@ -45,7 +45,7 @@ function askOnce(view, cx) {
   cx.spawn(async (cx) => { await pollNow({ limitsOlder: 60000 }); cx.notify(); });
 }
 
-// Home Assistant (HERD-51), as Shepherdr's home spaces: a machine's home space (its ~) has an
+// Home Assistant (HERD-51), as Agent IDE's home spaces: a machine's home space (its ~) has an
 // Assistant that also looks after the machine; this computer's keeps every machine's overview.
 // Per machine in ~/.config/herdr-ide/settings.json machines[key].home; unset, on for this computer only.
 // What herdr-task's home round last found (~/.local/share/herdr-ide/tasks/.home.json) says how each is now.

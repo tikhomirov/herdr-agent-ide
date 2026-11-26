@@ -6,7 +6,7 @@
 // theirs, read live.
 // Every list on every machine: this computer's, and each connected machine's (read now and then).
 // Grouped For you, by space or by status (shared "tasks.group", from the header's ⋯: mods/tasks-menu;
-// core/tasks.js groupBy). For you (the default, SHEP-98, as Shepherdr's): what needs the person on
+// core/tasks.js groupBy). For you (the default, SHEP-98, as Agent IDE's): what needs the person on
 // top (everything that needs them, inbox.js, then Ready, flat, each row saying its space), Pinned,
 // then each space's other work in status order under its name (a click opens the space), Done
 // hidden behind its count at the end. The machine is never a group: a space's heading says it only
@@ -109,7 +109,7 @@ export default class Tasks extends View {
     this.prefixes = new Map(); // another folder's list (not loaded here): "<machine> <slug>" -> its prefix (null: none found)
     // A toast asks for Needs you (shared "tasks.show"): only asks made from now on.
     this.shownAt = shared("tasks.show")?.at ?? 0;
-    // The search field (Shepherdr's "Filter tasks"): filters as you type, Done and archived tasks
+    // The search field (Agent IDE's "Filter tasks"): filters as you type, Done and archived tasks
     // too. Esc clears it; F gets to it while the list holds the keyboard.
     this.query = InputState.new({ placeholder: tr("Filter tasks") });
     this.query.on("change", (_e, cx) => cx.notify());
@@ -285,7 +285,7 @@ export default class Tasks extends View {
     // Ctrl+K's jump (mods/jump) to a task with no chat to open: the list, searched for it, all statuses.
     const sq = shared("tasks.searchreq");
     if (sq?.at && sq.at !== this.searchAt) { this.searchAt = sq.at; this.pickFilter("all"); this.archivedOpen = false; this.query.set_value(String(sq.q ?? "")); this.jumpQ = String(sq.q ?? ""); }
-    // Shepherdr settings' "Status filters" off (shared "tasks.filters" false): no row, all shown (This space too).
+    // Agent IDE settings' "Status filters" off (shared "tasks.filters" false): no row, all shown (This space too).
     const filters = shared("tasks.filters") !== false;
     // This space: the shown space's only; not for Ctrl+K's jump while its words are still in the search field.
     const here = this.here && filters && !(this.jumpQ && this.query.value() === this.jumpQ) ? spaces().find((s) => s.active) ?? null : null;
@@ -356,7 +356,7 @@ export default class Tasks extends View {
     // What rows say of where they are: their space, never their machine (SHEP-98: a quiet detail);
     // by space, nothing (the headings say it). For you's space rows sit under their heading (bare).
     this.names = filter === "all" && by === "space" ? { machine: false, space: false } : { machine: false, space: true };
-    // Shepherdr settings' "Where on task rows" off (shared "tasks.place" false): rows say none.
+    // Agent IDE settings' "Where on task rows" off (shared "tasks.place" false): rows say none.
     if (shared("tasks.place") === false) this.names = { machine: false, space: false };
     // A status's rows, made only when shown (by status, or its chip).
     const rowsOf = { needs: needRows, automations: autos.map(([l, a]) => this.autoRow(l, a, placed, t)) };
@@ -571,7 +571,7 @@ export default class Tasks extends View {
       x.name, space, machineName(x.machine ?? machineOf(x.terminal)));
   }
 
-  // The search field, as Shepherdr's FilterBox: a magnifier, the box, and at its end F (its key)
+  // The search field, as Agent IDE's FilterBox: a magnifier, the box, and at its end F (its key)
   // while empty, or an X that clears it.
   searchField(t) {
     const q = this.query.value();
@@ -597,7 +597,7 @@ export default class Tasks extends View {
   }
 
   // At the very bottom of the list, once it has archived tasks: "Archived", how many, and a
-  // chevron; it opens them (Shepherdr's ArchivedLink). A button that opens a view, not a task.
+  // chevron; it opens them (Agent IDE's ArchivedLink). A button that opens a view, not a task.
   archivedLink(n, t) {
     return div().flex_none().pt(6).border_t(1).border_color(t.border)
       .child(h_flex().id("task-archived").h(32).px(8).gap(10).items_center().rounded(RADIUS.card).cursor_pointer()
@@ -655,7 +655,7 @@ export default class Tasks extends View {
     return v_flex().flex_none().gap(1)
       // a step of room over each group, so groups read as sections (as the web's)
       .pt(6)
-      // As Shepherdr's: the whole heading is the button; the chevron in the rows' icon column
+      // As Agent IDE's: the whole heading is the button; the chevron in the rows' icon column
       // (brighter on hover), the label small, its count right by it ("Ready 2"), not across the panel.
       .child(h_flex().id(`head-${key}`).h(28).px(8).gap(12).items_center().rounded(RADIUS.card).text_size(TEXT.label)
         .when(!open, (el) => el.cursor_pointer().hover((s) => s.bg(t.hover))
@@ -680,7 +680,7 @@ export default class Tasks extends View {
           .child(all ? "Show less" : `Show ${cut} more`))));
   }
 
-  // For you: a space's name over its other work (Shepherdr's SpaceHeading): its emoji (else #) where
+  // For you: a space's name over its other work (Agent IDE's SpaceHeading): its emoji (else #) where
   // the rows' dots are, its name, its machine quieter (note), its count. A click opens the space
   // (its chat); a list no space works in is just its name.
   spaceGroup(list, rows, t, note) {
@@ -712,7 +712,7 @@ export default class Tasks extends View {
       .child(`${ps.length} done${all ? " today" : ""}`);
   }
 
-  // A row's status mark: Shepherdr's task dot (dot.js); a Working row's pie shows its % done.
+  // A row's status mark: Agent IDE's task dot (dot.js); a Working row's pie shows its % done.
   glyph(p, w) {
     return taskDot(p.section, { pct: w?.done });
   }
@@ -880,7 +880,7 @@ export default class Tasks extends View {
     const { list, task, live, section } = p;
     const shown = this.frame ? (this.frame.agents ??= new Map(agents().map((a) => [a.address, a]))) : new Map(agents().map((a) => [a.address, a]));
     const focused = live.some((a) => shown.get(a.address)?.focused);
-    // The second line, as Shepherdr's: Working, what its agent says it's doing (herdr-task status),
+    // The second line, as Agent IDE's: Working, what its agent says it's doing (herdr-task status),
     // its time left short under the glyph, or a provider retry's line while Herdr waits; Needs you,
     // why; Queued, what it waits for ("after HERD-3"); Merging, why it waits. The id leads it.
     const w = reportOf(task, section, live);
@@ -954,7 +954,7 @@ export default class Tasks extends View {
       props: { ref: refOf(p.list, p.task), folder: p.list.folder, machine: p.list.machine ?? null, title: p.task.title } });
   }
 
-  // One row (as Shepherdr's web Tasks list), three parts with one job each:
+  // One row (as Agent IDE's web Tasks list), three parts with one job each:
   // - the glyph, level with the title, and under it, level with the second line, the time left
   //   ("2h", "<1m": short, in the working color, centred on the glyph; wider than it, it overflows
   //   evenly, so the column and the titles never move);
@@ -1036,7 +1036,7 @@ function accepting(key) {
   return typeof at === "number" && Date.now() - at < 600000;
 }
 
-// Needs you's mark, whatever is needed: Shepherdr's red dot. What is needed shows in the row's words only.
+// Needs you's mark, whatever is needed: Agent IDE's red dot. What is needed shows in the row's words only.
 const needDot = () => taskDot("needs");
 
 // What a task's agent last said (core/tasks.js reportOf), with the progress its own terminal reports.

@@ -1,4 +1,4 @@
-// The Secrets section (DECISIONS.md, "Shepherdr gaps being closed": Secrets as Shepherdr's):
+// The Secrets section (DECISIONS.md, "Agent IDE gaps being closed": Secrets as Agent IDE's):
 // keys, tokens and passwords agents use by name (bin/herdr-secret), kept in the owner-only vault
 // on the machine that keeps them (Kept on: this one or another, moved with `shepherdr secrets
 // move-to`). Add or replace one in masked boxes, for Everywhere, a machine or a space (a

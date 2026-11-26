@@ -2,7 +2,7 @@
 // kept only on their own machine in ~/.local/state/herdr-ide/service/usage.jsonl, so their own agents can suggest better ways to
 // work when the person asks. Private: nothing here or in its writers makes a network call; the data never leaves the
 // machine unless the person's own agent reads it over their own machines' link.
-// Only what Shepherdr keeps nowhere else is written here: views opened and the time on them, space and tab switches,
+// Only what Agent IDE keeps nowhere else is written here: views opened and the time on them, space and tab switches,
 // clicks on main controls, features used, errors shown. Tasks, messages, asks and Autopilot wakes are read where
 // they already live (the insights skill, templates/insights.md, says where).
 // Never words: kinds, ids, counts and times only. clean() keeps the fields below and drops everything else, so a

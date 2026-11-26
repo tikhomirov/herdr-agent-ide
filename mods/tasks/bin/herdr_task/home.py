@@ -1,12 +1,12 @@
 """Home: each machine's home space (the space at its home folder, ~) has an Assistant that also
-looks after the machine, as Shepherdr's home coordinator: its disk, load and memory (HERD-40's
+looks after the machine, as Agent IDE's home coordinator: its disk, load and memory (HERD-40's
 health sample), processes stuck busy, and worktrees finished tasks left behind. Herdr tells it in
 tagged lines only what changed (a meter crossing its alert limit or coming back, a process newly
 stuck, worktrees newly left over); it tells the person only what matters. The lead machine's home
 Assistant also keeps every machine's overview: what needs the person in every space, one line each, and each
 home machine's health news.
 
-Opt-in per machine: Shepherdr settings machines[<name> | "local"].home (true / false); unset, on
+Opt-in per machine: Agent IDE settings machines[<name> | "local"].home (true / false); unset, on
 for this computer only. Each machine with a window runs it (home_pass): it reads itself and each
 machine it links to (`herdr-task home report` there, over its herdr-core link) once a minute,
 judges, and sends. Nothing is installed or run on another machine beyond herdr-task itself.
@@ -283,7 +283,7 @@ def remote_report(machine, candidates, since, news_only, timeout=40):
 
 
 def judge(was, h):
-    """Shepherdr's: each meter told once when over its alert limit long enough, and again (back)
+    """Agent IDE's: each meter told once when over its alert limit long enough, and again (back)
     once well under. was/next: {kind: {since, told}}. Returns (next, [(kind, "over" | "back")])."""
     from .machine import ALERT
     alert = {"cpu": (h["load"], ALERT["load"] * h["cores"]), "memory": (h["memory"], ALERT["memory"]),

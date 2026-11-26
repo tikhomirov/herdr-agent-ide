@@ -18,11 +18,11 @@
 // shared "spaces-chat.iconpick"), saved for the new space as Rename saves it (coordinator.js
 // createSpace).
 // Only the folder and icon are asked (DECISIONS.md, New space dialog): every new space opens with its
-// Assistant chat, on Shepherdr settings' coordinator (else the CLI's default); the person changes
+// Assistant chat, on Agent IDE settings' coordinator (else the CLI's default); the person changes
 // the model in the chat's own model button. Task IDs aren't asked here either: herdr-task picks
 // the folder's prefix and the coordinator may change it (only agents set up tasks).
 // A folder that isn't in a git repo (one made on Create too, never home) offers "Make it a git
-// repo", on by default (Shepherdr makes every such folder one): Create runs git init on main with
+// repo", on by default (Agent IDE makes every such folder one): Create runs git init on main with
 // an empty first commit, so tasks get worktrees; files already there stay uncommitted. The line
 // under the field always keeps its room, so nothing moves as the field changes.
 // Create space has the tab bar make the space in the field's folder and its Assistant tab
@@ -305,12 +305,12 @@ export default class NewSpace extends View {
           }
           this.repo.set(folder, true);
         }
-        // Shepherdr settings' coordinator (the space's machine's, else Everywhere's) when set; {}:
+        // Agent IDE settings' coordinator (the space's machine's, else Everywhere's) when set; {}:
         // the template's own agent. On another machine the Assistant runs there (mods/chat
         // startAgent), with what is installed there when the one chosen isn't.
         const choice = { ...(shepherdrFor(await readShepherdr(), `m:${this.machine ?? LOCAL_MACHINE}`).coordinator ?? {}) };
         // The tab bar makes it (coordinator.js watchNewSpaces): this dialog goes as the view moves.
-        // Shepherdr settings' "Open the Assistant" off (shared "coordinator.auto" false): settings
+        // Agent IDE settings' "Open the Assistant" off (shared "coordinator.auto" false): settings
         // null, so the space keeps Herdr's own first tab and gets no Assistant.
         const assistant = autoCoordinator();
         setShared("newspace.createreq", { folder, machine: this.machine, settings: assistant ? choice : null, icon: this.icon, at: Date.now() });

@@ -1,5 +1,5 @@
 // The Window section (was Layout): on/off switches for how the window looks and what a new space
-// opens with (DECISIONS.md, "Shepherdr settings: layout switches"). The same everywhere, no scope. Each
+// opens with (DECISIONS.md, "Agent IDE settings: layout switches"). The same everywhere, no scope. Each
 // default is today's choice, so nothing changes until one is flipped; each takes effect at once:
 // - Tabs: shared "tabbar.tabs" (mods/tabs-tasks). Only the tabs go: the bar also holds +, the
 //   side panels' buttons, and work for the rest of the app (new spaces, tasks' watcher).

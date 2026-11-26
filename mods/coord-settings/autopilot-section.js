@@ -1,8 +1,8 @@
-// The Autopilot section (DECISIONS.md, "Shepherdr gaps being closed": Autopilot, no sandbox): a
+// The Autopilot section (DECISIONS.md, "Agent IDE gaps being closed": Autopilot, no sandbox): a
 // space's Assistant wakes on a schedule or on task events, and each wake brings it the heartbeat
 // (plain text) and its saved progress. Otherwise it's the same regular Assistant.
 // Set as Tasks is: Everywhere's heartbeat, schedule and events, and a space's own of any of them
-// (its rows say "Set for this space · Reset" or "Inherited from Everywhere"), kept in Shepherdr
+// (its rows say "Set for this space · Reset" or "Inherited from Everywhere"), kept in Agent IDE
 // settings with the rest ("autopilot" in ~/.config/herdr-ide/settings.json: main.js set/scoped/reset, so they
 // go to every machine). A space switches it on or off with the switch in its Assistant's header
 // (mods/pane-chat/autopilot.js); this page has no switch and no Run now. herdr-task reads them

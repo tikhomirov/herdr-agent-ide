@@ -2,7 +2,7 @@
 // under a main.js that wraps the artifact's own; the source is mods/artifacts/markup.js).
 // The Mark up button (the full-screen viewer's toolbar in mods/chat-image, the sidebar's header in
 // mods/artifacts) sets shared "artifacts.markup" = { mod, where: "viewer" | "panel" }; the copies of
-// that artifact there lay a layer over it (as Shepherdr's Mark up): click a spot or drag over an
+// that artifact there lay a layer over it (as Agent IDE's Mark up): click a spot or drag over an
 // area, write what should change, and Send gives it to the agent that keeps the artifact
 // (`herdr-artifact note`) with the version, the spot in words and a picture of the panel with the
 // spot outlined. A note with no spot is about the whole artifact. Esc drops the spot, then ends.

@@ -1,5 +1,5 @@
 """GitHub news: what GitHub says about a Ready task's pull request, passed on to its resting agent,
-and its base branch going red after merges, told to the space's Assistant (as Shepherdr's)."""
+and its base branch going red after merges, told to the space's Assistant (as Agent IDE's)."""
 
 import datetime
 import json

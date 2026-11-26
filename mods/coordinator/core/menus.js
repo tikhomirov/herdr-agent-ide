@@ -1,4 +1,4 @@
-// The menus Shepherdr shows, as data: each item's id and words, in order, given what it is for. The window's mods and
+// The menus Agent IDE shows, as data: each item's id and words, in order, given what it is for. The window's mods and
 // the web app build their menus from these lists (each does an item its own way), so both offer the same things in
 // the same words. A label ends in "…" when it opens a dialog.
 // Shared core: the source is core/menus.js.

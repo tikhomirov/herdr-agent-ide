@@ -1,4 +1,4 @@
-// An artifact's recipe (Shepherdr 3.1): what an agent shows the person, written once as data (recipe.json beside its
+// An artifact's recipe (Agent IDE 3.1): what an agent shows the person, written once as data (recipe.json beside its
 // pictures) and drawn natively by each side: the window in GPUI (mods/artifacts/recipe-view.js), the web app in HTML
 // (web/src/screens/Recipe.tsx). One file, one version history, the same answers on both.
 //

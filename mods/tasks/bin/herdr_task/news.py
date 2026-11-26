@@ -26,7 +26,7 @@ from .takeover import backup_news
 # ---- news -----------------------------------------------------------------------------------
 # Herdr itself tells a space's Assistant (its coordinator) when one of its tasks needs the person
 # (with the reason), is Ready, is Done, failed, or went quiet: one tagged line each, and the lines
-# of one moment as one message (as Shepherdr's task news); workers don't report. The status is
+# of one moment as one message (as Agent IDE's task news); workers don't report. The status is
 # the one people see (view(): task_status() and its reason, as `list` and the Tasks panel). Each
 # task's last told status is kept in .news.json, so a change is told once, also across restarts.
 # A line goes only if its task still says so when it's sent: a status that flickers tells nothing.
@@ -52,7 +52,7 @@ def activity(task, live):
 
 def stall_of(task, v, live):
     """(mark, words) when a Working task went quiet (QUIET_MS) or is far past its own time left
-    (as Shepherdr: its report's minutes, plus as many again, at least 20, gone by); else None.
+    (as Agent IDE: its report's minutes, plus as many again, at least 20, gone by); else None.
     The mark says which stall it is: the same one is told once."""
     if v["status"] != "working" or task["state"] != "running" or starting(task) or task.get("retry"):
         return None

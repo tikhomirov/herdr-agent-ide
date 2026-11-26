@@ -1,6 +1,6 @@
 """Extra launch flags for a task's agent (#1222): `--advisor opus` for a Sonnet task, say. Only flags Claude Code and
-Codex really have (their CLI references, and their own --help for one newer than these tables), none of Shepherdr's
-own; the ones that clash with what Shepherdr sets itself (model, effort, permissions, resuming, print mode...) are
+Codex really have (their CLI references, and their own --help for one newer than these tables), none of Agent IDE's
+own; the ones that clash with what Agent IDE sets itself (model, effort, permissions, resuming, print mode...) are
 refused with why.
 
 Flags are kept normalized, one word each where they take a value (`--advisor=opus`, `--add-dir=/x --add-dir=/y`):
@@ -34,24 +34,24 @@ CLAUDE = {
 }
 CLAUDE_SHORT = {"-n": "--name", "-d": "--debug", "-c": "--continue", "-r": "--resume", "-p": "--print", "-w": "--worktree",
                 "-v": "--version", "-h": "--help"}
-_SET = "Shepherdr sets it from the task's"
+_SET = "Agent IDE sets it from the task's"
 _PRINT = "it only works with --print, and a task's agent is interactive"
 CLAUDE_REFUSED = {
     "--model": f"{_SET} model: use --model (or --set model=...)",
     "--effort": f"{_SET} effort: use --effort (or --set effort=...)",
-    "--settings": "Shepherdr passes its own --settings (speed, the chat's question card): put settings in ~/.claude/settings.json",
-    "--permission-mode": "Shepherdr sets the permission mode from Settings › Agents (Task agent)",
-    "--dangerously-skip-permissions": "Shepherdr sets the permission mode from Settings › Agents (Task agent): pick Bypass there",
-    "--resume": "Shepherdr resumes the task's own session itself", "--continue": "Shepherdr resumes the task's own session itself",
-    "--session-id": "Shepherdr resumes the task's own session itself", "--fork-session": "Shepherdr resumes the task's own session itself",
-    "--from-pr": "Shepherdr resumes the task's own session itself", "--teleport": "the agent works here, not from a cloud session",
+    "--settings": "Agent IDE passes its own --settings (speed, the chat's question card): put settings in ~/.claude/settings.json",
+    "--permission-mode": "Agent IDE sets the permission mode from Settings › Agents (Task agent)",
+    "--dangerously-skip-permissions": "Agent IDE sets the permission mode from Settings › Agents (Task agent): pick Bypass there",
+    "--resume": "Agent IDE resumes the task's own session itself", "--continue": "Agent IDE resumes the task's own session itself",
+    "--session-id": "Agent IDE resumes the task's own session itself", "--fork-session": "Agent IDE resumes the task's own session itself",
+    "--from-pr": "Agent IDE resumes the task's own session itself", "--teleport": "the agent works here, not from a cloud session",
     "--print": "a task's agent is interactive (it would answer once and exit)",
     "--bg": "the agent must stay in its own terminal", "--background": "the agent must stay in its own terminal",
     "--desktop": "the agent must stay in its own terminal", "--cloud": "the agent works here, not in a cloud session",
     "--remote": "the agent works here, not in a cloud session", "--environment": "the agent works here, not in a cloud session",
     "--correlation-id": "it is for cloud sessions (--environment)", "--metadata": "it is for cloud sessions (--environment)",
     "--ref": "it is for cloud sessions (--environment)", "--exec": "it runs a background job (--bg), not an agent",
-    "--worktree": "Shepherdr gives each task its own worktree already", "--tmux": "Shepherdr gives each task its own worktree already",
+    "--worktree": "Agent IDE gives each task its own worktree already", "--tmux": "Agent IDE gives each task its own worktree already",
     "--init-only": "it exits before the agent starts", "--version": "it exits before the agent starts",
     "--help": "it exits before the agent starts", "--enable-auto-mode": "Claude Code removed it: pick Auto in Settings › Agents",
     **{f: _PRINT for f in ("--output-format", "--input-format", "--json-schema", "--max-budget-usd", "--max-turns",
@@ -67,22 +67,22 @@ CODEX = {"--config": ONE, "--enable": ONE, "--disable": ONE, "--strict-config": 
          "--no-alt-screen": N}
 CODEX_SHORT = {"-c": "--config", "-i": "--image", "-p": "--profile", "-m": "--model", "-s": "--sandbox",
                "-a": "--ask-for-approval", "-C": "--cd", "-h": "--help", "-V": "--version"}
-_PERM = "Shepherdr sets the sandbox and approvals from Settings › Agents (Task agent)"
+_PERM = "Agent IDE sets the sandbox and approvals from Settings › Agents (Task agent)"
 CODEX_REFUSED = {
     "--model": f"{_SET} model: use --model (or --set model=...)", "--sandbox": _PERM, "--ask-for-approval": _PERM,
     "--dangerously-bypass-approvals-and-sandbox": _PERM + ": pick Full access there", "--approve-for-me": _PERM,
-    "--full-auto": _PERM, "--no-daemon": "Shepherdr passes it already",
+    "--full-auto": _PERM, "--no-daemon": "Agent IDE passes it already",
     "--remote": "a task's agent runs on its own app server (--no-daemon)", "--remote-auth-token-env": "a task's agent runs on its own app server (--no-daemon)",
-    "--cd": "Shepherdr starts the agent in the task's folder", "--worktree": "Shepherdr gives each task its own worktree already",
-    "--last": "Shepherdr resumes the task's own session itself", "--all": "Shepherdr resumes the task's own session itself",
-    "--include-non-interactive": "Shepherdr resumes the task's own session itself",
+    "--cd": "Agent IDE starts the agent in the task's folder", "--worktree": "Agent IDE gives each task its own worktree already",
+    "--last": "Agent IDE resumes the task's own session itself", "--all": "Agent IDE resumes the task's own session itself",
+    "--include-non-interactive": "Agent IDE resumes the task's own session itself",
     "--help": "it exits before the agent starts", "--version": "it exits before the agent starts",
 }
-# -c keys Shepherdr sets itself.
+# -c keys Agent IDE sets itself.
 CODEX_KEYS = {"model": f"{_SET} model: use --model", "model_reasoning_effort": f"{_SET} effort: use --effort",
-              "service_tier": "Shepherdr sets the speed from Settings › Agents (Task agent)", "sandbox_mode": _PERM,
-              "approval_policy": _PERM, "projects": "Shepherdr trusts the task's folder itself",
-              "hooks": "Shepherdr sets the chat's question card's hook itself"}
+              "service_tier": "Agent IDE sets the speed from Settings › Agents (Task agent)", "sandbox_mode": _PERM,
+              "approval_policy": _PERM, "projects": "Agent IDE trusts the task's folder itself",
+              "hooks": "Agent IDE sets the chat's question card's hook itself"}
 
 TABLES = {"claude": (CLAUDE, CLAUDE_SHORT, CLAUDE_REFUSED), "codex": (CODEX, CODEX_SHORT, CODEX_REFUSED)}
 NAMES = {"claude": "Claude Code", "codex": "Codex"}

@@ -1,4 +1,4 @@
-// Tasks > Base branch, per space (as Shepherdr's space.base): the branch a space's new tasks
+// Tasks > Base branch, per space (as Agent IDE's space.base): the branch a space's new tasks
 // branch from and merge into. herdr-task reads tasks.base when a task is added (captured then, so
 // a change touches only new tasks); empty, they take the branch the folder has checked out. The
 // branch is checked before it's saved: here, or on origin as git last fetched it.

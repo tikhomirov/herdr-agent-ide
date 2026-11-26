@@ -1,4 +1,4 @@
-// Unread, as Slack has it (Shepherdr's src/unread.ts): a space whose Assistant (its coordinator)
+// Unread, as Slack has it (Agent IDE's src/unread.ts): a space whose Assistant (its coordinator)
 // has something new the person hasn't seen shows its sidebar row bold and bright. Only the
 // Assistant counts; task chats never make a row bold.
 // New: the agent's core counts its turns (`turn`, up each time it stops working: a reply, or its

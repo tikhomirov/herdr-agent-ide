@@ -1,6 +1,6 @@
 // Autopilot's words and picks, the same in the window (Settings › Autopilot: mods/coord-settings/autopilot-section.js;
 // the header's switch: mods/pane-chat/autopilot.js) and on the web (service/compat.ts, web/plugins/coordinators).
-// Set as Tasks is: Everywhere's heartbeat, schedule and events, and a space's own where it sets one (Shepherdr settings,
+// Set as Tasks is: Everywhere's heartbeat, schedule and events, and a space's own where it sets one (Agent IDE settings,
 // ~/.config/herdr-ide/settings.json "autopilot" = { every, events, heartbeat } in "everywhere" and in "spaces"[id], travelling
 // to every machine with the rest). A space switches it on or off in its Assistant's header. herdr-task keeps each
 // space's switch and how its wakes go (mods/tasks/bin/herdr_task/autopilot.py, ~/.local/share/herdr-ide/tasks/.autopilot.json, whose
@@ -16,7 +16,7 @@ export const ABOUT = "Turn it on in a space with the switch in its Assistant's h
   + "most useful tasks to push the project forward, toward the space's Direction (none: what the project itself shows). "
   + "It acts on its own and makes the calls itself, never asking you; it only alerts you for something critical "
   + "(money, publishing, deleting data, security, or stuck). It never merges or accepts: that stays yours.";
-// The fields a space can set its own of (Shepherdr settings' "autopilot"). direction: one line that steers it (a space's).
+// The fields a space can set its own of (Agent IDE settings' "autopilot"). direction: one line that steers it (a space's).
 export const FIELDS = ["heartbeat", "every", "events", "direction"];
 
 // Each row's label and its line under it.
@@ -165,7 +165,7 @@ export function everywhereOf(file) {
     ...(e.trigger ? { trigger: e.trigger } : {}) };
 }
 
-// A level's Autopilot in Shepherdr settings (null: Everywhere's), only what it sets: { every, events, heartbeat }.
+// A level's Autopilot in Agent IDE settings (null: Everywhere's), only what it sets: { every, events, heartbeat }.
 export function levelOf(settings, space = null) {
   const a = (space ? settings?.spaces?.[space] : settings?.everywhere)?.autopilot;
   if (!a || typeof a !== "object") return {};
@@ -173,7 +173,7 @@ export function levelOf(settings, space = null) {
 }
 const ruleText = (x) => { const t = String(x ?? "").trim(); return !t || /^(off|none|never)$/i.test(t) ? null : t; };
 
-// What applies in a space: its own on/off (off until switched on); the schedule and events it sets in Shepherdr
+// What applies in a space: its own on/off (off until switched on); the schedule and events it sets in Agent IDE
 // settings, else Everywhere's there, else Everywhere's from before (file.everywhere), else the defaults; own: what it
 // sets itself. Everything else its record holds (next_run, pending, last_wake, progress…) comes along as it is.
 // file.spaces: the file's map, or herdr-task's list of views (already what applies: taken as they are).

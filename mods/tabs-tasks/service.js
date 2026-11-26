@@ -1,4 +1,4 @@
-// Shepherdr's always-on service (3.1, service/main.ts): while it runs, it does the background work that doesn't hang on
+// Agent IDE's always-on service (3.1, service/main.ts): while it runs, it does the background work that doesn't hang on
 // what this window shows (the task tick, serving secrets to other machines), so the window leaves that to it: one runs
 // it at a time. Gone (stopped, not installed), the window does it again, as in 3.0, and starts the service once a
 // minute at most. The service's health says whether it took the work over (jobs).
@@ -14,7 +14,7 @@ let runs = false, started = false, startedAt = 0;
 export const serviceRuns = () => runs;
 
 async function check(cx) {
-  // only Shepherdr's own service counts (local.js): another app on its port is "not answering"
+  // only Agent IDE's own service counts (local.js): another app on its port is "not answering"
   const r = (await localService(cx).catch(() => null))?.health ?? null;
   runs = r?.jobs === true;
   // Not answering: start it (its systemd user unit or launchd agent), at most once a minute.

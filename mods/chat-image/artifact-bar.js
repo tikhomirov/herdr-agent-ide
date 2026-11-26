@@ -1,5 +1,5 @@
 // The artifact viewer's toolbar (props.artifact; artview.js opens it): its icon,
-// title and which version; the version stepper (‹ v3 of 5 ›, as Shepherdr steps back through
+// title and which version; the version stepper (‹ v3 of 5 ›, as Agent IDE steps back through
 // versions; "· Latest ›" when an older one shows); Mark up (mods/artifacts/markup.js draws the
 // layer over the artifact while shared "artifacts.markup" names it); Open in the sidebar; close.
 // An older version is its own mod (art-<id>--v<n>, herdr-artifact pull --version): stepping

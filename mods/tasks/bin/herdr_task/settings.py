@@ -33,7 +33,7 @@ DEFAULTS = {"tasks": {"merge": "ask", "review_rounds": 0, "must_fix": "major", "
                       "start_notes": "", "finish_notes": "", "archive_after": 7, "proof": True, "base": "", "branch": "",
                       "worktree_root": "", "setup": "", "accept_command": "", "claude_flags": [], "codex_flags": []},
             "automations": {"enabled": True}, "worker": {}, "reviewer": {}, "coordinator": {}, "backup": {},
-            "agents": {"reactions": True, "suggestions": True, "feedback": True, "feedback_repo": "eliasstravik/shepherdr"}}
+            "agents": {"reactions": True, "suggestions": True, "feedback": False, "feedback_repo": "tikhomirov/herdr-agent-ide"}}
 LEVELS = ["blocker", "major", "minor"]
 
 
@@ -69,7 +69,7 @@ def write_autopilot(space, values):
     pushed here: the window's machine holds the truth and would put its own back."""
     d = read_settings()
     if d.get("pushed_from"):
-        raise Fail("This machine's Shepherdr settings are a copy from the machine whose window sets them: change Autopilot in Settings there.")
+        raise Fail("This machine's Agent IDE settings are a copy from the machine whose window sets them: change Autopilot in Settings there.")
     if space:
         layer = (d.setdefault("spaces", {})).setdefault(space, {})
     else:
@@ -126,7 +126,7 @@ def settings_layers(s, space=None):
 
 
 def settings_for(s, space=None):
-    """The settings for this folder's tasks: Shepherdr settings' Everywhere, then this machine's,
+    """The settings for this folder's tasks: Agent IDE settings' Everywhere, then this machine's,
     then the override of the space working in this folder (--space's when several do): the most
     specific wins. The window no longer writes agent or task values for a machine (only its
     machine-only rows, read by machine_limits/machine_option); ones set before still apply here. Written by the settings window (~/.config/herdr-ide/settings.json); herdr-task only
@@ -148,7 +148,7 @@ def settings_for(s, space=None):
 
 def notes(s, task, which, space=None):
     """A task's "When a task starts" / "finishes" notes (which: "start" or "finish"): its own
-    (--start-notes / --finish-notes), else its folder's from Shepherdr settings. Herdr runs
+    (--start-notes / --finish-notes), else its folder's from Agent IDE settings. Herdr runs
     nothing itself: the notes go into the agents' starting prompts."""
     own = (task.get(f"{which}_notes") or "").strip()
     return own or (settings_for(s, space or task.get("space"))["tasks"].get(f"{which}_notes") or "").strip()
@@ -160,7 +160,7 @@ def notes_part(head, text):
 
 
 def worktrees_on(s, space=None):
-    """Tasks here get a git worktree each: in a git repo, unless the person's Shepherdr settings
+    """Tasks here get a git worktree each: in a git repo, unless the person's Agent IDE settings
     turn worktrees off for it (then it works in the folder itself, as a folder without git)."""
     return s.loc["kind"] == "repo" and settings_for(s, space)["tasks"].get("worktrees") is not False
 
@@ -176,7 +176,7 @@ def argv_for(pick):
         return a[:1] + extra + a[1:]
     agent = pick.get("agent")
     if agent == "claude":
-        # #1222: the extra flags first, each one word (flags.py), so what Shepherdr adds after them ends them
+        # #1222: the extra flags first, each one word (flags.py), so what Agent IDE adds after them ends them
         a = ["claude", *extra]
         if pick.get("model"):
             a += ["--model", pick["model"]]
@@ -292,7 +292,7 @@ def argv_model(argv):
 
 
 # ---- the Settings block: the settings that shape a task's work, as words in its brief ---------
-# As in Shepherdr: settings only change what goes into an agent's starting prompt. Every brief
+# As in Agent IDE: settings only change what goes into an agent's starting prompt. Every brief
 # ends with this block, one line per setting; a line that differs from Herdr's default says who
 # changed it. The coordinator changes one task's with `add --set key=value` (and --model, --effort,
 # --reviewer...). The brief's own words win over the block.
@@ -304,7 +304,7 @@ MERGE_WORDS = {"ask": "ask the person first: they accept it in the Tasks panel, 
                "checks": "after checks: once you say ready, Herdr merges it when its checks pass",
                "auto": "on its own: once you say ready, Herdr merges it"}
 MUST_WORDS = {"blocker": "blocker", "major": "major and up (blocker, major)", "minor": "everything (blocker, major, minor)"}
-# --set's keys (Shepherdr's spellings too) and the task fields they set.
+# --set's keys (Agent IDE's spellings too) and the task fields they set.
 SET_KEYS = {"review": "review", "brief.review": "review", "merge": "merge", "brief.merge": "merge",
             "rounds": "review_rounds", "review.rounds": "review_rounds", "review-rounds": "review_rounds", "review_rounds": "review_rounds",
             "mustfix": "must_fix", "must-fix": "must_fix", "must_fix": "must_fix", "review.mustfix": "must_fix",
@@ -314,7 +314,7 @@ SET_KEYS = {"review": "review", "brief.review": "review", "merge": "merge", "bri
             "reviewer_effort": "reviewer_effort", "reviewer-effort": "reviewer_effort",
             "proof": "proof", "brief.proof": "proof",
             "flags": "flags", "task.flags": "flags", "extra-flags": "flags", "extra_flags": "flags"}
-# The Proof line (as Shepherdr's skill asks of its task agents), on and off.
+# The Proof line (as Agent IDE's skill asks of its task agents), on and off.
 PROOF_WORDS = {"on": "show verifiable proof in one recipe artifact: each proof with a one-line caption, real and from this work now, "
                      "plus a \"Not proven\" list; then say ready with --proof <its id>",
                "off": "not needed for this task: no proof artifact; say in your summary how you checked it"}
@@ -509,13 +509,13 @@ def cli_env(name):
     return 'env "PATH=' + ":".join(dirs) + ':$PATH" '
 
 
-# --no-daemon is what every Codex Shepherdr starts gets (#745); a Codex without it exits 2 on it (#1190).
+# --no-daemon is what every Codex Agent IDE starts gets (#745); a Codex without it exits 2 on it (#1190).
 UPDATE_CODEX = "npm install -g @openai/codex@latest, or brew upgrade codex"
 _codex_old = {}
 
 
 def codex_too_old():
-    """'codex-cli 0.144.5 at <path>' when the Codex here has no --no-daemon (too old for Shepherdr), else None
+    """'codex-cli 0.144.5 at <path>' when the Codex here has no --no-daemon (too old for Agent IDE), else None
     (new enough, or unknown: never blocks on a check that couldn't run)."""
     p = cli_path("codex")
     if not p:
@@ -537,7 +537,7 @@ def codex_too_old():
 
 
 def codex_update_words(old):
-    return (f"Codex here is too old for Shepherdr ({old} has no --no-daemon). Update it ({UPDATE_CODEX}), "
+    return (f"Codex here is too old for Agent IDE ({old} has no --no-daemon). Update it ({UPDATE_CODEX}), "
             "then start again.")
 
 
@@ -687,7 +687,7 @@ def task_settings(s, t, space=None, argv=None, live=False):
             text += (f" (Codex's own default model: Codex here doesn't offer {dropped} "
                      "for the account it is signed in with)")
         if old:
-            text += (f" (your own CLI: Codex here is too old for Shepherdr, {old} has no --no-daemon; the person updates "
+            text += (f" (your own CLI: Codex here is too old for Agent IDE, {old} has no --no-daemon; the person updates "
                      f"it ({UPDATE_CODEX}), then asks for the review again)")
         elif who != want:
             text += (f" (your own CLI: {CLI_NAMES.get(want, want)} isn't signed in here"
@@ -780,12 +780,12 @@ def review_limits(s, t):
 
 
 def space_base(s, space=None):
-    """The branch a space's new tasks branch from and merge into (Shepherdr settings > Tasks >
+    """The branch a space's new tasks branch from and merge into (Agent IDE settings > Tasks >
     Base branch, per space); "" when unset: the folder's current branch."""
     return str(settings_for(s, space)["tasks"].get("base") or "").strip()
 
 
-# Shepherdr settings > Tasks > Branch names (tasks.branch, #570): a folder's new task branches.
+# Agent IDE settings > Tasks > Branch names (tasks.branch, #570): a folder's new task branches.
 # {n}: the task's number, {key}: its id (SHEP-4), {slug}: its title's words. Unset: this.
 BRANCH_PATTERN = "task/{n}-{slug}"
 
@@ -838,7 +838,7 @@ def machine_limits(machine=None):
     """A machine's start limits (Settings > Machines; HERD-40): Everywhere's ("everywhere" ->
     "machine"), then that machine's own ("machines" -> its key -> "machine"; "local" is this
     computer, and a file Herdr pushed to another machine names it in "here"). Each is a number,
-    or null for off; one not set is Shepherdr's default (machine.HOLD)."""
+    or null for off; one not set is Agent IDE's default (machine.HOLD)."""
     from .machine import hold_limits
     try:
         with open(SETTINGS) as f:

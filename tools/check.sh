@@ -3,7 +3,7 @@
 set -e
 here=$(cd "$(dirname "$0")/.." && pwd)
 cd "$here"
-python3 tools/vendor.py --check
+python3 tools/check-paths.py
 fail=0
 while IFS= read -r f; do
   node --input-type=module --check < "$f" || { echo "BAD $f"; fail=1; }

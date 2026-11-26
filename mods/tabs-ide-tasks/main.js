@@ -26,7 +26,7 @@ function find(node, id) {
   return null;
 }
 
-// Claude Code and Codex are the agents Shepherdr's chat can show.
+// Claude Code and Codex are the agents Agent IDE's chat can show.
 const chatty = (p) => Boolean(p?.terminal) && (["claude-code", "codex", "pi"].includes(p.app) || ["claude", "codex", "pi"].includes(p.program?.key));
 
 // One app command, waited for: its JSON answer.
@@ -69,7 +69,7 @@ export default class Tabs extends View {
     cx.timer.every(5000, () => sweep());
     this.pressed = null;
     this.panels = JSON.parse(localStorage.getItem("panels") ?? "{}");
-    // Shepherdr's service, which does the background work while it runs (lib/service.js).
+    // Agent IDE's service, which does the background work while it runs (lib/service.js).
     watchService(cx);
     // The person's pins, sidebar sections, icons and Notify, in step with the web app (lib/bridge.js).
     startBridge(cx);
@@ -181,7 +181,7 @@ export default class Tabs extends View {
     const button = (id, label, action) => div().id(id).size(H.sm).flex_none().flex().items_center().justify_center().rounded(RADIUS.control).cursor_pointer().text_color(t.dim).hover(s => s.bg(t.hover).text_color(t.foreground))
       .on_mouse_down("left", stop).on_click(action).child(label);
     // What needs the person, per tab (the Inbox's items), and Tasks' Ready: a red and a green
-    // count on the tab. Shepherdr settings' "Red counts" off (shared "counts.red" false): none
+    // count on the tab. Agent IDE settings' "Red counts" off (shared "counts.red" false): none
     // here, nor on Tasks.
     const counts = shared("counts.red") !== false, greens = shared("counts.green") !== false;
     const needs = counts ? countsByTab() : new Map(), readies = greens ? readyByTab() : new Map();

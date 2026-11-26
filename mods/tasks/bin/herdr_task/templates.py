@@ -37,7 +37,7 @@ AFTER_READY = ("- After ready, GitHub news on your pull request may arrive (a <h
                "`--agents-md \"<one line>\"` to your ready command. The Assistant decides whether it goes in; never commit it yourself.\n")
 _REVIEW_END = "as do findings below the bar."
 WORKER_MD_BEFORE_SUMMARY = WORKER_MD_BEFORE_GATE.replace(_REVIEW_END, _REVIEW_END + REVIEW_GATE) + AFTER_READY
-# Since the ready summary is short and for the person (HERD-64, as Shepherdr's).
+# Since the ready summary is short and for the person (HERD-64, as Agent IDE's).
 READY_LINE = ("- When the work is finished, run the `herdr-task ready` command given at the end of your brief, with a short summary.")
 SUMMARY_RULE = ("- When the work is finished, run the `herdr-task ready` command given at the end of your brief. Its summary is for "
                 "the person, like explaining it to a five-year-old: at most 160 characters of plain words on what they now see or "
@@ -50,7 +50,7 @@ ESTIMATE_OLD = "how far through the whole task you are and about how long is lef
 ESTIMATE_RULE = ("how far through the whole task you are (`--done`). Leave out `--left` at the start: add about how long is left "
                  "only once you know the work well enough for a real estimate, never a first guess. The person sees it in the Tasks panel.")
 WORKER_MD_BEFORE_CUT = WORKER_MD_BEFORE_ESTIMATE.replace(ESTIMATE_OLD, ESTIMATE_RULE)
-# Since a longer status line is cut at a word (HERD-84, as Shepherdr's): the agent knows before it writes one.
+# Since a longer status line is cut at a word (HERD-84, as Agent IDE's): the agent knows before it writes one.
 CUT_OLD = "with what you're doing now (at most 40 characters), how far"
 CUT_RULE = "with what you're doing now (at most 40 characters; a longer one is cut at a word), how far"
 WORKER_MD_BEFORE_DETAILS = WORKER_MD_BEFORE_CUT.replace(CUT_OLD, CUT_RULE)
@@ -83,8 +83,8 @@ SUBAGENTS_RULE = ("read-only, as your own helper agent that people can watch and
                   "400`, then end it with `hc kill <its name>`. Any other helper agent you want (research, a second opinion) "
                   "goes the same way, labelled herdr.role=helper. The reviewer reports")
 WORKER_MD_BEFORE_FEEDBACK = WORKER_MD_BEFORE_SUBAGENTS.replace(SUBAGENTS_OLD, SUBAGENTS_RULE)
-# Since agents offer feedback for Shepherdr itself through their Assistant (SHEP-78).
-FEEDBACK_RULE = ("- Shepherdr itself misbehaving, not your task's own code (a Shepherdr, herdr-task, web app or window feature that doesn't work as meant, a Herdr command failing like a bug, the person frustrated with Shepherdr, or a \"Shepherdr feedback:\" line in your reviewer's findings): run the `herdr-task feedback` command given at the end of your brief, once per problem, then carry on. It returns at once and your Assistant asks the person whether to file it; never file an issue yourself, and put no secrets, private paths or whole logs in it.\n")
+# Since agents offer feedback for Agent IDE itself through their Assistant (SHEP-78).
+FEEDBACK_RULE = ("- Agent IDE itself misbehaving, not your task's own code (a Agent IDE, herdr-task, web app or window feature that doesn't work as meant, a Herdr command failing like a bug, the person frustrated with Agent IDE, or a \"Agent IDE feedback:\" line in your reviewer's findings): run the `herdr-task feedback` command given at the end of your brief, once per problem, then carry on. It returns at once and your Assistant asks the person whether to file it; never file an issue yourself, and put no secrets, private paths or whole logs in it.\n")
 WORKER_MD_BEFORE_COMMAND = WORKER_MD_BEFORE_FEEDBACK + FEEDBACK_RULE
 # Since the brief's Reviewer line gives the reviewer's whole command: Codex's with --no-daemon (#745).
 COMMAND_OLD = "its command `codex --sandbox read-only --ask-for-approval never` or `claude --permission-mode plan` (never"
@@ -127,13 +127,13 @@ REVIEWER_MD_BEFORE_SUBAGENT = """You review one Herdr task's work before it can 
 REVIEWER_MD_BEFORE_FEEDBACK = REVIEWER_MD_BEFORE_SUBAGENT + ("- You run as the worker's helper agent, in a chat people can watch. Your findings are your last message: "
                                              "the worker reads them there. Write them as a plain message, never as a plan to approve, "
                                              "and start no other agents.\n")
-# Since agents offer feedback for Shepherdr itself (SHEP-78): a reviewer's goes through its worker.
-REVIEWER_FEEDBACK = ("- Shepherdr itself misbehaving while you review (a Herdr command or feature failing like a bug, not the task's code): "
-                     "one line in your findings starting \"Shepherdr feedback:\", what happened and what you expected; your worker passes it on.\n")
+# Since agents offer feedback for Agent IDE itself (SHEP-78): a reviewer's goes through its worker.
+REVIEWER_FEEDBACK = ("- Agent IDE itself misbehaving while you review (a Herdr command or feature failing like a bug, not the task's code): "
+                     "one line in your findings starting \"Agent IDE feedback:\", what happened and what you expected; your worker passes it on.\n")
 REVIEWER_MD_BEFORE_SANDBOX = REVIEWER_MD_BEFORE_FEEDBACK + REVIEWER_FEEDBACK
 # Since a Codex reviewer's read-only sandbox can't run every check (#840): it says which, and its worker runs them.
 REVIEWER_SANDBOX = ("- A check that can't run in a read-only sandbox (Codex's): `herdr-app check` hangs there on the window's "
-                    "services and `shepherdr doctor` can't reach the Shepherdr service, as with anything needing the network, a "
+                    "services and `herdr-task where` can't reach the Agent IDE service, as with anything needing the network, a "
                     "window or writes outside the folder. Don't run or wait on those: list them in your findings under \"Not run "
                     "in my sandbox:\", and your worker runs them and checks the output.\n")
 REVIEWER_MD_BEFORE_CLAUDE = REVIEWER_MD_BEFORE_SANDBOX + REVIEWER_SANDBOX

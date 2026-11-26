@@ -1,7 +1,7 @@
-// Agents > Feedback offers and Feedback repo (herdr-task's feedback.py, SHEP-78): when Shepherdr
+// Agents > Feedback offers and Feedback repo (herdr-task's feedback.py, SHEP-78): when Agent IDE
 // itself misbehaves, an agent offers once to file it as a GitHub issue, filed only on the person's
 // yes. The switch is per scope (as Reactions); the repo it files to is Everywhere's only (one box:
-// owner/name, a github.com link made one, empty for Shepherdr's own repo).
+// owner/name, a github.com link made one, empty for Agent IDE's own repo).
 
 import { div } from "gpui-kit";
 import { v_flex, InputState, Input } from "gpui-base";

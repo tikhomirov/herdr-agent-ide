@@ -168,8 +168,8 @@ def ensure_scheduler_quietly():
 
 def set_base(s, t, base, space=None, new=False):
     """--base: the branch a worktree task branches from and merges into (its pull request's base).
-    Without it a new task takes its space's base branch (Shepherdr settings > Tasks > Base branch,
-    as Shepherdr's space.base: captured when added, so a later change only touches new tasks);
+    Without it a new task takes its space's base branch (Agent IDE settings > Tasks > Base branch,
+    as Agent IDE's space.base: captured when added, so a later change only touches new tasks);
     unset, the folder's current branch, kept unmarked. "" goes back to the folder's."""
     if base is None:
         own = space_base(s, space) if new and t.get("mode") == "worktree" else ""
@@ -178,7 +178,7 @@ def set_base(s, t, base, space=None, new=False):
             try:
                 base_ref(main, own)
             except Fail as e:
-                raise Fail(f"This space's base branch is {own} (Shepherdr settings > Tasks > Base branch), but: {e} "
+                raise Fail(f"This space's base branch is {own} (Agent IDE settings > Tasks > Base branch), but: {e} "
                            "Change the setting, or pass --base.")
             t["base"], t["base_set"], t["base_by"] = own, True, "space"
         return
@@ -486,7 +486,7 @@ def folder_desc(t, s):
 
 
 def ready_words(args):
-    """The ready summary in one line, refused past SUMMARY_MAX (as Shepherdr's) before anything
+    """The ready summary in one line, refused past SUMMARY_MAX (as Agent IDE's) before anything
     changes; --details, any length, as written."""
     said = " ".join(str(args.summary or "").split())
     if len(said) > SUMMARY_MAX:
@@ -541,7 +541,7 @@ def base_pr(s, t):
 
 def pr_words(t, args):
     """--pr-title / --pr-body / --draft (#1087, #1155): kept on the task; the pull request opens with them, and a later
-    ready that gives them again changes the open one (github.pr_open). "" goes back to Shepherdr's own."""
+    ready that gives them again changes the open one (github.pr_open). "" goes back to Agent IDE's own."""
     for k in ("pr_title", "pr_body"):
         v = getattr(args, k, None)
         if v is None:
@@ -670,7 +670,7 @@ def rounds_used(t):
 
 
 def review_refusal(s, t, wt):
-    """Why ready is refused for review (as Shepherdr's: `ready` waits for a review of the final
+    """Why ready is refused for review (as Agent IDE's: `ready` waits for a review of the final
     commit), or None. Only tasks whose brief taught `reviewed` (review_gate) and whose Settings
     block says Review: on. A worktree task's final commit must be one a round was recorded on; a
     task in the folder itself needs a round recorded since it started. Out of rounds, only the
@@ -835,7 +835,7 @@ def cmd_reviewed(args):
 
 
 def cmd_review_more(args):
-    """The Assistant gives a task exactly one more review round (as Shepherdr's `task review-more`):
+    """The Assistant gives a task exactly one more review round (as Agent IDE's `task review-more`):
     only once all its rounds are used. The limit stops an agent reviewing for ever, so the task's
     own agent can never raise it. Its agent is told."""
     labels = caller_labels()
@@ -895,7 +895,7 @@ STATUS_WAIT = 15
 
 def cmd_status(args):
     """A task agent says what it's doing, how far along it is and the time left, at the start, at
-    each natural step and at least every 5 minutes (as Shepherdr's `shepherdr status`). Herdr guesses nothing: it shows
+    each natural step and at least every 5 minutes (as Agent IDE's `shepherdr status`). Herdr guesses nothing: it shows
     what the agent said and counts the minutes down while it works."""
     text = " ".join(str(args.text or "").split())
     if not text:
@@ -926,7 +926,7 @@ ALERT = "herdr.alert"
 
 
 def cmd_alert(args):
-    """An agent tells the person something that can't wait (as Shepherdr's `shepherdr alert`): a
+    """An agent tells the person something that can't wait (as Agent IDE's `shepherdr alert`): a
     toast and a sound in every Herdr window. Never asks permission. A task's agent (or an alert
     --task names) always reaches the person; an Assistant's follows its space's Notify (Off:
     nothing). It sets the core label herdr.alert on the caller's own terminal, which every Herdr
@@ -1226,7 +1226,7 @@ def start_again(s, t, space, key=None, argv_json=None, message=None, parent=None
 
 # SHEP-189: what a resumed agent hears first. Its session comes back with no message, so without this
 # it sat idle until someone wrote to it.
-RESUME_NUDGE = ("Shepherdr resumed your session because your agent had stopped. Carry on where you left off: check "
+RESUME_NUDGE = ("Agent IDE resumed your session because your agent had stopped. Carry on where you left off: check "
                 "what is already done with `herdr-task show`, then keep going with the task.")
 
 
@@ -1257,7 +1257,7 @@ def cmd_resume(args):
 
 # SHEP-211: what a session resumed by switch hears first. Without it the new agent sat idle on the old one's
 # interrupted turn ("Interrupted · What should Claude do instead?") and the task showed a false "needs you".
-SWITCH_NUDGE = ("Shepherdr restarted your session on a new agent (the task's agent, model or settings changed), "
+SWITCH_NUDGE = ("Agent IDE restarted your session on a new agent (the task's agent, model or settings changed), "
                 "which stopped your last turn part-way. Nothing is wrong and nobody is waiting on you: carry on "
                 "where you left off (check what is already done with `herdr-task show` and git), then keep going "
                 "with the task.")

@@ -31,14 +31,14 @@ const ANNOT_DIR = path.join(STATE_DIR, "annotations");
 const SHOT_DIR = path.join(HOME, "Pictures", "herdr-screenshots");
 const START_PAGE = "file://" + path.join(__dirname, "start.html");
 
-// agent-browser: $HERDR_IDE_AGENT_BROWSER, else the PATH's, else Shepherdr's own copy.
+// agent-browser: $HERDR_IDE_AGENT_BROWSER, else the PATH's, else Agent IDE's own copy.
 function findAgentBrowser() {
   if (process.env.HERDR_IDE_AGENT_BROWSER) return process.env.HERDR_IDE_AGENT_BROWSER;
   for (const d of (process.env.PATH || "").split(path.delimiter)) {
     const p = path.join(d, "agent-browser");
     try { fs.accessSync(p, fs.constants.X_OK); return p; } catch {}
   }
-  const base = path.join(HOME, ".local", "share", "shepherdr", "agent-browser");
+  const base = path.join(HOME, ".local", "share", "herdr-ide", "agent-browser");
   try {
     for (const v of fs.readdirSync(base).sort().reverse()) {
       const p = path.join(base, v, "agent-browser");

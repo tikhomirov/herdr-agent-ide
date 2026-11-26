@@ -18,8 +18,8 @@ export const keptLine = (name, at) => `<hc from="person" secret="${name}">Kept: 
 
 export const declinedLine = (name) => `<hc from="person" secret="${name}">Declined: ${name}. The person won't give it now: go on without it, or say plainly what you can't do without it. Don't ask for its value in the chat.</hc>`;
 
-// Which machine keeps the secrets (Settings › Secrets › Kept on): herdr-core document "shepherdr.secrets" = { id, at, by,
-// auto? } on every machine (id: that machine's herdr-core id), as "shepherdr.host" is for Serve from (core/host.js): the
+// Which machine keeps the secrets (Settings › Secrets › Kept on): herdr-core document "herdr-ide.secrets" = { id, at, by,
+// auto? } on every machine (id: that machine's herdr-core id), as "herdr-ide.host" is for Serve from (core/host.js): the
 // newest record wins, each service hands it on to the machines it links, and a machine believes its own record or a
 // newer one from the machine that keeps the secrets now (none of its own yet: the newest it's handed).
 // By default they follow Serve from (auto: true, "Same as Serve from" in Settings): nobody named a machine, so the
@@ -28,7 +28,7 @@ export const declinedLine = (name) => `<hc from="person" secret="${name}">Declin
 // the same way. The person picking another machine in Kept on overrides it (a record without auto); picking the Serve
 // from machine follows it again. No record anywhere yet: the machine without ~/.local/share/herdr-ide/secrets/remote keeps them
 // (bin/herdr-secret remote()). `shepherdr secrets move-to <machine>` moves them (service/secrets-move.ts).
-export const SECRETS_DOC = "shepherdr.secrets";
+export const SECRETS_DOC = "herdr-ide.secrets";
 
 /** A record as it may be believed: { id, at, by?, auto? } with a sane time, else null. */
 export function secretsRecord(v, now = Date.now()) {

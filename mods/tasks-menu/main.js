@@ -19,7 +19,7 @@ import { menuRow, heading, toast, TEXT } from "./ui.js";
 import { taskMenu } from "./core/menus.js";
 import { detach, settle } from "./core/pending.js";
 
-// Shepherdr's GROUP_WORDS (core/tasks.js GROUP_BY).
+// Agent IDE's GROUP_WORDS (core/tasks.js GROUP_BY).
 const GROUPS = [{ key: "you", label: "For you" }, { key: "space", label: "Space" }, { key: "status", label: "Status" }];
 
 // The menu's sections, each a title (or none), its items, which is checked and what a pick does.

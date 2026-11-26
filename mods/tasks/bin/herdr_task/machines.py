@@ -35,7 +35,7 @@ from .addons import off_note
 # What a machine needs to run tasks: herdr-task (one zipapp), herdr-artifact (with its guide and
 # markup), herdr-secret (a remote copy: it asks the main machine), herdr-browser once it exists,
 # and the role templates. Each goes to the same place under that machine's home as here
-# (~/.local/bin/..., ~/.config/herdr-core/templates/...). A stamp there (tools.json in Shepherdr's data;
+# (~/.local/bin/..., ~/.config/herdr-core/templates/...). A stamp there (tools.json in Agent IDE's data;
 # STAMP names its old place, which SHEP turns into wherever it is on that machine)
 # records what was installed (each file's sha256 and its source's time), so a machine that is
 # current is skipped, an older copy never replaces a newer one, and a template someone changed
@@ -44,7 +44,7 @@ from .addons import off_note
 ROLES = ("assistant", "worker", "reviewer")
 ARTIFACT_HOME = ".local/share/herdr/artifacts"
 # The installed web app's artifact viewer in one file (bin/shepherdr installs web/dist there), synced beside herdr-artifact
-VIEWER_BUILT = os.path.join(".local", "share", "shepherdr", "web", "dist", "artifact-viewer.html")
+VIEWER_BUILT = os.path.join(".local", "share", "herdr-ide", "web", "dist", "artifact-viewer.html")
 STAMP = ".herdr/tools.json"
 MACHINES = os.path.join(STORE, ".machines.json")
 SYNC_DEBOUNCE_MS = 30000        # files changed here: wait until they stay put this long
@@ -83,7 +83,7 @@ def _core_dir():
 
 def secrets_main_here():
     """Whether this machine keeps the secrets (bin/herdr-secret remote()): herdr-core's document
-    "shepherdr.secrets" names it, or, none named yet, it has a vault and no remote mark. Only then
+    "herdr-ide.secrets" names it, or, none named yet, it has a vault and no remote mark. Only then
     does a copy of herdr-secret it installs elsewhere get marked as asking another machine: a hub
     that doesn't keep them (the Mac mini) once marked the main machine remote (SHEP-11)."""
     def js(path):
@@ -93,7 +93,7 @@ def secrets_main_here():
         except (OSError, ValueError):
             return None
     docs, core = js(os.path.join(_core_dir(), "docs.json")) or {}, js(os.path.join(_core_dir(), "core.json")) or {}
-    rec = ((docs.get("shepherdr.secrets") if isinstance(docs, dict) else None) or {}).get("value")
+    rec = ((docs.get("herdr-ide.secrets") if isinstance(docs, dict) else None) or {}).get("value")
     if isinstance(rec, dict) and rec.get("id"):
         return isinstance(core, dict) and rec["id"] == core.get("id")
     return os.path.isfile(WHERE.path("vault")) and not os.path.exists(WHERE.path("secret-remote"))
@@ -181,7 +181,7 @@ def P(r):
         return os.path.join(X, r[len(".config/"):])
     return os.path.join(H, r)
 ''' + layout.PY + r'''
-# Shepherdr's own files (the stamp, the secrets' marks) where they are on that machine: its own
+# Agent IDE's own files (the stamp, the secrets' marks) where they are on that machine: its own
 # folders once its data moved there, else ~/.herdr (SHEP: herdr_task/layout.py).
 def sha(p):
     try:
@@ -266,11 +266,11 @@ for l in x["links"]:
             st = "failed: " + str(e)
     out["links"][l["path"]] = st
 def main_here():
-    # the record naming the machine that keeps the secrets ("shepherdr.secrets"), and this one's id
+    # the record naming the machine that keeps the secrets ("herdr-ide.secrets"), and this one's id
     core = os.path.join(os.environ.get("XDG_STATE_HOME") or P(".local/state"), "herdr-core", "default")
     try:
         with open(os.path.join(core, "docs.json")) as f:
-            rec = (json.load(f).get("shepherdr.secrets") or {}).get("value") or {}
+            rec = (json.load(f).get("herdr-ide.secrets") or {}).get("value") or {}
         with open(os.path.join(core, "core.json")) as f:
             me = json.load(f).get("id")
     except Exception:
@@ -405,7 +405,7 @@ def sync(names=None, op="install", force=False):
 
     def one(name):
         if held:
-            out[name] = {"machine": name, "state": "held", "details": [f"{held} (shepherdr doctor lets it go)"], "version": m["version"]}
+            out[name] = {"machine": name, "state": "held", "details": [f"{held} (herdr-task where lets it go)"], "version": m["version"]}
             return
         out[name] = sync_machine(name, m, op, force) if links[name].get("state") == "connected" else \
             {"machine": name, "state": "unreachable", "details": [f"herdr-core link {links[name].get('state')}"], "version": m["version"]}

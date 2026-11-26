@@ -1,4 +1,4 @@
-// Settings: Shepherdr's settings window (the sidebar foot's Shepherdr; lib/ui.js openSettings). How
+// Settings: Agent IDE's settings window (the sidebar foot's Agent IDE; lib/ui.js openSettings). How
 // Assistants, workers and reviewers run, how tasks are reviewed, merged and queued, Autopilot,
 // Notify, Secrets, Machines and the Window's switches; Herdr's own settings are the sidebar foot's
 // other button, Settings. Props: { space?: that space's own settings, section? }.
@@ -64,7 +64,7 @@ const withValue = (opts, v, words) => (opts.some(([k]) => k === v) ? opts : [...
 const daysWord = (d) => plural(d, "day", "days");
 const roundsWord = (n) => plural(n, "round", "rounds");
 // A pushed copy's mark: a machine whose file lacks it keeps its own settings, and is left alone.
-// Its settings file wherever that machine keeps it (its Shepherdr folders, or ~/.herdr on an older one: core/paths.js SH).
+// Its settings file wherever that machine keeps it (its Agent IDE folders, or ~/.herdr on an older one: core/paths.js SH).
 const PUSH = `${SH}f="$SHEP_SETTINGS"; mkdir -p "$(dirname "$f")" || exit 1
 if [ -f "$f" ] && ! grep -q '"pushed_from"' "$f"; then echo own; exit 0; fi
 if [ -f "$f" ] && [ "$(cat "$f")" = "$1" ]; then exit 0; fi
@@ -215,7 +215,7 @@ export default class ShepherdrSettings extends View {
     else if (own[key] && typeof own[key] === "object") { delete own[key][field]; if (!Object.keys(own[key]).length) delete own[key]; }
   }
 
-  // As Shepherdr's: setting what this scope would inherit anyway unsets it, so it follows again.
+  // As Agent IDE's: setting what this scope would inherit anyway unsets it, so it follows again.
   // Autopilot's Everywhere is always written: what it inherits is this machine's from before, and
   // another machine's may differ.
   set(key, field, value, cx) {
@@ -459,7 +459,7 @@ export default class ShepherdrSettings extends View {
 
   // Sections -------------------------------------------------------------
 
-  // Notify (notify.js), as Shepherdr's: what reaches you from a space's Assistant. A space's own
+  // Notify (notify.js), as Agent IDE's: what reaches you from a space's Assistant. A space's own
   // is set in its settings or its sidebar menu.
   notify(t) {
     const sc = this.scope;
@@ -557,7 +557,7 @@ export default class ShepherdrSettings extends View {
         this.scoped("tasks", "review_rounds")))
       .when(rounds > 0, (el) => el.child(this.row(t, rowTitle("tasks.must_fix"), ABOUT["tasks.must_fix"],
         segmented("mustfix", MUST_FIX, k.must_fix, (v, _e, cx) => this.set("tasks", "must_fix", v, cx)), this.scoped("tasks", "must_fix"))))
-      // As Shepherdr's task agents: one artifact of real proof the Accept card links to. Only a
+      // As Agent IDE's task agents: one artifact of real proof the Accept card links to. Only a
       // line in each brief's Settings block (herdr-task's Proof line); a task may turn it off.
       .child(this.row(t, rowTitle("tasks.proof"), ABOUT["tasks.proof"],
         toggleSwitch("proof", k.proof !== false, (next, _e, cx) => this.set("tasks", "proof", next, cx)), this.scoped("tasks", "proof")))

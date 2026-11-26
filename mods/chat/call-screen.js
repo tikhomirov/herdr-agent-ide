@@ -1,5 +1,5 @@
 // A voice call's screen in the Herdr window (SHEP-51, core/screen.js): the voice agent's fallback for what its
-// Shepherdr tools can't do, as the web page's (web/plugins/voice/screen.ts) but with what a mod can reach. A mod can't
+// Agent IDE tools can't do, as the web page's (web/plugins/voice/screen.ts) but with what a mod can reach. A mod can't
 // read another mod's drawing, so the window's screen is its frame, read from Herdr: the spaces, the shown space's tabs,
 // the side panel's tabs (Files, Changes, Tasks, Artifacts) and an open task's tabs (Chat, Terminal, Pull request,
 // Artifacts, Browser), the call's own chat (scrolled

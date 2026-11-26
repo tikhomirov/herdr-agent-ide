@@ -10,7 +10,7 @@ from .store import locate, read_list, Store, store_files
 
 
 # ---- archive --------------------------------------------------------------------------------
-# Done tasks archive themselves after a while (Shepherdr settings > Tasks > Archive Done after:
+# Done tasks archive themselves after a while (Agent IDE settings > Tasks > Archive Done after:
 # tasks.archive_after, in days; 0 or "off": never). Metadata only: an archived task keeps its
 # record, chat and summary, and leaves every list and count (the Tasks panel's Archived row shows
 # it, `list --archived` lists it). Its agent at work again (someone wrote to it), or a command that

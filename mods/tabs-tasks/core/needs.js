@@ -3,7 +3,7 @@
 // lib/COPIES (beside lib/inbox.js, which re-exports it). Edit it here, never a copy.
 import { words } from "./asks.js";
 
-// At most this many characters, as Shepherdr's status lines (herdr-task's LINE_MAX).
+// At most this many characters, as Agent IDE's status lines (herdr-task's LINE_MAX).
 export const LINE_MAX = 40;
 export const REASONS = { plan: "Plan to approve", permission: "Asks permission", question: "Question for you",
   reply: "Waits for your reply", signedOut: "Signed out", stopped: "Agent stopped", trust: "Asks to trust this folder" };

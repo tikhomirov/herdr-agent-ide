@@ -110,8 +110,8 @@ function folderOf(space) {
   return p?.cwd || agent?.cwd || space.folder || home();
 }
 
-// Shepherdr settings (mods/coord-settings writes them; herdr-task reads them too):
-// Shepherdr's settings file (~/.config/herdr-ide/settings.json) = { version, everywhere: SETTINGS, machines: { <machine>: SETTINGS },
+// Agent IDE settings (mods/coord-settings writes them; herdr-task reads them too):
+// Agent IDE's settings file (~/.config/herdr-ide/settings.json) = { version, everywhere: SETTINGS, machines: { <machine>: SETTINGS },
 //   spaces: { <space id>: { folder, name, machine, ...SETTINGS } } }
 // with SETTINGS = { coordinator, worker, reviewer: { agent, model, effort, fast, perm },
 //   tasks: { merge: "auto"|"checks"|"ask", review_rounds, must_fix: "blocker"|"major"|"minor", max_running,
@@ -123,7 +123,7 @@ function folderOf(space) {
 // anything it set for all its spaces before machine scope went.
 export const SHEPHERDR_FILE = () => dirs().settings;   // ~/.config/herdr-ide/settings.json (lib/dirs.js)
 export const SHEPHERDR_DEFAULTS = { tasks: { merge: "ask", review_rounds: 0, must_fix: "major", max_running: 10, archive_after: 7 }, automations: { enabled: true },
-  agents: { reactions: true, suggestions: true, feedback: true, feedback_repo: "" } };
+  agents: { reactions: true, suggestions: true, feedback: false, feedback_repo: "" } };
 export const LOCAL_MACHINE = "local";
 export async function readShepherdr() {
   try { return JSON.parse((await readTextFile(SHEPHERDR_FILE())) ?? "{}") ?? {}; } catch { return {}; }
@@ -184,7 +184,7 @@ export async function openCoordinator(space, show = true, settings = null) {
     return;
   }
   const folder = folderOf(space);
-  // Unless the New space dialog chose, the coordinator runs what Shepherdr settings say for the space.
+  // Unless the New space dialog chose, the coordinator runs what Agent IDE settings say for the space.
   if (!settings) settings = shepherdrFor(await readShepherdr(), space.id).coordinator;
   const slot = `coord-${space.id}-${Math.random().toString(36).slice(2, 10)}`;
   const was = focused();
@@ -364,7 +364,7 @@ function liveSlots() {
   return Object.fromEntries(Object.entries(slots).filter(([, s]) => !s.pane || have.has(s.pane)));
 }
 
-// Whether a machine runs a Shepherdr window of its own (its herdr-app home has mods): that window
+// Whether a machine runs a Agent IDE window of its own (its herdr-app home has mods): that window
 // gives its own new spaces their Assistant, so this one leaves them be. Asked once per machine.
 const ownWindow = new Map();
 function hasOwnWindow(machine) {
@@ -380,7 +380,7 @@ function hasOwnWindow(machine) {
 const wasReady = new Set();
 
 // Called from the tab bar's render: every new space gets a coordinator tab, on this computer and on
-// other machines (one with a Shepherdr window of its own sees to its own). Spaces there when this
+// other machines (one with a Agent IDE window of its own sees to its own). Spaces there when this
 // first ran, made while it was off, or made on a machine while it was away, are left alone.
 export function watchNewSpaces(spaces) {
   if (machines().find((m) => m.name == null)?.layout !== "ready") return;

@@ -12,7 +12,7 @@ export const RANK_OF = Object.fromEntries(["needs", "ready", "merging", "working
 // The list's order: its groups, and the filter row's chips.
 // Scheduled (SHEP-38, herdr-task --at/--in): a task that starts by itself at a time, after Queued (it waits longer).
 export const ORDER = ["needs", "ready", "merging", "working", "queued", "scheduled", "todo", "done", "automations"];
-// How the list can be grouped (the ⋯ menu's Group by; Shepherdr's GROUP_WORDS). "folder" was Space's old key.
+// How the list can be grouped (the ⋯ menu's Group by; Agent IDE's GROUP_WORDS). "folder" was Space's old key.
 export const GROUP_BY = ["you", "space", "status"];
 // A grouping's key: "folder" was Space's; Machine and Machine › Space are gone (SHEP-98): For you.
 export const groupBy = (v) => (v === "folder" ? "space" : GROUP_BY.includes(v) ? v : "you");
@@ -261,7 +261,7 @@ export function order(section) {
   return (a, b) => (b.task.ready_at ?? b.task.started ?? 0) - (a.task.ready_at ?? a.task.started ?? 0);
 }
 
-// Whether every word typed is in one of these, any case (Shepherdr's matches(): its lists' filters).
+// Whether every word typed is in one of these, any case (Agent IDE's matches(): its lists' filters).
 export function matches(q, ...fields) {
   const words = String(q).toLowerCase().split(/\s+/).filter(Boolean);
   const all = fields.filter((f) => f != null && f !== "").join(" ").toLowerCase();
@@ -288,10 +288,10 @@ export function ago(ms, suffix = true, now = Date.now()) {
 // already in mixed case ("iOS") is left as it is.
 export const capital = (s) => (/^[a-z](?![A-Z])/.test(String(s)) ? s[0].toUpperCase() + s.slice(1) : s);
 
-// Time left, as Shepherdr writes it short under a working row's glyph: "6m", "<1m", "2h".
+// Time left, as Agent IDE writes it short under a working row's glyph: "6m", "<1m", "2h".
 export const short = (n) => (n < 1 ? "<1m" : n < 60 ? `${n}m` : `${Math.round(n / 60)}h`);
 
-// A row's second line, as Shepherdr's: Needs you and Merging, why; Working, why or what its agent says it's
+// A row's second line, as Agent IDE's: Needs you and Merging, why; Working, why or what its agent says it's
 // doing (w: reportOf); Queued, what it waits for (queued: queueReason's words); Ready, since when.
 export function secondLine(p, w, queued = null, now = Date.now()) {
   const { section } = p;

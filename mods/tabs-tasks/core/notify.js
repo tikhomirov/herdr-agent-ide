@@ -1,4 +1,4 @@
-// Notify, as Shepherdr's (shared/alerts.ts): what reaches the person from a space's Assistant.
+// Notify, as Agent IDE's (shared/alerts.ts): what reaches the person from a space's Assistant.
 //   All       every new message from it alerts too
 //   Needs me  its questions and alerts (the default)
 //   Off       nothing from it; its sidebar row is muted: dimmed, a crossed-out bell, never bold

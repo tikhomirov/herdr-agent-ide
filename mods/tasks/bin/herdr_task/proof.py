@@ -1,4 +1,4 @@
-"""A task's proof and what its Accept card shows (as Shepherdr's merge card): the proof artifact
+"""A task's proof and what its Accept card shows (as Agent IDE's merge card): the proof artifact
 its agent made, and the evidence from Git, GitHub and that artifact, never the agent's own words
 (only its summary)."""
 

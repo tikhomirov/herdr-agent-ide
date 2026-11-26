@@ -135,4 +135,4 @@ fi
 
 command -v node >/dev/null 2>&1 || echo "warning: node is needed (the browser viewer is a Node script)" >&2
 command -v agent-browser >/dev/null 2>&1 || echo "note: install the browser engine with: npm i -g agent-browser && agent-browser install" >&2
-echo "Next: herdr-app do layout.switch '{\"name\":\"ide\"}'"
+echo "Next: herdr-app do layout.switch '{\"name\":\"ide-coord\"}'"

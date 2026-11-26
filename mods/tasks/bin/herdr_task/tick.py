@@ -461,7 +461,7 @@ def lost_logs_pass(report, folder=None):
                     report.setdefault("logs_found", []).append(s.ref(t))
 
 
-# ---- Done tasks end their agents (as Shepherdr) -----------------------------------------------
+# ---- Done tasks end their agents (as Agent IDE) -----------------------------------------------
 # A Done task's worker and reviewer terminals end (their shells too) once the final news went
 # and its agent is quiet; their sessions stay recorded on the task, so `resume` brings one back
 # (which makes it running again). Ready tasks keep theirs. Only terminals labelled with that

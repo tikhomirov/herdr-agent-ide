@@ -15,7 +15,7 @@
 //            told it to carry on after 1, 2, 4 and 8 minutes, and the fifth try was cut off too,
 //            or the error is one waiting can't fix (signed out, out of allowance)
 //
-// Each item says why in at most 40 characters (reasonOf: as Shepherdr, a standard reason or the
+// Each item says why in at most 40 characters (reasonOf: as Agent IDE, a standard reason or the
 // agent's own question cut to fit, never its message pasted): the Tasks row, the red counts'
 // alerts and toasts say the same. A task's reason is herdr-task's (its why); an ask's comes from
 // the hook's request; a waiting agent's from its own status report (OSC 7501 kind).
@@ -156,7 +156,7 @@ async function alert(a) {
 
 // ---- agents' alerts --------------------------------------------------------------------------
 
-// `herdr-task alert "<title>" --body "<why>"` (as Shepherdr's `shepherdr alert`): the agent's own
+// `herdr-task alert "<title>" --body "<why>"` (as Agent IDE's `shepherdr alert`): the agent's own
 // terminal gets the core label herdr.alert = { id, at, title, body, task?, about? }, which every
 // Herdr client sees at once. Each new one: the blocked sound and a toast, a click on it goes to
 // the agent (a task's chat in the Tasks panel). A task's agent, or an alert about a task
@@ -239,7 +239,7 @@ async function readTasksNow() {
     const on = machine ? ["--on", machine] : [];
     const list = await json(CLI(), [...on, "list", "--all", "--json"]);
     for (const g of Array.isArray(list) ? list : []) for (const x of g.tasks ?? []) {
-      // Ready: herdr-task's own status, the same as Tasks' Ready group and Shepherdr's green
+      // Ready: herdr-task's own status, the same as Tasks' Ready group and Agent IDE's green
       // counts (not Merging, nor one whose agent asks: that agent is a "blocked" item).
       // "asks": its agent waits (a live blocked terminal, an item of its own): kept for its reason.
       // "provider": cut off by its model's provider, the tries used up (herdr-task tick).

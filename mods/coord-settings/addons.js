@@ -1,4 +1,4 @@
-// Add-ons (Shepherdr 3.0.0, everything is a plugin): each feature can be switched off in Shepherdr
+// Add-ons (Agent IDE 3.0.0, everything is a plugin): each feature can be switched off in Agent IDE
 // settings > Window. lib/addons.json names each one, what it is made of and what it needs; an
 // add-on without "switch" is always on. The off list lives in two places that say the same:
 // shared "addons.off" (what the window's mods read, so a flip shows at once) and "everywhere.off"
@@ -15,7 +15,7 @@ import { shared, setShared, appHome, readTextFile } from "herdr";
 
 export const off = () => (Array.isArray(shared("addons.off")) ? shared("addons.off") : []);
 
-// Agent IDE does not ship Shepherdr's voice, web app or usage insights.
+// Agent IDE does not ship Agent IDE's voice, web app or usage insights.
 const DROPPED = ["voice", "web", "insights"];
 export const on = (id) => !DROPPED.includes(id) && !off().includes(id);
 

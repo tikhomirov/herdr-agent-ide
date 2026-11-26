@@ -9,7 +9,7 @@ from .agents import fit, from_person, log_tail, REASONS
 # ---- provider errors ------------------------------------------------------------------------
 # A turn cut off by the model's provider is no question for the person: Herdr waits and tells
 # the agent to carry on after PROVIDER_WAITS minutes; only when the fifth try is cut off too (or
-# the error is one waiting can't fix) does it need them. As Shepherdr's provider-error.ts: the
+# the error is one waiting can't fix) does it need them. As Agent IDE's provider-error.ts: the
 # CLI's own log says what cut it off (its code and HTTP status where it has them, else its words).
 
 PROVIDER_WAITS = [1, 2, 4, 8]

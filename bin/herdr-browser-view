@@ -33,7 +33,7 @@ const name = task.replace(/[^A-Za-z0-9_-]/g, "-").replace(/-+/g, "-").replace(/^
 const session = name.length <= 32 ? `herdr-${name}`
   : `herdr-${name.slice(-20).replace(/^-+/, "")}-${require("crypto").createHash("sha256").update(task).digest("hex").slice(0, 8)}`;
 const HOME = process.env.HOME;
-// Shepherdr's state folder once this machine's data moved there (herdr_task/layout.py), else the old ~/.herdr/browser
+// Agent IDE's state folder once this machine's data moved there (herdr_task/layout.py), else the old ~/.herdr/browser
 const ROOT = (() => {
   const env = process.env, abs = (p) => (p && p.startsWith("/") ? p : null);
   const one = abs(env.HERDR_IDE_HOME);

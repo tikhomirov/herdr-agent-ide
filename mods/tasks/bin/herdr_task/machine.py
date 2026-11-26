@@ -1,5 +1,5 @@
 """A machine's health (CPU, memory, disk) and what is left of its CLIs' plans, read on the machine
-itself (HERD-40, as Shepherdr's health and plan-limits). Standalone, so it runs anywhere with
+itself (HERD-40, as Agent IDE's health and plan-limits). Standalone, so it runs anywhere with
 nothing installed: Herdr's sidebar sends it as `python3 -c <this file> [--limits]` through
 `hc exec --on <machine>` and reads the JSON it prints, {"health": {...}, "limits": {...}}; and
 herdr-task's tick imports it to hold new tasks while its machine is too busy (hold_reason).
@@ -23,9 +23,9 @@ HOME = os.path.expanduser("~")
 MAC = sys.platform == "darwin"
 
 # New tasks wait while the 1-minute load is over this many times the cores, or memory or the
-# fullest disk (home, /tmp) is over this share (%): Shepherdr's start limits, and its disk alert.
+# fullest disk (home, /tmp) is over this share (%): Agent IDE's start limits, and its disk alert.
 HOLD = {"start_load": 1.0, "start_memory": 80, "start_disk": 90}
-# Past these the sidebar's meter turns red (Shepherdr's alert limits).
+# Past these the sidebar's meter turns red (Agent IDE's alert limits).
 ALERT = {"load": 1.5, "memory": 90, "disk": 90}
 
 
@@ -135,7 +135,7 @@ def biggest_words(top):
 
 
 def hold_limits(given=None):
-    """The start limits, from `given` (Settings' for this machine) over Shepherdr's defaults. A
+    """The start limits, from `given` (Settings' for this machine) over Agent IDE's defaults. A
     limit set to None is off."""
     out = dict(HOLD)
     for k, v in (given or {}).items():

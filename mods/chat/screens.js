@@ -1,5 +1,5 @@
 // A CLI's own screens before its session starts (trust this folder, theme, sign in, an update
-// prompt, whatever a later version adds), as cards in the chat, as Shepherdr has them. Reading
+// prompt, whatever a later version adds), as cards in the chat, as Agent IDE has them. Reading
 // a screen and watching an agent that is starting are core/screens.js's (the web app's service
 // watches with the same): two matching reads a poll apart put a card up, and one press on a
 // choice presses it in the terminal, only if the screen still shows what the card was drawn from.

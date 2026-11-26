@@ -16,7 +16,7 @@
 // choices (agent.js). A voice call (voice.ts, run beside the app) talks about this chat.
 // Hovering a message shows its actions in a small bar over its top corner: react, reply (quote),
 // copy, and rewind (the CLI's own) or fork.
-// As Shepherdr's chat (docs/chat.md): a CLI stopped on its own first screen (trust, theme, sign
+// As Agent IDE's chat (docs/chat.md): a CLI stopped on its own first screen (trust, theme, sign
 // in) shows it as a card to answer here (screens.js; a task worker's also in its Assistant's
 // chat); an agent whose resumed session is gone starts a new one by itself (lostSession());
 // /model opens the model picker instead of reaching the CLI; long replies fold with Show more;
@@ -579,7 +579,7 @@ export default class Chat extends View {
         // a pane copy already does on focus (draw()), so again is harmless.
         if (c === "focus") { this.box.focus(); cx.notify(); continue; }
         if (focused()?.pane !== this.myPane()) continue;
-        // Voice off (Shepherdr settings > Window > Add-ons): its keys do nothing.
+        // Voice off (Agent IDE settings > Window > Add-ons): its keys do nothing.
         if (c === "dictate" && addonOn("voice")) this.toggleDictation(cx);
         if (c === "call" && addonOn("voice")) this.toggleCall(cx);
         if (c === "mute") this.callMute(cx);
@@ -1071,7 +1071,7 @@ export default class Chat extends View {
     return true;
   }
 
-  // As Shepherdr: the session is gone, so a new one starts in the same chat with a short
+  // As Agent IDE: the session is gone, so a new one starts in the same chat with a short
   // handover, and the chat says so in one quiet line (brief()). The agent still at its shell
   // (a task's worker) gets the new agent typed into that shell: the same terminal, labels and
   // task. One whose terminal ended starts again the way the model picker restarts (agent.js).
@@ -1814,7 +1814,7 @@ export default class Chat extends View {
   }
 
   // Before the first message: what the agent will start on (the model button in the box), from
-  // props.settings (Shepherdr settings, given when its tab opened), else the CLI's own default.
+  // props.settings (Agent IDE settings, given when its tab opened), else the CLI's own default.
   // A pick there just changes it: nothing runs yet, so nothing is lost. Kept per slot, so a
   // reload keeps it. On another machine, what is installed there.
   loadChoice(cx) {
@@ -3724,7 +3724,7 @@ export default class Chat extends View {
   // two or more as one row ("3 background processes", their shared state, the newest's name) that
   // opens in place to the list of them. A shell's or watcher's row opens to its command, what it
   // printed last (Claude Code's), and Stop.
-  // Shepherdr settings' "Helpers above the chat box" off (shared "chat.helpers" false): no subagents.
+  // Agent IDE settings' "Helpers above the chat box" off (shared "chat.helpers" false): no subagents.
   background(t, st, rcx) {
     const now = Date.now();
     // its own helper agents in herdr first (SHEP-54: a reviewer it started as its hc child), then the CLI's
@@ -4293,7 +4293,7 @@ export default class Chat extends View {
         .when(!this.addr && this.phase === "fresh" && Boolean(this.choice?.sel) && Boolean(cx), (el) => el.child(this.freshPick(t, cx)))
         .when(addonOn("voice"), (el) => el.child(this.round("chat-mic", "mods/chat/mic.svg", t, "ghost", (cx) => this.toggleDictation(cx))))
         // Always Send (SHEP-108): quiet with nothing to send, filled once there is. A call is with
-        // Shepherdr itself, from the top of the sidebar (SHEP-105), never from a chat's box.
+        // Agent IDE itself, from the top of the sidebar (SHEP-105), never from a chat's box.
         .child(this.round("chat-send", "mods/chat/send.svg", t, can ? "solid" : "off", can ? (cx) => this.send(cx) : null)))));
   }
 
@@ -4438,7 +4438,7 @@ export default class Chat extends View {
     this.wasFocused = paneFocused;
     this.hadBox = showsBox;
     this.paneFocused = paneFocused;
-    // The sidebar's Shepherdr row (mods/spaces-chat voiceRow, SHEP-105) starts, mutes and ends the call it runs here
+    // The sidebar's Agent IDE row (mods/spaces-chat voiceRow, SHEP-105) starts, mutes and ends the call it runs here
     // through shared "chat.callreq" = { pane, at, action: "start" | "mute" | "end" } (none: start or end).
     const req = shared("chat.callreq");
     if (req && req.pane === mine && req.at !== this.callReqAt && Date.now() - req.at < 5000) {

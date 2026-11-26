@@ -11,7 +11,7 @@ root = os.path.dirname(os.path.abspath(__file__)) + "/.."
 mods = os.path.join(root, "mods")
 src, dst = os.path.join(mods, "tabs-tasks"), os.path.join(mods, "tabs-ide-tasks")
 if not os.path.isdir(src):
-    raise SystemExit("mods/tabs-tasks is missing (run tools/vendor.py)")
+    raise SystemExit("mods/tabs-tasks is missing")
 shutil.rmtree(dst, ignore_errors=True)
 shutil.copytree(src, dst, ignore=shutil.ignore_patterns("gpui-kit.d.ts", "jsconfig.json"))
 shutil.copy(os.path.join(mods, "tabs-ide", "chat.svg"), dst)

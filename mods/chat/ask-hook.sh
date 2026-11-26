@@ -97,7 +97,7 @@ while [ "$i" -lt 6000 ]; do
     done_
   fi
   if [ "$unseen" -ge 0 ] && [ ! -f "$seen" ] && [ "$i" -ge "$unseen" ]; then
-    ended "No Shepherdr window or web page showed this card, so Codex asks in its terminal"
+    ended "No Agent IDE window or web page showed this card, so Codex asks in its terminal"
   fi
   if [ "$watch" = 1 ]; then
     case "$(status)" in

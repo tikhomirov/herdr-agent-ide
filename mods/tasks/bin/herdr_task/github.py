@@ -186,14 +186,14 @@ def pr_note(task, repo, summary):
         task["pr_note"] = {"number": number, "id": int(m.group(1)) if m else None, "said": summary}
 
 
-# #1208: Shepherdr's part of a pull request's description, between these marks: a later ready rewrites only that part,
+# #1208: Agent IDE's part of a pull request's description, between these marks: a later ready rewrites only that part,
 # and keeps what a person or an agent added around it (gh pr edit).
 MARK_START, MARK_END = "<!-- shepherdr -->", "<!-- /shepherdr -->"
 OWN_SECTIONS = {"Summary", "Details", "Proof"}
 
 
 def described(s, task, body, want):
-    """The description a ready makes of the one there now (body), or None to leave it as it is: Shepherdr's marked part
+    """The description a ready makes of the one there now (body), or None to leave it as it is: Agent IDE's marked part
     replaced; an older unmarked one of Herdr's ("Task: SHEP-n" first) only while it holds nothing but its own sections;
     anything else is a person's or an agent's."""
     body = body or ""
@@ -243,7 +243,7 @@ def pr_title(s, task):
 
 def pr_body(s, task, summary=None):
     """Short: the task's ref, what ready said (summary), the details and its proof's title. Never the
-    brief: that stays with the task in Shepherdr. Between its marks (#1208), so a later ready keeps what was added around
+    brief: that stays with the task in Agent IDE. Between its marks (#1208), so a later ready keeps what was added around
     it. Its agent's own (--pr-body, #1087) instead, as written, when given."""
     if task.get("pr_body"):
         return task["pr_body"]
@@ -254,7 +254,7 @@ def pr_body(s, task, summary=None):
         lines += ["", "## Details", "", task["details"].strip()]
     proof = (task.get("proof") or {}).get("title")
     if proof:
-        lines += ["", "## Proof", "", f"Shepherdr's proof artifact: {proof}"]
+        lines += ["", "## Proof", "", f"Agent IDE's proof artifact: {proof}"]
     return "\n".join(lines + [MARK_END])
 
 
@@ -447,7 +447,7 @@ def check_rows(repo, sha):
 
 
 def note_checks(s, task, v):
-    """Remembers on the folder's task list whether its GitHub checks could be read (`shepherdr doctor` warns while
+    """Remembers on the folder's task list whether its GitHub checks could be read (`herdr-task where` warns while
     they can't), and on the task's pull request (the Accept card says so)."""
     pr = task.get("pr") or {}
     if v.get("checks_unknown"):
@@ -806,7 +806,7 @@ MAIN_WATCH_MS = 3 * 3600000  # how long main is watched after a task merges thro
 
 def watch_main(s, task, sha=None):
     """A task just merged through its pull request: its base branch on GitHub is watched for a few
-    hours (ghnews.main_pass), so the Assistant hears once if it goes red (as Shepherdr)."""
+    hours (ghnews.main_pass), so the Assistant hears once if it goes red (as Agent IDE)."""
     if not task.get("pr"):
         return
     base = task.get("base") or "main"

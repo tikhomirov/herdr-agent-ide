@@ -21,7 +21,7 @@ if not __import__("shutil").which("hc"):
     os.environ["PATH"] = os.pathsep.join([p for p in os.environ.get("PATH", "").split(os.pathsep) if p] + [
         d for d in (os.path.join(HOME, ".local", "bin"), "/opt/homebrew/bin", "/usr/local/bin")
         if d not in os.environ.get("PATH", "").split(os.pathsep)])
-# Shepherdr's own folders (layout.py): ~/.local/share/herdr-ide/tasks once this machine's data moved
+# Agent IDE's own folders (layout.py): ~/.local/share/herdr-ide/tasks once this machine's data moved
 # there, else the old ~/.herdr/tasks (the entry moves it first, so a run sees one or the other).
 WHERE = layout.Where()
 # HERDR_TASK_STORE: another task list (a test's own), as HERDR_TASK_SETTINGS for settings.
@@ -31,7 +31,7 @@ WORKTREES = WHERE.worktrees()
 
 
 def beside_store(kind, name):
-    """A herdr-task file kept beside the task lists: its own place in Shepherdr's folders, or beside a
+    """A herdr-task file kept beside the task lists: its own place in Agent IDE's folders, or beside a
     test's own HERDR_TASK_STORE."""
     if os.environ.get("HERDR_TASK_STORE"):
         return os.path.join(os.path.dirname(STORE.rstrip("/")), name)
@@ -49,11 +49,11 @@ class Fail(Exception):
     pass
 
 
-# Shepherdr's installer (bin/shepherdr) puts this file here while it replaces helpers or templates,
-# and removes it once `shepherdr doctor` finds the install whole. Until then nothing copies a helper
+# Agent IDE's installer (bin/shepherdr) puts this file here while it replaces helpers or templates,
+# and removes it once `herdr-task where` finds the install whole. Until then nothing copies a helper
 # to another machine: not the sync, not a command's self-copy (cli.remote, herdr-artifact's,
 # herdr-secret's install --on), so a half-done or wrong copy never reaches every machine.
-# It is in Shepherdr's state folder; an older installer's is at ~/.herdr/sync-hold: either holds.
+# It is in Agent IDE's state folder; an older installer's is at ~/.herdr/sync-hold: either holds.
 SYNC_HOLD = os.path.join(WHERE.roots["state"], "sync-hold")
 SYNC_HOLDS = (SYNC_HOLD, os.path.join(HOME, ".herdr", "sync-hold"))
 
@@ -63,13 +63,13 @@ def sync_held():
     for p in SYNC_HOLDS:
         try:
             with open(p) as f:
-                return f.readline().strip() or "held by Shepherdr's installer"
+                return f.readline().strip() or "held by Agent IDE's installer"
         except OSError:
             continue
     return None
 
 
-# Shepherdr's add-ons (lib/addons.json): one the person switched off in Shepherdr settings >
+# Agent IDE's add-ons (lib/addons.json): one the person switched off in Agent IDE settings >
 # Window is in Everywhere's "off" (the settings file, or HERDR_TASK_SETTINGS), and its
 # background work here stops (autopilot, browsers, the sync to other machines).
 def addon_off(name):
@@ -87,7 +87,7 @@ def now():
 
 
 # ---- the stop log (SHEP-189) ----------------------------------------------------------------------
-# Every time an agent goes (Shepherdr ends it, or its terminal is gone while its task is running),
+# Every time an agent goes (Agent IDE ends it, or its terminal is gone while its task is running),
 # one line here: when, what, which terminal, and what Herdr knew then. Kept small: the last
 # STOP_LOG_LINES lines. Never raises: logging must not stop the work it records.
 STOP_LOG = os.path.join(STORE, ".stops.jsonl")
