@@ -123,10 +123,10 @@ export function feedbackRepo(v) {
 export const BACKUP = { title: "Backup agent", about: "The other CLI takes over a task once when its agent can't go on." };
 // The machines where the other CLI can't take over (herdr-task's check, ~/.local/state/herdr-ide/cli-check.json's machines: this
 // computer is ""), in one line. m: the scope's machine ("local" or its name), null for Everywhere (every machine).
-export function backupProblem(checks, m, cli) {
+export function backupProblem(checks, m, cli, f = (s, ...v) => s.replace(/\{(\d+)\}/g, (_, i) => v[i]), w = (s) => s) {
   const here = Object.entries(checks ?? {}).filter(([k]) => m === null || k === (m === LOCAL ? "" : m));
   return here.filter(([, c]) => c?.[cli] === "missing" || c?.[cli] === "signed-out")
-    .map(([k, c]) => `Can't on ${k || "this computer"}: ${NAMES[cli] ?? cli} is ${c[cli] === "missing" ? "not installed" : "signed out"}.`).join(" ");
+    .map(([k, c]) => f("Can't on {0}: {1} is {2}.", k || w("this computer"), NAMES[cli] ?? cli, w(c[cli] === "missing" ? "not installed" : "signed out"))).join(" ");
 }
 
 // The model menu's words (mods/chat-models, settings mode) and its button's: "Opus 5.5 · 1M · High".

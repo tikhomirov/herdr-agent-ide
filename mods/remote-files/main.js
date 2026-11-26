@@ -3,7 +3,7 @@
 //   - as a panel block (no props): the server picker and the file tree;
 //   - as a tab (`props().edit = { host, path, remote }`, made by tab.new): the editor of one remote file.
 // Sign-in is by key or ssh-agent only (see ssh.js).
-import { tr } from "./i18n.js";
+import { tr, trf } from "./i18n.js";
 import { View, div, svg } from "gpui-kit";
 import { h_flex, v_flex, InputState, Input, EditorState, Editor, ScrollHandle } from "gpui-base";
 import { layout, props, run, spaces, theme, home } from "herdr";
@@ -144,7 +144,7 @@ class Panel {
       const res = await ssh.remove(r.host, join(this.data.path, e.name), e.dir && !e.link);
       this.loading = false;
       if (!res.ok) { this.msg = { error: res.err.includes("not empty") ? "The folder isn't empty: only empty folders can be deleted here" : res.err }; cx.notify(); return; }
-      this.msg = { ok: `Deleted ${e.name}` }; this.refresh(cx);
+      this.msg = { ok: trf("Deleted {0}", e.name) }; this.refresh(cx);
     });
   }
 
@@ -209,7 +209,7 @@ class Panel {
         .child(svg(icon("server")).size(18).text_color(t.muted))
         .child(div().flex_1().text_size(14).font_semibold().text_color(t.foreground)
           .child(first ? `Connect a server for ${project}` : this.editing == null ? tr("Add a server") : tr("Edit server"))))
-      .child(div().text_size(12).text_color(t.dim).child("Browse and edit the project's files on a server over SSH. Sign-in is by key or ssh-agent; nothing is stored but the server's name and folder."))
+      .child(div().text_size(12).text_color(t.dim).child(tr("Browse and edit the project's files on a server over SSH. Sign-in is by key or ssh-agent; nothing is stored but the server's name and folder.")))
       .child(field("Name", this.name))
       .child(field("Server", this.host, "An alias from ~/.ssh/config, or user@host"))
       .when(chips.length > 0, (el) => el.child(h_flex().gap(6).flex_wrap().children(chips)))
@@ -294,7 +294,7 @@ class Panel {
       .when(!d && this.loading, (el) => el.child(div().p(8).text_size(12).text_color(t.dim).child(tr("Connecting…"))))
       .when(Boolean(d?.entries) && entries.length === 0, (el) => el.child(div().p(8).text_size(12).text_color(t.dim).child(tr("Empty folder"))))
       .children(entries.slice(0, MAX).map(row))
-      .when(entries.length > MAX, (el) => el.child(div().p(8).text_size(11.5).text_color(t.dim).child(`${entries.length - MAX} more not shown`)));
+      .when(entries.length > MAX, (el) => el.child(div().p(8).text_size(11.5).text_color(t.dim).child(trf("{0} more not shown", entries.length - MAX))));
 
     return v_flex().id("remote-panel").size_full().min_h(0).bg(t.background)
       .child(tr(header)).when(Boolean(menu), (el) => el.child(tr(menu))).child(tr(pathRow))

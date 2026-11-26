@@ -12,7 +12,7 @@
 //             refuses shows as a toast.
 // ↑/↓ move, Enter picks, Esc closes.
 
-import { tr } from "./i18n.js";
+import { tr, trf } from "./i18n.js";
 import { View, div } from "gpui-kit";
 import { v_flex } from "gpui-base";
 import { props, closeOverlay, theme, shared, setShared, exec, appHome } from "herdr";
@@ -67,9 +67,9 @@ function rowPick(p, key) {
     .then((r) => {
       let out = null;
       try { out = JSON.parse(r.stdout || "null"); } catch {}
-      if (r.code !== 0 || !out || out.error) toast({ level: "error", title: `Couldn't schedule ${p.ref}`, body: out?.error || r.stderr?.trim() || "herdr-task refused it." });
+      if (r.code !== 0 || !out || out.error) toast({ level: "error", title: trf("Couldn't schedule {0}", p.ref), body: out?.error || r.stderr?.trim() || "herdr-task refused it." });
     })
-    .catch((e) => toast({ level: "error", title: `Couldn't schedule ${p.ref}`, body: String(e?.message ?? e) }));
+    .catch((e) => toast({ level: "error", title: trf("Couldn't schedule {0}", p.ref), body: String(e?.message ?? e) }));
 }
 
 // Every item in order, with its section: ↑/↓ run through all of them.

@@ -16,7 +16,7 @@
 // everywhere.machine and machines[name or "local"].machine, each { start_load (× cores),
 // start_memory, start_disk } (herdr-task's tick holds new tasks by them).
 
-import { tr } from "./i18n.js";
+import { tr, trf } from "./i18n.js";
 import { div } from "gpui-kit";
 import { v_flex, h_flex } from "gpui-base";
 import { exec, shared, setShared, appHome, home, machines, knownAgents, readTextFile } from "herdr";
@@ -146,7 +146,7 @@ function cliBlock(t, mid, r, now) {
   if (r.none) return v_flex().id(`${mid}-${r.cli}`).gap(4).child(head()).child(div().text_size(12).text_color(t.dim).child(tr(NO_USAGE)));
   const read = r.read;
   const old = readOld(read, now);
-  const box = v_flex().id(`${mid}-${r.cli}`).gap(8).child(v_flex().gap(2).child(head({ text: `Read ${ago(read.at, now)}`, old }))
+  const box = v_flex().id(`${mid}-${r.cli}`).gap(8).child(v_flex().gap(2).child(head({ text: trf("Read {0}", ago(read.at, now)), old }))
     .when(Boolean(read.account), (el) => el.child(div().truncate().text_size(11.5).text_color(t.dim).child(tr(read.account)))));
   if (read.state === "ok") {
     return box.children(read.windows.map((w, i) => {

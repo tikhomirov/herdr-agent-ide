@@ -87,7 +87,7 @@ export default class Rename extends View {
     return v_flex().id("rename").track_focus(this.handle).on_key_down((e, cx) => this.key(e, cx))
       .size_full().min_h(0).p(18).gap(12).bg(t.popover).text_color(t.foreground)
       .child(h_flex().items_center().child(div().flex_1().text_size(15).font_semibold().child(tr("Rename tab")))
-        .child(div().text_size(11).text_color(t.dim).child("Esc")))
+        .child(div().text_size(11).text_color(t.dim).child(tr("Esc"))))
       .child(h_flex().gap(8).items_center()
         .child(div().size(36).flex_none().flex().items_center().justify_center().rounded(9).border_1().border_color(t.input).bg(t.background)
           .text_size(19).text_color(lead ? t.foreground : t.dim).child(tr(lead ?? "🙂")))

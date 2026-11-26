@@ -5,7 +5,7 @@
 // Spaces move between sections by dragging only. ↑/↓ move, Enter runs, Esc closes. Rows are the
 // app's menu rows (ui.js menuRow, 32 tall); a label ends in "…" when it opens a dialog.
 
-import { tr } from "./i18n.js";
+import { tr, trf } from "./i18n.js";
 import { div, svg } from "gpui-kit";
 import { v_flex, h_flex } from "gpui-base";
 import { run, props, closeOverlay, openOverlay, theme, setShared } from "herdr";
@@ -32,7 +32,7 @@ const icon = (name) => (name.includes("/") ? name : `mods/workspace-chrome/${nam
 function closeSpace(id, name) {
   const w = spaces().find((s) => s.id === id);
   openOverlay({ mod: "confirm-chat", kind: "dialog", width: 400, height: 168, props: {
-    title: `Close “${name ?? w?.name ?? "this space"}”?`,
+    title: trf("Close “{0}”?", name ?? w?.name ?? "this space"),
     detail: tr("Its tabs close and every program in them ends."),
     verb: tr("Close space"),
     command: { name: "space.close", args: { id, confirmed: true } } } });

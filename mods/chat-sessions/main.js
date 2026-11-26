@@ -3,7 +3,7 @@
 // shared "chat.sessionreq" = { pane, at, session }; the chat restarts the agent on it.
 // Props: { pane, sessions: [{ id, at, title, turns }], current: id | null, width, height, overlay }
 
-import { tr } from "./i18n.js";
+import { tr, trf } from "./i18n.js";
 import { View, div, svg } from "gpui-kit";
 import { h_flex, v_flex } from "gpui-base";
 import { theme, props, setShared, closeOverlay } from "herdr";
@@ -46,7 +46,7 @@ export default class Sessions extends View {
               .on_click((_e, cx) => { cx.stop_propagation(); this.pick(s); cx.notify(); })
               .child(v_flex().flex_1().min_w(0).gap(1)
                 .child(div().w_full().truncate().child(s.title || "(no messages yet)"))
-                .child(div().text_size(11).text_color(t.dim).child(`${s.turns} message${s.turns === 1 ? "" : "s"} · ${ago(s.at)}`)))
+                .child(div().text_size(11).text_color(t.dim).child(trf("{0} message{1} · {2}", s.turns, s.turns === 1 ? "" : "s", ago(s.at)))))
               .when(now, (el) => el.child(svg("mods/chat-sessions/check.svg").size(14).flex_none().text_color(t.muted)));
           })));
     return v_flex().id("sessions-area").w(W).h(H).justify_end()

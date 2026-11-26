@@ -9,6 +9,7 @@
 // box, and keys.
 // A ref stays with its thing for the whole call (reset at its start).
 
+import { trf } from "./i18n.js";
 import { run, layout, shared } from "herdr";
 import { spaces, panes } from "./live.js";
 import { screenText, screenParams, risky } from "./core/screen.js";
@@ -52,7 +53,7 @@ export class CallScreen {
     nodes.push({ ref: "", role: "heading", name: "Spaces", level: 2 });
     for (const s of spaces().slice(0, 40)) add(`space:${s.id}`, { role: "button", name: `${s.name ?? s.id}${s.machine ? ` on ${s.machine}` : ""}`, selected: !!s.active, depth: 1 }, () => run("space.select", { id: s.id }));
     if (shown) {
-      nodes.push({ ref: "", role: "heading", name: `${shown.name ?? shown.id}'s tabs`, level: 2 });
+      nodes.push({ ref: "", role: "heading", name: trf("{0}'s tabs", shown.name ?? shown.id), level: 2 });
       for (const t of shown.tabs ?? []) {
         const program = panes().find((p) => p.tab === t.id)?.program?.name;
         add(`tab:${t.id}`, { role: "tab", name: t.name || program || "Tab", selected: !!t.active, depth: 1 }, () => run("tab.select", { id: t.id }));
@@ -69,7 +70,7 @@ export class CallScreen {
     if (open && body?.active === TASKS && find(tree, TASKS)?.active === THREAD) {
       add("thread:back", { role: "button", name: "Back to the task list", depth: 1 }, () => backToTasks());
       const shownTab = find(tree, BODY)?.active;
-      for (const [id, name] of THREAD_TABS) if (find(tree, id)) add(`thread:${id}`, { role: "tab", name: `Task's ${name}`, selected: shownTab === id, depth: 1 }, () => {
+      for (const [id, name] of THREAD_TABS) if (find(tree, id)) add(`thread:${id}`, { role: "tab", name: trf("Task's {0}", name), selected: shownTab === id, depth: 1 }, () => {
         const term = shared("tasks.thread")?.terminal;
         if (id === TERM && term) requestWorkerTerminal(term);
         run("layout.select", { stack: BODY, child: id });
@@ -114,8 +115,8 @@ export class CallScreen {
     }
     if (q.do === "type" || q.do === "select" || q.do === "key") return no(`the window can't ${q.do === "key" ? "press keys" : q.do} from a call: ${GAPS}`);
     const thing = this.things.get(q.ref) ?? (this.read(), this.things.get(q.ref));
-    if (!thing || !thing.act) return no(`${q.ref} isn't on the screen any more: here is what is`);
-    if (risky(thing.name) && !q.confirmed) return { ok: false, ask: `Press ${thing.name}?`, screen: "" };
+    if (!thing || !thing.act) return no(trf("{0} isn't on the screen any more: here is what is", q.ref));
+    if (risky(thing.name) && !q.confirmed) return { ok: false, ask: trf("Press {0}?", thing.name), screen: "" };
     thing.act();
     return after(`Pressed ${thing.role} "${thing.name}"`);
   }

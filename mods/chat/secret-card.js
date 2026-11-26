@@ -6,7 +6,7 @@
 // card says "Kept: NAME". Shown in the agent's own chat where it asked, and in its Assistant's
 // chat for a task's worker (main.js workerAsks()), as strips of the timeline (strips.js).
 
-import { tr } from "./i18n.js";
+import { tr, trf } from "./i18n.js";
 import { InputState } from "gpui-base";
 import * as secrets from "./secrets.js";
 import { terminals } from "./live.js";
@@ -115,11 +115,11 @@ export class SecretCards {
     const id = `${ask.address}-${ask.name}`.replace(/[^\w-]/g, "_");
     const st = this.states.get(key(ask.address, ask.name));
     if (ask.kept) return [headStrip({ who: "Kept", asks: false, dot: green(), links: opts.links }),
-      { key: "title", kind: "title", text: `Secret: ${ask.name}` },
-      { key: "kept", kind: "text", tone: "dim", text: `For ${ask.kept}. The agent was told its name, never the value.` }];
+      { key: "title", kind: "title", text: trf("Secret: {0}", ask.name) },
+      { key: "kept", kind: "text", tone: "dim", text: trf("For {0}. The agent was told its name, never the value.", ask.kept) }];
     const lv = secrets.levels(ask.address), cur = this.level(ask, st);
     const has = Boolean(st?.box?.value());
-    const out = [headStrip({ who: opts.who, links: opts.links }), { key: "title", kind: "title", text: `Secret: ${ask.name}` }];
+    const out = [headStrip({ who: opts.who, links: opts.links }), { key: "title", kind: "title", text: trf("Secret: {0}", ask.name) }];
     if (ask.why) out.push({ key: "why", kind: "text", tone: "muted", text: ask.why });
     out.push({ key: "box", kind: "input", state: st?.box ?? null, placeholder: tr("Paste the value"), focus: () => st?.box?.focus() });
     if (lv.length > 1) out.push({ key: "for", kind: "controls", align: "start", lead: "For", ctls: lv.map((l) => ({ id: `slevel-${id}-${l.scope}`, label: l.label, look: "pill",

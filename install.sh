@@ -3,6 +3,8 @@
 #   ./install.sh            copy mods (replacing earlier copies) and a layout that is not there yet
 #   ./install.sh --force    also replace layout files and the role templates
 #   ./install.sh --hib      also link `hib` into ~/.local/bin
+#   ./install.sh --deps     also install the browser engine (npm i -g agent-browser)
+#   ./install.sh --no-doctor  skip the check that runs at the end (./herdr-ide doctor runs it any time)
 # Herdr's app folder is $HERDR_APP_HOME, else ~/.config/herdr-app.
 # Task data lives under ~/.config/herdr-ide, ~/.local/share/herdr-ide and ~/.local/state/herdr-ide
 # (HERDR_IDE_HOME puts all four under that root). Templates go to herdr-core, which Herdr already uses.
@@ -11,12 +13,10 @@ here=$(cd "$(dirname "$0")" && pwd)
 home=${HERDR_APP_HOME:-$HOME/.config/herdr-app}
 [ -d "$home" ] || { echo "No Herdr app folder at $home (is Herdr installed and started once?)" >&2; exit 1; }
 
-force=; link=
-for a in "$@"; do case "$a" in --force) force=1 ;; --hib) link=1 ;; esac; done
+force=; link=; deps=; verify=1
+for a in "$@"; do case "$a" in --force) force=1 ;; --hib) link=1 ;; --deps) deps=1 ;; --no-doctor) verify= ;; esac; done
 
-mods="ide-topbar ide-browser ide-browser-bar ide-browser-menu remote-files tabs-ide tabs-ide-tasks agents-ide rename-dialog layout-switcher chat-acp pi-settings chat-sessions
-accept-card artifacts chat chat-image chat-models chat-react confirm-chat coordinator coord-settings git-graph
-menu-tasks new-menu-tasks newspace pane-chat prompt-chat spaces-chat task-artifacts task-browser task-pr tasks tasks-menu toasts workspace-status-chat"
+mods=$(python3 -c 'import json,sys;print(" ".join(json.load(open(sys.argv[1]))["mods"]))' "$here/lib/manifest.json")
 
 mkdir -p "$home/mods" "$home/layouts" "$home/lib" "$home/bin"
 for m in $mods; do
@@ -133,4 +133,12 @@ fi
 
 command -v node >/dev/null 2>&1 || echo "warning: node is needed (the browser viewer is a Node script)" >&2
 command -v agent-browser >/dev/null 2>&1 || echo "note: install the browser engine with: npm i -g agent-browser && agent-browser install" >&2
+if [ -n "$deps" ]; then
+  if command -v npm >/dev/null 2>&1; then npm i -g agent-browser && agent-browser install || echo "warning: the browser engine did not install" >&2
+  else echo "warning: --deps needs npm" >&2; fi
+fi
+
+if [ -n "$verify" ]; then
+  HERDR_APP_HOME=$home HERDR_IDE_INSTALL_ROOT=${HERDR_IDE_INSTALL_ROOT:-} python3 "$here/tools/doctor.py" --after-install || true
+fi
 echo "Next: herdr-app do layout.switch '{\"name\":\"agent-ide\"}'"

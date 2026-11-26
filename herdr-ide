@@ -1,0 +1,16 @@
+#!/bin/sh
+# One entry point: herdr-ide install | doctor | update | uninstall-hint
+here=$(cd "$(dirname "$0")" && pwd)
+cmd=${1:-help}; [ $# -gt 0 ] && shift
+case "$cmd" in
+  install) exec sh "$here/install.sh" "$@" ;;
+  doctor)  exec python3 "$here/tools/doctor.py" "$@" ;;
+  update)  git -C "$here" pull --ff-only && exec sh "$here/install.sh" "$@" ;;
+  *) cat <<'TXT'
+herdr-ide install [--force] [--deps] [--hib]   install the layout, every mod, the helpers and the templates
+herdr-ide doctor [--fix] [--json] [--verbose]  check that everything is in place and works
+herdr-ide update                               pull the newest version and install it
+Then: herdr-app do layout.switch '{"name":"agent-ide"}'
+TXT
+  ;;
+esac

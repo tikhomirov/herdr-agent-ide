@@ -1,7 +1,7 @@
 // The graph itself: Git Graph's table (graph, description, date, author,
 // commit) for the focused pane's repository, or `props.folder` when opened as
 // a pane. Labels take double-clicks (checkout) and right-clicks (menus).
-import { tr } from "./i18n.js";
+import { tr, trf } from "./i18n.js";
 import { div, svg, PathBuilder } from "gpui-kit";
 import { v_flex, h_flex, Scrollbar, v_virtual_list } from "gpui-base";
 import { spaces, panes, focused, layout, exec, watchFolder, readTextFile, theme, settings, props, shared, setShared, openOverlay, home, notify, knownAgents, updates } from "herdr";
@@ -331,8 +331,8 @@ export class Graph {
       });
       if (this.fetchAll === run) this.fetchAll = null;
       const repositories = (n) => `${n} ${n === 1 ? "repository" : "repositories"}`;
-      notify(run.failed ? { title: `Fetched ${run.total - run.failed} of ${repositories(run.total)}`, body: tr("The failed ones show git's error on their row."), level: "warning" }
-        : { title: `Fetched ${repositories(run.total)}`, level: "success", timeout: 3000 });
+      notify(run.failed ? { title: trf("Fetched {0} of {1}", run.total - run.failed, repositories(run.total)), body: tr("The failed ones show git's error on their row."), level: "warning" }
+        : { title: trf("Fetched {0}", repositories(run.total)), level: "success", timeout: 3000 });
       cx.notify();
     });
     cx.notify();
@@ -588,7 +588,7 @@ export class Graph {
           if (r.code !== 0) throw new Error(r.stderr.trim());
           rows = diffRows(r.stdout) ?? [{ kind: "", text: file.binary ? "Binary file changed" : "No text changes" }];
         }
-      } catch (e) { rows = [{ kind: "", text: `Can't show this diff: ${e?.message ?? e}` }]; }
+      } catch (e) { rows = [{ kind: "", text: trf("Can't show this diff: {0}", e?.message ?? e) }]; }
       if (this.selected === hash && this.diff?.path === file.path) {
         this.diff = { path: file.path, rows, width: Math.max(300, ...rows.map((r) => r.text.length * 6.6 + 60)) };
       }
@@ -878,7 +878,7 @@ export class Graph {
           .when(f.add > 0, (e) => e.child(div().text_size(11).text_color(t.ansi2).child(`+${f.add}`)))
           .when(f.del > 0, (e) => e.child(div().text_size(11).text_color(t.ansi1).child(`−${f.del}`)));
       }))
-      .when(d.more > 0, (e) => e.child(div().text_size(11).text_color(t.dim).child(`and ${d.more} more`))));
+      .when(d.more > 0, (e) => e.child(div().text_size(11).text_color(t.dim).child(trf("and {0} more", d.more)))));
   }
 
   diffRow({ kind, number, text }, t) {

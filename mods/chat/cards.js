@@ -9,7 +9,7 @@
 // Every ask's header ends with "Dismiss" (Esc too, once the card is pressed): closed without an
 // answer, as Esc in Claude's prompt; the agent hears it was declined and carries on.
 
-import { tr } from "./i18n.js";
+import { tr, trf } from "./i18n.js";
 import { div } from "gpui-kit";
 import { InputState } from "gpui-base";
 import { allow, deny, answer, answers, annotationsOf, chatAbout, dismiss, release } from "./core/asks.js";
@@ -52,7 +52,7 @@ export class AskCards {
       ...(opts.terminal !== false ? [this.terminalLink(ask)] : []), this.dismissLink(ask)];
     const out = [headStrip({ who: opts.who, links }), { key: "title", kind: "title", text: w.title }];
     if (w.detail) out.push({ key: "detail", kind: "detail", lines: w.detail.split("\n"), clip: long && !open ? SHORT : null });
-    if (w.cut) out.push({ key: "cut", kind: "text", tone: "dim", text: "Some of it is too long for the chat; the terminal shows it all." });
+    if (w.cut) out.push({ key: "cut", kind: "text", tone: "dim", text: tr("Some of it is too long for the chat; the terminal shows it all.") });
     if (w.kind === "question") {
       // A question's choices, each a whole-width row (a row of buttons could run past the card).
       w.options.forEach((o, i) => out.push({ key: `opt${i}`, kind: "option", gap: i ? 2 : 8, num: i + 1, label: o.label,
@@ -221,7 +221,7 @@ export class AskCards {
     const links = [...(opts.links ?? []), ...(opts.terminal !== false ? [this.terminalLink(ask)] : []), this.dismissLink(ask)];
     const out = [headStrip({ who: opts.who, links })];
     if (many) {
-      out.push({ key: "title", kind: "title", text: `${n} questions` });
+      out.push({ key: "title", kind: "title", text: trf("{0} questions", n) });
       out.push({ key: "steps", kind: "controls", align: "start", ctls: [...w.questions.map((qq, i) => ({ label: qq.header || `Question ${i + 1}`, i })), { label: tr("Submit"), i: n }]
         .map(({ label, i }) => ({ id: `q-step-${id}-${i}`, label, look: "pill", on: i === step, done: i < n && Boolean(this.answerOf(ask, q, i)), fn: () => this.go(ask, i) })) });
     }
@@ -240,7 +240,7 @@ export class AskCards {
       // The picked option's preview (else the first one's), as Claude's prompt shows the one in focus (SHEP-139).
       const shown = !qq.multi && q.picks[step].size === 1 && qq.options[[...q.picks[step]][0]]?.preview ? [...q.picks[step]][0] : qq.options.findIndex((o) => o.preview);
       if (!qq.multi && shown >= 0) {
-        out.push({ key: `q${step}-preview-label`, kind: "text", tone: "dim", gap: 6, text: `Preview · ${qq.options[shown].name}` });
+        out.push({ key: `q${step}-preview-label`, kind: "text", tone: "dim", gap: 6, text: trf("Preview · {0}", qq.options[shown].name) });
         out.push({ key: `q${step}-preview`, kind: "detail", gap: 2, lines: qq.options[shown].preview.split("\n"), clip: null });
       }
       out.push({ key: `q${step}-other`, kind: "option", gap: 2, on: q.other[step] !== null, multi: qq.multi, label: tr("Other…"), fn: (cx) => this.openOther(ask, step, cx) });

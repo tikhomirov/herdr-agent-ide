@@ -7,11 +7,14 @@ and only when "X" is in i18n/ru.js. Idempotent.
   localize.py --undo               restore *.js.orig-i18n where those backups exist
 """
 import os, re, shutil, sys, json
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import tpl
+tpl.POS = re.compile(r'(\.child\(\s*|\.tooltip\(\s*|=>\s*|\breturn\s+|\b\w+:\s*|\(\s*)`')
 here = os.path.dirname(os.path.abspath(__file__)) + "/../i18n"
 repo = os.path.dirname(os.path.abspath(__file__)) + "/../mods"
 installed = os.environ.get("HERDR_APP_HOME", os.path.expanduser("~/.config/herdr-app")) + "/mods"
 home = installed if "--home" in sys.argv else repo
-MODS = ("tabs-ide-tasks agents-ide ide-topbar ide-browser ide-browser-bar ide-browser-menu remote-files spaces-chat workspace-status-chat pane-chat new-menu-tasks menu-tasks "
+MODS = ("tabs-ide tabs-ide-tasks agents-ide ide-topbar ide-browser ide-browser-bar ide-browser-menu remote-files spaces-chat workspace-status-chat pane-chat new-menu-tasks menu-tasks "
         "layout-switcher tasks newspace coordinator confirm-chat prompt-chat rename-dialog task-pr task-browser accept-card chat chat-models chat-sessions chat-react chat-image "
         "chat-acp coord-settings git-graph artifacts task-artifacts toasts tasks-menu").split()
 ru = open(f"{here}/ru.js").read()
@@ -66,14 +69,22 @@ for m in [a for a in sys.argv[1:] if not a.startswith("--")] or MODS:
             continue
         s = open(p).read()
         if os.path.exists(bak): s = open(bak).read()   # always start from the original
-        n = rx.sub(lambda g: f'{g.group(1)}tr("{g.group(2)}")' if g.group(2).replace('\\"', '"') in keys else g.group(0), s)
+        dec = lambda t: re.sub(r'\\u([0-9a-fA-F]{4})', lambda u: chr(int(u.group(1), 16)), t.replace('\\"', '"'))
+        n = rx.sub(lambda g: f'{g.group(1)}tr("{g.group(2)}")' if dec(g.group(2)) in keys else g.group(0), s)
         n = wrap_calls(n)
-        if "tr(" not in n or re.search(r'\bfunction tr\b|\bconst tr\b', n): continue
+        for a, b, key, ex in reversed(list(tpl.find(n))):
+            if key in keys and "\\" not in key:
+                n = n[:a] + 'trf("' + key.replace('"', '\\"') + '"' + "".join(", " + e for e in ex) + ")" + n[b:]
+        if "tr(" not in n and "trf(" not in n or re.search(r'\bfunction tr\b|\bconst tr\b', n): continue
         i = re.search(r'^import ', n, re.M)
         if not i: continue
         if home == installed and not os.path.exists(bak): open(bak, "w").write(s)
-        imp = '' if 'from "./i18n.js"' in n else 'import { tr } from "./i18n.js";\n'
-        open(p, "w").write(n[:i.start()] + imp + n[i.start():])
+        need = ", ".join(x for x in ("tr", "trf") if re.search(r'\b%s\(' % x, n))
+        imp = '' if 'from "./i18n.js"' in n else 'import { %s } from "./i18n.js";\n' % need
+        n = n[:i.start()] + imp + n[i.start():]
+        if re.search(r'\btrf\(', n):
+            n = re.sub(r'import \{ tr \} from "\./i18n\.js";', 'import { tr, trf } from "./i18n.js";', n)
+        open(p, "w").write(n)
     if not undo:
         shutil.copy(f"{here}/i18n.js", d); shutil.copy(f"{here}/ru.js", d)
 print("done")

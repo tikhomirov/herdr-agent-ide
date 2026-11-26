@@ -3,7 +3,7 @@
 // its recipe (recipe-data.js, from recipe.json) into each recipe artifact it installs, so the viewer, its versions and Mark up stay as they are.
 // Colors from theme() only; text 12-15 px; works from 320 px wide. A choice, a form or a button sends its words to
 // the agent that made it (artifact.js reply), from a click only.
-import { tr } from "./i18n.js";
+import { tr, trf } from "./i18n.js";
 import { View, div } from "gpui-kit";
 import { v_flex, h_flex, TextView, InputState, Input } from "gpui-base";
 import { image } from "gpui-kit";
@@ -129,7 +129,7 @@ export default class RecipeView extends View {
         : v_flex().w_full().h(96).rounded(6).bg(t.surface).items_center().justify_center().gap(2)
           .child(div().text_size(17).text_color(t.muted).child(tr(mark)))
           .child(div().text_size(12).text_color(t.muted).child(tr(what))))
-      .child(div().text_size(12).text_color(t.muted).whitespace_normal().child(`${String(b.caption ?? b.src ?? what)} · plays in the web app`));
+      .child(div().text_size(12).text_color(t.muted).whitespace_normal().child(trf("{0} · plays in the web app", String(b.caption ?? b.src ?? what))));
   }
 
   block(b, t, cx) {

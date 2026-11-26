@@ -3,6 +3,7 @@
 // image path into an image). An agent on another machine gets a copy there first (`hc put`).
 // Pasted images are kept in data/chat-attach until the person sends or removes them.
 
+import { trf } from "./i18n.js";
 import { exec, hc, appHome, window } from "herdr";
 import * as fs from "fs/promises";
 
@@ -97,7 +98,7 @@ export async function deliver(files, addr, machine) {
     const r = await hc(["put", addr, f.path, "--json"]);
     let landed = null;
     try { landed = JSON.parse(r.stdout || "{}").path ?? null; } catch { landed = r.stdout.trim() || null; }
-    if (r.code !== 0 || !landed) throw new Error(`${f.name} didn't reach ${machine}: ${(r.stderr || r.stdout).trim()}`);
+    if (r.code !== 0 || !landed) throw new Error(trf("{0} didn't reach {1}: {2}", f.name, machine, (r.stderr || r.stdout).trim()));
     out.push(landed);
   }
   return out;

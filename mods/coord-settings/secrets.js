@@ -10,7 +10,7 @@
 // Shared: the source is lib/secrets.js; bin/sync-shared copies it into each mod in lib/COPIES.
 // Edit lib/secrets.js, never a mod's copy, then run bin/sync-shared.
 
-import { tr } from "./i18n.js";
+import { tr, trf } from "./i18n.js";
 import { appHome, home, exec, hc, readTextFile, writeTextFile } from "herdr";
 import { terminals, spaces, panes } from "./live.js";
 import { chatPane } from "./core/spaces.js";
@@ -66,7 +66,7 @@ export function levels(address) {
 
 // A scope in words, for lists: "Everywhere", "laptop", "Space ~".
 export function where(s) {
-  if (s.scope === "space") return `Space ${spaces().find((x) => x.id === s.space)?.name || s.space}`;
+  if (s.scope === "space") return trf("Space {0}", spaces().find((x) => x.id === s.space)?.name || s.space);
   if (s.scope === "machine") return machineName(s.machine);
   return "Everywhere";
 }
@@ -122,7 +122,7 @@ async function read() {
   if (text == null) return { text: null, data: { version: 1, secrets: [] } };
   let data = null;
   try { data = JSON.parse(text); } catch {}
-  if (!data || !Array.isArray(data.secrets)) throw new Error(`The vault (${vault()}) isn't readable; fix or move it first.`);
+  if (!data || !Array.isArray(data.secrets)) throw new Error(trf("The vault ({0}) isn't readable; fix or move it first.", vault()));
   return { text, data };
 }
 

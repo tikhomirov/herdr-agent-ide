@@ -22,7 +22,7 @@
 // /model opens the model picker instead of reaching the CLI; long replies fold with Show more;
 // a day's line (Today, Yesterday, ...) goes where a new day starts.
 
-import { tr } from "./i18n.js";
+import { tr, trf } from "./i18n.js";
 import { View, div, svg, image } from "gpui-kit";
 import { v_flex, h_flex, TextareaState, Textarea, Scrollbar, VirtualListScrollHandle, TextView, v_virtual_list, InputState, Input } from "gpui-base";
 import { focused, props, run, theme, home, hc, exec, shared, setShared, watchFolder, window, settings, playSound, notify, appHome, readTextFile, writeTextFile, nextCommand, openOverlay, knownAgents, machines, layout } from "herdr";
@@ -232,7 +232,7 @@ function voiceOpened(nav) {
   if (nav.kind === "task") return `${nav.ref ?? String(nav.task ?? "").split(":").pop()}${nav.title ? ` \u00b7 ${nav.title}` : ""}`;
   if (nav.kind === "artifact") return nav.title ?? "An artifact";
   if (nav.kind === "tasks" || nav.kind === "needs") return nav.kind === "needs" ? "What needs you" : "The Tasks list";
-  if (nav.kind === "settings") return `Settings${nav.section ? ` \u203a ${nav.section}` : ""}`;
+  if (nav.kind === "settings") return trf("Settings{0}", nav.section ? ` \u203a ${nav.section}` : "");
   if (nav.kind === "panel") return `${nav.panel[0].toUpperCase()}${nav.panel.slice(1)}`;
   return nav.kind === "space" || nav.kind === "chat" ? "A space" : "";
 }
@@ -774,7 +774,7 @@ export default class Chat extends View {
     if (settings()?.sounds?.enabled !== false) playSound("blocked");
     if (looking) return;
     const tab = mine && panes().find((p) => p.pane === mine)?.tab;
-    toast({ title: `${toastWho(k)} · Needs you`, body: this.asks[0]?.words.title ?? "", level: "alert",
+    toast({ title: trf("{0} · Needs you", toastWho(k)), body: this.asks[0]?.words.title ?? "", level: "alert",
       action: tab ? { name: "tab.select", args: { id: tab } } : undefined });
   }
 
@@ -864,7 +864,7 @@ export default class Chat extends View {
     // A worker asking for a secret (secret-card.js): its masked card too, when it asks nothing else.
     for (const [address, x] of by) {
       for (const s of this.secretCards.items(address)) {
-        if (!out.some((b) => b.ref === x.ref)) out.push({ id: `secret:${address}:${s.name}`, terminal: address, ref: x.ref, title: x.title, words: { kind: "secret", title: `Secret: ${s.name}` }, secret: s });
+        if (!out.some((b) => b.ref === x.ref)) out.push({ id: `secret:${address}:${s.name}`, terminal: address, ref: x.ref, title: x.title, words: { kind: "secret", title: trf("Secret: {0}", s.name) }, secret: s });
       }
     }
     return out;
@@ -995,7 +995,7 @@ export default class Chat extends View {
     const mine = this.myPane();
     if (Boolean(mine) && focused()?.pane === mine && window()?.active) return;
     const tab = mine && panes().find((p) => p.pane === mine)?.tab;
-    toast({ title: `${task?.ref ?? toastWho(k)} · Needs you`, body: `${card.cli} is waiting on its start screen.`, level: "alert",
+    toast({ title: trf("{0} · Needs you", task?.ref ?? toastWho(k)), body: trf("{0} is waiting on its start screen.", card.cli), level: "alert",
       action: tab ? { name: "tab.select", args: { id: tab } } : undefined });
   }
 
@@ -1356,7 +1356,7 @@ export default class Chat extends View {
             if (lost.length) {
               this.pending = this.pending.filter((p) => !lost.includes(p));
               if (!this.box.value().trim()) this.box.set_value(lost.map((p) => p.msg?.text ?? p.text).filter(Boolean).join("\n\n"));
-              toast({ title: `The ${this.role === "coordinator" ? "Assistant" : this.role} ended before it started`, body: `${why || "It exited before it was ready."} Your message is back in the box.`, level: "error" });
+              toast({ title: trf("The {0} ended before it started", this.role === "coordinator" ? "Assistant" : this.role), body: trf("{0} Your message is back in the box.", why || "It exited before it was ready."), level: "error" });
             }
             cx.notify();
             return;
@@ -1481,7 +1481,7 @@ export default class Chat extends View {
       match: norm(msg.text).slice(0, 60) || null, msg };
     this.pending.push(p);
     const menu = msg.files.length ? null : slash.opensMenu(this.kind, msg.text);
-    if (menu) this.note = { id: `note-${msg.id}`, text: `/${menu} opens a menu in the terminal. Switching to it.` };
+    if (menu) this.note = { id: `note-${msg.id}`, text: trf("/{0} opens a menu in the terminal. Switching to it.", menu) };
     cx.spawn(async (cx) => {
       let r;
       try {
@@ -1727,7 +1727,7 @@ export default class Chat extends View {
     // back (adoptSlot); nothing is lost meanwhile.
     if (machine && !online(machine)) {
       if (msg) Object.assign(p, { waiting: WORDS.offline(machine), machine, msg });
-      else toast({ title: `${machine} is offline`, body: tr("Its Assistant starts when it's back.") });
+      else toast({ title: trf("{0} is offline", machine), body: tr("Its Assistant starts when it's back.") });
       cx.notify();
       return;
     }
@@ -1782,7 +1782,7 @@ export default class Chat extends View {
       if (out.address && out.first_message?.sent === false && words) this.firstSend = [words, task].filter(Boolean).join("\n\n");
       if (r.code !== 0 && !late || !out.address) {
         p.failed = (r.stderr || r.stdout || "It didn't start.").trim();
-        toast({ title: `The ${this.role === "coordinator" ? "Assistant" : this.role} didn't start`, body: msg ? `${p.failed} Your message is back in the box.` : p.failed, level: "error" });
+        toast({ title: trf("The {0} didn't start", this.role === "coordinator" ? "Assistant" : this.role), body: msg ? `${p.failed} Your message is back in the box.` : p.failed, level: "error" });
         // the fresh chat shows no pending rows: the message goes back in the box rather than vanish (GitHub #839)
         if (msg) { this.pending = this.pending.filter((x) => x !== p); if (!this.box.value().trim()) this.box.set_value(msg.text); }
         this.phase = "fresh";
@@ -2909,7 +2909,7 @@ export default class Chat extends View {
   switchTask(pick, cx) {
     if (this.restarting || !this.addr) return;
     this.restarting = true;
-    this.note = { id: `note-${Date.now()}`, text: "Restarting…" };
+    this.note = { id: `note-${Date.now()}`, text: tr("Restarting…") };
     cx.spawn(async (cx) => {
       try {
         const t = JSON.parse((await hc(["get", this.addr, "--json"])).stdout);
@@ -3022,7 +3022,7 @@ export default class Chat extends View {
     // Start screens answered or gone (screens.js): this agent's, and an Assistant's workers'.
     const screenEnds = [[this.addr, null], ...this.workerTasks()].flatMap(([addr, x]) => (addr ? cardsOf(addr) : [])
       .filter((c) => c.state !== "open").map((c) => ({ at: x?.ref ? this.afterNews(x.ref, c.opened) : c.opened,
-        row: { kind: "askend", id: `se:${c.id}`, text: `${x?.ref ? `${x.ref} · ` : ""}${c.cli}'s start screen · ${c.how}` } })));
+        row: { kind: "askend", id: `se:${c.id}`, text: trf("{0}{1}'s start screen · {2}", x?.ref ? `${x.ref} · ` : "", c.cli, c.how) } })));
     // Cards waiting on the person, in the timeline at their moment (DECISIONS, Chat): this
     // agent's own question in place of its "Asked you" line, the rest by time.
     const cards = this.timelineCards();
@@ -3056,7 +3056,7 @@ export default class Chat extends View {
       if (x.kind !== "mark") dated(x.at);
       // A message this agent sent another (SHEP-27): "Assistant → SHEP-4", drawn as another agent's message is.
       if (x.kind === "sent") {
-        if (x.text) out.push({ kind: "brief", id: x.id, label: `Message to ${sentTo(x, (a) => this.sender(a))}`, text: unsigned(x.text), at: x.at,
+        if (x.text) out.push({ kind: "brief", id: x.id, label: trf("Message to {0}", sentTo(x, (a) => this.sender(a))), text: unsigned(x.text), at: x.at,
           who: selfName({ assistant: this.role === "coordinator" || assistant(this.t), task: this.taskRef, kind: this.kind }), to: sentTo(x, (a) => this.sender(a)) });
         continue;
       }
@@ -3255,9 +3255,9 @@ export default class Chat extends View {
 
   // The empty box's words: whom it writes to.
   placeholder() {
-    if (this.role === "coordinator" || assistant(this.t)) return "Message the Assistant";
-    if (this.thread && this.taskRef) return `Message ${this.taskRef}`;
-    return `Message ${agent.NAMES[this.kind] ?? "the agent"}`;
+    if (this.role === "coordinator" || assistant(this.t)) return tr("Message the Assistant");
+    if (this.thread && this.taskRef) return trf("Message {0}", this.taskRef);
+    return trf("Message {0}", agent.NAMES[this.kind] ?? "the agent");
   }
 
   // A user message the person didn't type, in words for its quiet row, else null: the session's
@@ -3388,7 +3388,7 @@ export default class Chat extends View {
         return pad(div().w_full().text_center().text_size(12).text_color(t.muted).child(tr(x.text)));
       case "user":
         return pad(v_flex().w_full().items_end().gap(3)
-          .when(Boolean(x.from), (el) => el.child(div().text_size(12).text_color(t.dim).child(`From ${this.sender(x.from, x.text)}`)))
+          .when(Boolean(x.from), (el) => el.child(div().text_size(12).text_color(t.dim).child(trf("From {0}", this.sender(x.from, x.text)))))
           .when(Boolean(x.text), (el) => el.child(bubble(x.text, false)))
           .when(x.images > (x.paths?.length ?? 0), (el) => el.child(fileLine(imagesLine(x.images)))));
       case "pending":
@@ -3660,7 +3660,7 @@ export default class Chat extends View {
     if ((this.phase === "starting" || this.phase === "finding") && this.role && this.pending.length) {
       return h_flex().id("chat-status").flex_none().w_full().max_w(COLUMN + 36).mx_auto().h(30).px(18).gap(8).items_center().text_size(12).text_color(t.muted)
         .child(svg("mods/workspace-chrome/spinner.svg").size(12).flex_none().text_color(t.working).spin(900))
-        .child(div().flex_1().min_w(0).truncate().child(`Starting the ${this.role === "coordinator" ? tr("Assistant") : this.role}…`));
+        .child(div().flex_1().min_w(0).truncate().child(trf("Starting the {0}…", this.role === "coordinator" ? tr("Assistant") : this.role)));
     }
     if (st === "working") {
       // What it is doing, in plain words, for how long, and Stop. The line has the composer box's
@@ -3685,7 +3685,7 @@ export default class Chat extends View {
             .on_click((_e, cx) => { cx.stop_propagation(); this.stop(cx); }))
           .child(svg("mods/chat/stop-chip.svg").size(8).flex_none())
           .child(div().child(tr("Stop")))
-          .child(div().text_size(11).text_color(t.dim).child("Esc")));
+          .child(div().text_size(11).text_color(t.dim).child(tr("Esc"))));
     }
     if (st === "blocked") {
       return div().flex_none().w_full().max_w(COLUMN + 28).mx_auto().px(14).pt(6).child(h_flex().px(12).py(10).gap(10).items_center().rounded(10)

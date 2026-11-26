@@ -14,7 +14,7 @@
 // herdr-task. Agents use the chat's own model button (settings.js and agent.js from lib/).
 // The window draws its own frame (frame: "none"), most of Herdr's height, at most 900.
 
-import { tr } from "./i18n.js";
+import { tr, trf } from "./i18n.js";
 import { View, div, svg } from "gpui-kit";
 import { v_flex, h_flex, Scrollbar, TextareaState, Textarea, InputState, Input } from "gpui-base";
 import { props, theme, machines, home, exec, readTextFile, writeTextFile, closeOverlay, openOverlay, shared } from "herdr";
@@ -263,7 +263,7 @@ export default class ShepherdrSettings extends View {
   }
 
   scopeName(scope = this.scope) {
-    if (!scope) return EVERYWHERE;
+    if (!scope) return tr(EVERYWHERE);
     // As the sidebar calls it (core/spaces.js): never "~".
     const s = spaceById(scope);
     return s ? spaceName(s, { home: home(), named: Boolean(s.named) }) : this.cfg.spaces?.[scope]?.name ?? "This space";
@@ -495,7 +495,7 @@ export default class ShepherdrSettings extends View {
   // An unset Reviewer's button says what runs: "Other CLI (Codex)".
   roleRow(t, r, cx) {
     const c = this.roles[r.id];
-    const label = r.id === "reviewer" && c?.unset ? otherCliWords(this.otherCli()) : undefined;
+    const label = r.id === "reviewer" && c?.unset ? otherCliWords(this.otherCli()).replace(/^Other CLI \((.*)\)$/, (_, n) => trf("Other CLI ({0})", n)) : undefined;
     const control = h_flex().gap(8).items_center()
       .child(c?.sel ? models.modelButton(t, c, { label }, cx) : div().text_size(TEXT.label).text_color(t.dim).child(tr(LOADING_AGENTS)))
       .when(!this.scope && r.id === "reviewer" && c && !c.unset,
@@ -523,7 +523,7 @@ export default class ShepherdrSettings extends View {
     const other = value && value !== "off" ? value : this.otherCli();
     // The machines this scope reaches (the check names this computer ""): all of them for Everywhere.
     const m = this.scope ? machineOfSpace(this.scope) : null;
-    const problem = on ? backupProblem(this.clis, m, other) : "";
+    const problem = on ? backupProblem(this.clis, m, other, trf, tr) : "";
     const about = BACKUP.about;
     // Turning it on follows what it would get anyway when that is on, else names the other CLI.
     const flip = (_next, _e, cx) => {
@@ -622,7 +622,7 @@ export default class ShepherdrSettings extends View {
         .child(div().flex_none().text_size(TEXT.label).text_color(t.muted).child(tr(LEVEL.label)))
         .child(tr(picker)))
       .child(div().text_size(TEXT.label).line_height("17px").text_color(t.dim)
-        .child(this.scope ? LEVEL.space(where) : LEVEL.everywhere))
+        .child(this.scope ? trf("Only this space, on {0}. What it doesn't set is inherited from Everywhere.", where) : tr(LEVEL.everywhere)))
       .when(Boolean(folder), (el) => el.child(div().truncate().font_family("JetBrains Mono").text_size(TEXT.id).text_color(t.dim).child(tr(folder))));
   }
 
@@ -651,7 +651,7 @@ export default class ShepherdrSettings extends View {
       .when(all.length > 8, (el) => el.child(div().mb(4).h(H.lg).px(9).flex().items_center().rounded(RADIUS.control)
         .border_1().border_color(t.input).bg(t.background)
         .child(Input.new(this.levelFind).w_full().text_size(TEXT.body).text_color(t.foreground))))
-      .child(menuRow("level-all", EVERYWHERE, { icon: I("globe"), check: !this.scope, onClick: pick(null) }))
+      .child(menuRow("level-all", tr(EVERYWHERE), { icon: I("globe"), check: !this.scope, onClick: pick(null) }))
       .children(machinesHere.flatMap((m) => [
         div().px(8).pt(8).pb(3).text_size(TEXT.id).font_medium().text_color(t.dim).child(machineLabel(m)),
         ...shown.filter((s) => s.machine === m).map((s) => {

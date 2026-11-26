@@ -32,7 +32,7 @@
 // Shared: the source is lib/inbox.js; bin/sync-shared copies it into each mod in lib/COPIES.
 // Edit lib/inbox.js, never a mod's copy, then run bin/sync-shared.
 
-import { tr } from "./i18n.js";
+import { tr, trf } from "./i18n.js";
 import { LINE_MAX, REASONS, fit, reqReason, reportReason } from "./core/needs.js";
 import { SH } from "./core/paths.js";
 import { dirsReady } from "./dirs.js";
@@ -151,7 +151,7 @@ async function alert(a) {
   try { req = JSON.parse(await readTextFile(`${ASKS()}/req/${a.id}.json`) ?? ""); } catch {}
   if (settings()?.sounds?.enabled !== false) playSound("blocked");
   const k = terminals().find((x) => x.address === a.terminal);
-  toast({ title: `${whoOf(k)} · Needs you`, body: req ? reqReason(req) : REASONS.question, level: "alert",
+  toast({ title: trf("{0} · Needs you", whoOf(k)), body: req ? reqReason(req) : REASONS.question, level: "alert",
     action: { name: "tabs-ide-tasks.inbox", args: {} } });
 }
 

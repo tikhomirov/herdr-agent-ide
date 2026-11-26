@@ -74,10 +74,12 @@ A button at the end of the tab bar lists your layouts and switches between them.
 ```sh
 git clone https://github.com/tikhomirov/herdr-agent-ide
 cd herdr-agent-ide
-./install.sh --hib          # mods, both layouts, herdr-task, templates, the browser skill
-npm i -g agent-browser && agent-browser install     # the browser engine
-herdr-app do layout.switch '{"name":"agent-ide"}'   # assistants, git, editor, remote, coordinators
+./herdr-ide install --deps   # layout + all 36 mods + helpers + templates (--deps adds agent-browser)
+./herdr-ide doctor           # checks every mod, helper, dependency and Herdr itself; exit 1 on a failure
+./herdr-ide update           # later: git pull + install
 ```
+
+The mod list lives in `lib/manifest.json`; every mod is in this repository (`mods/`), so nothing else is fetched. Existing files are kept unless you pass `--force`.
 
 Or let your agent do it: *"Add the layout from https://github.com/tikhomirov/herdr-agent-ide"* (Herdr's agents read `RECIPE.md` and the files).
 

@@ -2,7 +2,7 @@
 // GitHub's public releases API: no token, nothing about the person or their
 // repositories. "Stop checking" in the update window turns it off for good, and
 // CHECK = false turns it off before it ever asks.
-import { tr } from "./i18n.js";
+import { tr, trf } from "./i18n.js";
 import { div } from "gpui-kit";
 import { v_flex, h_flex, TextView } from "gpui-base";
 import { props, shared, setShared, closeOverlay, openOverlay, theme, settings } from "herdr";
@@ -67,9 +67,9 @@ export class Update {
       .hover((st) => st.opacity(0.88)).on_click(action).child(tr(text));
     return v_flex().id("git-graph-update").track_focus(this.handle).size_full().min_h(0).p(18).bg(t.popover).text_color(t.foreground).text_size(12.8)
       .on_key_down((e, cx) => { if (e.key === "escape") { close(); cx.stop_propagation(); } })
-      .child(h_flex().items_center().child(div().flex_1().text_size(15).font_semibold().child(tr(`Git Graph ${latest?.tag ?? ""} is out`)))
-        .child(div().text_size(11).text_color(t.dim).child("Esc")))
-      .child(div().pt(6).text_color(t.muted).child(`You have v${VERSION}. To update, ask your Herdr agent:`))
+      .child(h_flex().items_center().child(div().flex_1().text_size(15).font_semibold().child(tr(trf("Git Graph {0} is out", latest?.tag ?? ""))))
+        .child(div().text_size(11).text_color(t.dim).child(tr("Esc"))))
+      .child(div().pt(6).text_color(t.muted).child(trf("You have v{0}. To update, ask your Herdr agent:", VERSION)))
       .child(div().mt(8).px(10).py(8).rounded(8).bg(t.background).border_1().border_color(t.border).font_family(settings().font_family ?? "JetBrains Mono").text_size(12).child(tr(PROMPT)))
       .child(div().pt(14).pb(6).text_size(11.5).text_color(t.dim).child(tr("What changed")))
       // Release notes are markdown; links open in the browser.

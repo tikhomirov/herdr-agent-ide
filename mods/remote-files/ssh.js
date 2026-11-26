@@ -1,5 +1,6 @@
 // SSH helpers: every call is one `ssh` on a shared OpenSSH connection (ControlMaster), so after the first the
 // calls are fast. Key or agent sign-in only (BatchMode): nothing here can ask for a password, and nothing is stored.
+import { trf } from "./i18n.js";
 import { exec, home, writeTextFile } from "herdr";
 
 const DIR = () => `${home()}/.local/state/herdr-ide/ssh`;
@@ -32,8 +33,8 @@ async function ensureMaster(host) {
 function why(r) {
   const lines = (r.stderr.trim() ? r.stderr : r.stdout).split("\n").map((l) => l.trim()).filter((l) => l && !/^(\*\* |Welcome )/.test(l));
   const last = lines[lines.length - 1] || `ssh exited with ${r.code}`;
-  if (/Permission denied \((publickey|password|keyboard)/.test(last)) return `${last} (sign-in needs a key or ssh-agent: this panel can't ask for a password)`;
-  if (/Host key verification failed/.test(last)) return `${last} (connect once with ssh in a terminal to trust the host)`;
+  if (/Permission denied \((publickey|password|keyboard)/.test(last)) return trf("{0} (sign-in needs a key or ssh-agent: this panel can't ask for a password)", last);
+  if (/Host key verification failed/.test(last)) return trf("{0} (connect once with ssh in a terminal to trust the host)", last);
   return last;
 }
 
@@ -85,7 +86,7 @@ export async function read(host, path) {
   const nl = r.out.indexOf("\n");
   const [size, mtime] = r.out.slice(0, nl).split(" ").map(Number);
   const text = r.out.slice(nl + 1);
-  if (size > MAX_BYTES) return { error: `Too big to edit here (${Math.round(size / 1024)} KB, the limit is 1024 KB)` };
+  if (size > MAX_BYTES) return { error: trf("Too big to edit here ({0} KB, the limit is 1024 KB)", Math.round(size / 1024)) };
   if (text.includes("\0")) return { error: "Binary file" };
   if (text.includes("\uFFFD")) return { error: "Not UTF-8 text: editing it here would damage it" };
   return { text, mtime, size };
@@ -99,7 +100,7 @@ export async function read(host, path) {
 export async function write(host, path, text, expect) {
   await ensureDirs();
   const local = `${TMP()}/${Date.now()}-${Math.random().toString(36).slice(2)}`;
-  try { await writeTextFile(local, text, null); } catch (e) { return { error: `Can't stage the file: ${e?.message ?? e}` }; }
+  try { await writeTextFile(local, text, null); } catch (e) { return { error: trf("Can't stage the file: {0}", e?.message ?? e) }; }
   const exp = expect == null ? "" : String(Math.floor(expect));
   const script = [
     `f=${q(path)}; exp=${q(exp)}`,

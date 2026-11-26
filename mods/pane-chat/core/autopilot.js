@@ -11,11 +11,7 @@
 // Shared core: the source is core/autopilot.js; bin/sync-shared copies it into the mods in lib/COPIES.
 
 export const TITLE = "Autopilot";
-export const ABOUT = "Turn it on in a space with the switch in its Assistant's header: its Assistant then wakes on a schedule "
-  + "or when something happens to its tasks. By default it unblocks and checks what's open, then adds and starts the next "
-  + "most useful tasks to push the project forward, toward the space's Direction (none: what the project itself shows). "
-  + "It acts on its own and makes the calls itself, never asking you; it only alerts you for something critical "
-  + "(money, publishing, deleting data, security, or stuck). It never merges or accepts: that stays yours.";
+export const ABOUT = "Turn it on in a space with the switch in its Assistant's header: its Assistant then wakes on a schedule or when something happens to its tasks. By default it unblocks and checks what's open, then adds and starts the next most useful tasks to push the project forward, toward the space's Direction (none: what the project itself shows). It acts on its own and makes the calls itself, never asking you; it only alerts you for something critical (money, publishing, deleting data, security, or stuck). It never merges or accepts: that stays yours.";
 // The fields a space can set its own of (Agent IDE settings' "autopilot"). direction: one line that steers it (a space's).
 export const FIELDS = ["heartbeat", "every", "events", "direction"];
 

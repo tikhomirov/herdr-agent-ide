@@ -20,7 +20,7 @@
 // Settings mode (settings.js settingsButton): the whole menu without Restart; every change
 // goes back at once as { key, field: "settings", value: { agent, model, effort, fast, perm } }.
 
-import { tr } from "./i18n.js";
+import { tr, trf } from "./i18n.js";
 import { View, div, svg, image } from "gpui-kit";
 import { h_flex, v_flex, InputState, Input, VirtualListScrollHandle, v_virtual_list, Scrollbar } from "gpui-base";
 import { theme, props, setShared, closeOverlay, home, readTextFile, writeTextFile } from "herdr";
@@ -246,7 +246,7 @@ export default class ModelMenu extends View {
     const items = sections.flatMap((s) => [
       ...(s.title ? [{ key: `h-${s.key}`, h: HEAD, draw: () => this.head(t, s.title) }] : []),
       ...s.rows.map((x) => ({ key: `m-${x.agent}:${x.id}`, h: ROW, row: x, draw: () => this.modelRow(t, x, x === cur) })),
-      ...(s.more ? [{ key: `more-${s.key}`, h: NOTE, draw: () => quiet(`${s.more} more. Type to narrow.`) }] : []),
+      ...(s.more ? [{ key: `more-${s.key}`, h: NOTE, draw: () => quiet(trf("{0} more. Type to narrow.", s.more)) }] : []),
     ]);
     const listH = Math.min(LIST, items.reduce((n, x) => n + x.h, 0));
     this.listW = (this.p.width ?? 340) - 12;
@@ -304,15 +304,15 @@ export default class ModelMenu extends View {
         .child(div().flex_none().text_size(12).text_color(t.dim).child(tr(perm?.label ?? "")))
         .child(svg("mods/workspace-chrome/chevron-right.svg").size(12).flex_none().text_color(t.dim))))
       // another agent can't carry this conversation on: said before the press, not after
-      .when(newChat, (el) => el.child(quiet(`${this.p.menus?.[this.sel.agent]?.name ?? "It"} starts a new conversation. This one stays in ${this.p.menus?.[this.was.agent]?.name ?? "its old agent"}’s history.`, 2 * NOTE)))
+      .when(newChat, (el) => el.child(quiet(trf("{0} starts a new conversation. This one stays in {1}’s history.", this.p.menus?.[this.sel.agent]?.name ?? "It", this.p.menus?.[this.was.agent]?.name ?? "its old agent"), 2 * NOTE)))
       // its machine out of reach: said once a change is chosen; the button still tries
-      .when(changes.length > 0 && Boolean(offline), (el) => el.child(quiet(`${offline} is offline. Try again once it’s back.`)))
+      .when(changes.length > 0 && Boolean(offline), (el) => el.child(quiet(trf("{0} is offline. Try again once it’s back.", offline))))
       .when(changes.length > 0, (el) => el.child(div().min_h(FOOT).flex_none().pt(5).child(h_flex().id("restart").w_full().min_h(28).px(10).py(5)
         .justify_center().items_center().rounded(7).cursor_pointer().bg(t.solid).text_color(t.solid_foreground).text_size(12.5).font_medium()
         .hover((s) => s.opacity(0.88))
         .on_click((_e, cx) => { cx.stop_propagation(); this.restart(cx); })
         // its words wrap rather than end in …
-        .child(div().text_center().child(`Restart with ${changes.join(" · ")}`)))))
+        .child(div().text_center().child(trf("Restart with {0}", changes.join(" · ")))))))
       .when(this.permOpen, (el) => el.child(this.permMenu(t, 5 + (changes.length ? FOOT + (offline ? NOTE : 0) : 0) + (newChat ? 2 * NOTE : 0) + ROW)));
     // The overlay is the menu at its tallest; the menu sits at its bottom, just above the button.
     return v_flex().id("model-menu-area").w(this.p.width ?? 340).h(this.p.height ?? 600).justify_end()

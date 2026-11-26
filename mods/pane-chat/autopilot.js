@@ -12,7 +12,7 @@
 // "Write a heartbeat" link after it opens that page, on this space. The switch, its words and Run
 // now are one group (apGroup) on a quiet pill as tall as Chat | Terminal, as the web app's header.
 
-import { tr } from "./i18n.js";
+import { tr, trf } from "./i18n.js";
 import { div, svg } from "gpui-kit";
 import { h_flex } from "gpui-base";
 import { link, TEXT, H, RADIUS, openSettings, toast, plainError } from "./ui.js";
@@ -199,7 +199,7 @@ function apToggle(view, space, cx) {
       if (on) checkBlank(view, space, cx);
     } catch (e) {
       view.ap = was;
-      toast({ title: `Autopilot didn't turn ${on ? "on" : "off"}`, body: plainError(e), level: "error" });
+      toast({ title: trf("Autopilot didn't turn {0}", on ? "on" : "off"), body: plainError(e), level: "error" });
     }
     view.apBusy = false;
     setShared("autopilot.at", Date.now());

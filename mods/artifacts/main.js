@@ -10,7 +10,7 @@
 // placeholder before one is picked (props.blank), and the title bar of an artifact window kept
 // from before windows were cut (props.bar), so it can still be closed.
 
-import { tr } from "./i18n.js";
+import { tr, trf } from "./i18n.js";
 import { View, div, svg } from "gpui-kit";
 import { v_flex, h_flex, InputState, Input } from "gpui-base";
 import { spaces, panes, agents, readTextFile, watchFolder, home, theme, closeOverlay, props, shared, setShared } from "herdr";
@@ -185,7 +185,7 @@ export default class Artifacts extends View {
         .when(!this.store && !this.error, (el) => el.child(div().px(18).py(28).text_center().text_size(TEXT.label).text_color(t.dim).child(tr("Finding this space's folder…"))))
         .when(empty, (el) => el.child(this.emptyView(t)))
         .when(Boolean(q) && !empty && !shown.length, (el) => el.child(div().px(18).py(28).text_center().text_size(TEXT.label).text_color(t.dim)
-          .child(`No artifacts match “${q}”.`)))
+          .child(trf("No artifacts match “{0}”.", q))))
         .children(shown.map((a) => this.row(a, t))));
   }
 

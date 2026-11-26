@@ -1,0 +1,77 @@
+{
+  "layout": "agent-ide",
+  "mods": [
+    "ide-topbar",
+    "ide-browser",
+    "ide-browser-bar",
+    "ide-browser-menu",
+    "remote-files",
+    "tabs-ide",
+    "tabs-ide-tasks",
+    "agents-ide",
+    "rename-dialog",
+    "layout-switcher",
+    "chat-acp",
+    "pi-settings",
+    "chat-sessions",
+    "accept-card",
+    "artifacts",
+    "chat",
+    "chat-image",
+    "chat-models",
+    "chat-react",
+    "confirm-chat",
+    "coordinator",
+    "coord-settings",
+    "git-graph",
+    "menu-tasks",
+    "new-menu-tasks",
+    "newspace",
+    "pane-chat",
+    "prompt-chat",
+    "spaces-chat",
+    "task-artifacts",
+    "task-browser",
+    "task-pr",
+    "tasks",
+    "tasks-menu",
+    "toasts",
+    "workspace-status-chat"
+  ],
+  "shipped_by_herdr": [
+    "files",
+    "changes",
+    "workspace-chrome"
+  ],
+  "helpers": [
+    "herdr-task",
+    "herdr-artifact",
+    "herdr-browser",
+    "herdr-secret"
+  ],
+  "templates": [
+    "assistant.md",
+    "worker.md",
+    "reviewer.md"
+  ],
+  "needs": {
+    "required": [
+      "python3",
+      "node",
+      "git"
+    ],
+    "herdr": [
+      "herdr-app",
+      "hc"
+    ],
+    "agents_any": [
+      "claude",
+      "codex",
+      "pi"
+    ],
+    "optional": [
+      "agent-browser",
+      "gh"
+    ]
+  }
+}

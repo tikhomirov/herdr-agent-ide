@@ -12,7 +12,7 @@
 // view shows a task and is stopped when it hides or another task shows; it has no tab or pane.
 // This copy keeps ~/.local/state/herdr-ide/browser/<name>.view fresh while it wants the viewer: a viewer whose
 // file goes stale (this copy reloaded or gone) ends by itself.
-import { tr } from "./i18n.js";
+import { tr, trf } from "./i18n.js";
 import { View, div } from "gpui-kit";
 import { v_flex } from "gpui-base";
 import { exec, hc, theme, terminals, appHome, home, shared, layout, readTextFile, writeTextFile } from "herdr";
@@ -78,7 +78,7 @@ export default class TaskBrowser extends View {
   target() {
     const addr = shared("tasks.thread")?.terminal;
     if (!addr) return { why: null };
-    if (addr.includes("/")) return { why: `This task runs on ${addr.split("/")[0]}. Its browser can be watched only from that machine's Herdr for now.` };
+    if (addr.includes("/")) return { why: trf("This task runs on {0}. Its browser can be watched only from that machine's Herdr for now.", addr.split("/")[0]) };
     const key = terminals().find((k) => k.address === addr)?.labels?.["herdr.task"];
     return key ? { key, worker: addr } : { why: null };
   }

@@ -15,7 +15,7 @@
 // This space (the filter row's first chip, remembered by this panel): only the shown space's tasks, automations and
 // Needs you (core/tasks.js inSpace); it follows the space picked. The tab bar's counts still cover every space.
 
-import { tr } from "./i18n.js";
+import { tr, trf } from "./i18n.js";
 import { View, div, svg } from "gpui-kit";
 import { v_flex, h_flex, InputState, Input } from "gpui-base";
 import { machines, exec, readTextFile, watchFolder, appHome, home, run, theme, nextCommand, shared, setShared, openOverlay, layout } from "herdr";
@@ -369,7 +369,7 @@ export default class Tasks extends View {
     else if (filter !== "all") {
       const rows = rowsFor(filter);
       const what = filter === "needs" ? "tasks that need you" : filter === "automations" ? "automations" : `${STATUS[filter]} tasks`;
-      body.push(rows.length ? v_flex().flex_none().gap(1).children(rows) : note(`No ${what} match “${q}”.`));
+      body.push(rows.length ? v_flex().flex_none().gap(1).children(rows) : note(trf("No {0} match “{1}”.", what, q)));
     }
     else {
       const rest = placed.filter((p) => !isPin(p));
@@ -421,7 +421,7 @@ export default class Tasks extends View {
       // Searching, the archived tasks that match come last, as a group; else a row opens them.
       if (q && found.length) { this.names = { machine: true, space: true }; body.push(this.group("archived", "Archived", found.map((p) => this.row(p, t)), t, { open })); }
       else if (!q && archived.length) body.push(this.archivedLink(archived.length, t));
-      if (q && !body.length && this.ready) body.push(note(`No tasks match “${q}”.`));
+      if (q && !body.length && this.ready) body.push(note(trf("No tasks match “{0}”.", q)));
     }
 
     return v_flex().id("tasks").size_full().min_h(0).on_size_change((size, cx) => { if (size.width !== this.width) { this.width = size.width; cx.notify(); } }).rounded(10).overflow_hidden().bg(t.background).border_1().border_color(t.border).text_color(t.foreground).text_size(13)
@@ -709,7 +709,7 @@ export default class Tasks extends View {
       .on_click((_e, cx) => { this.fold("done:open", true); cx.notify(); })
       .child(h_flex().w(14).h(14).flex_none().items_center().justify_center()
         .child(svg("mods/workspace-chrome/chevron-right.svg").size(12).flex_none()))
-      .child(tr(`${ps.length} done${all ? " today" : ""}`));
+      .child(tr(trf("{0} done{1}", ps.length, all ? " today" : "")));
   }
 
   // A row's status mark: Agent IDE's task dot (dot.js); a Working row's pie shows its % done.

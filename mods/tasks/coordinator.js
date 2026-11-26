@@ -9,7 +9,7 @@
 // Shared: the source is lib/coordinator.js; bin/sync-shared copies it into each mod in lib/COPIES.
 // Edit lib/coordinator.js, never a mod's copy, then run bin/sync-shared.
 
-import { tr } from "./i18n.js";
+import { tr, trf } from "./i18n.js";
 import { appHome, exec, hc, run, openOverlay, shared, setShared, home, machines, focused, readTextFile } from "herdr";
 import { dirs } from "./dirs.js";
 import { isWorktreePath } from "./core/paths.js";
@@ -180,7 +180,7 @@ function runningAssistant(space, ps = panes()) {
 export async function openCoordinator(space, show = true, settings = null) {
   if (space.machine && !machineReady(space.machine)) {
     setShared("coordinator.pending", { ...(shared("coordinator.pending") ?? {}), [space.id]: { settings, at: Date.now() } });
-    toast({ title: `${space.machine} is offline`, body: tr("Its Assistant starts when it's back.") });
+    toast({ title: trf("{0} is offline", space.machine), body: tr("Its Assistant starts when it's back.") });
     return;
   }
   const folder = folderOf(space);
@@ -217,7 +217,7 @@ export async function newSpace(space) {
   const machine = asked && !machineReady(asked) ? null : asked;
   const choosing = machines().some((m) => m.name && m.layout === "ready");
   const [recent, at] = await Promise.all([recentFolders(machine).catch(() => []), homeOf(machine).catch(() => null)]);
-  if (!at) return toast({ title: `Couldn't reach ${machine}`, body: tr("Try New space again once it's connected."), level: "error" });
+  if (!at) return toast({ title: trf("Couldn't reach {0}", machine), body: tr("Try New space again once it's connected."), level: "error" });
   // The dialog draws its own panel (frame "none"), centered and as tall as what it shows now:
   // the overlay is the panel at its tallest.
   openOverlay({ mod: "newspace", kind: "dialog", frame: "none", width: 460, height: newSpaceHeight(recent.length, choosing), props: { recent, machine, home: at } });
@@ -297,7 +297,7 @@ export async function createSpace(folder, settings, machine = null, icon = null)
 // goes back to where the person was: Herdr's space.new shows the new space.
 export async function makeHomeSpace(machine = null) {
   const at = await homeOf(machine);
-  if (!at) throw new Error(`Couldn't reach ${machine}.`);
+  if (!at) throw new Error(trf("Couldn't reach {0}.", machine));
   const mine = (s) => (s.machine ?? null) === machine && s.folder === at;
   const all = JSON.parse((await exec("herdr-app", ["ls"]).catch(() => ({ stdout: "" }))).stdout || "{}").spaces ?? [];
   const there = all.find(mine);

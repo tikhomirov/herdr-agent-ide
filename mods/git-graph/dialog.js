@@ -66,7 +66,7 @@ export class Dialog {
         else return;
         cx.stop_propagation();
       })
-      .child(h_flex().items_center().child(div().flex_1().text_size(15).font_semibold().child(tr(s.title))).child(div().text_size(11).text_color(t.dim).child("Esc")))
+      .child(h_flex().items_center().child(div().flex_1().text_size(15).font_semibold().child(tr(s.title))).child(div().text_size(11).text_color(t.dim).child(tr("Esc"))))
       .when(Boolean(s.detail), (el) => el.child(div().pt(8).text_color(t.muted).child(tr(s.detail))))
       .children(this.inputs.map(({ field, state }, i) => v_flex()
         .child(label(field.label))
