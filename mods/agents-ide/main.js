@@ -257,6 +257,16 @@ export default class Agents extends View {
     const sort = sortOf();
     let list = agents();
     { const have = new Set(list.map((a) => a.address)); list = [...list, ...parkedAgents().filter((a) => !have.has(a.address))]; }
+    // A coordinator that has no agent yet (its chat waits for the first message) is still listed: one row per space.
+    {
+      const livePanes = new Map(panes().map((p) => [p.pane, p]));
+      const sps = new Map(spaces().map((sp) => [sp.id, sp]));
+      const haveTab = new Set(list.map((a) => a.tab));
+      const empty = Object.entries(shared("coordinator.slots") ?? {}).filter(([, v]) => v?.pane && livePanes.has(v.pane) && sps.has(v.space) && !haveTab.has(v.tab))
+        .map(([slot, v]) => ({ address: `slot:${slot}`, status: "idle", program: { name: "Coordinator" }, space: v.space, space_name: sps.get(v.space).name,
+          tab: v.tab, pane: v.pane, focused: Boolean(livePanes.get(v.pane)?.focused), pinned: false, seq: 0, title: String(v.folder ?? "").replace(/\/+$/, "").split("/").pop() || "Assistant", slot: true }));
+      list = [...list, ...empty];
+    }
     this.listed = new Map(list.map((a) => [a.address, a.status]));
     const all = terminals();
     this.migratePins(all);
@@ -414,7 +424,7 @@ export default class Agents extends View {
     // space are next to each other in agents(), so neighbours make a group.
     const groups = pinned.length ? [{ id: "pinned", label: tr("Pinned"), status: null, members: pinned }] : [];
     // Coordinators (assistant template / herdr.role=coordinator) get their own section on top; the rest are workers.
-    const coordAddrs = new Set(all.filter((k) => k?.state === "live" && (k.labels?.["herdr.role"] === "coordinator" || k.template === "assistant" || k.template === "coordinator")).map((k) => k.address));
+    const coordAddrs = new Set([...list.filter((a) => a.slot).map((a) => a.address), ...all.filter((k) => k?.state === "live" && (k.labels?.["herdr.role"] === "coordinator" || k.template === "assistant" || k.template === "coordinator")).map((k) => k.address)]);
     const coords = rest.filter((a) => coordAddrs.has(a.address));
     if (coords.length && !byPriority) groups.push({ id: "coordinators", label: tr("Coordinators"), status: null, members: coords });
     for (const a of (byPriority ? rest : rest.filter((a) => !coordAddrs.has(a.address) || !coords.length))) {
