@@ -20,7 +20,6 @@ import { props, theme, machines, home, exec, readTextFile, writeTextFile, closeO
 import { spaces, inRender } from "./live.js";
 import { SHEPHERDR_FILE, SHEPHERDR_DEFAULTS, LOCAL_MACHINE, shepherdrFor, shepherdrLayers, machineOfSpace } from "./coordinator.js";
 import * as models from "./settings.js";
-import { layoutSection } from "./layout.js";
 import { manifest } from "./addons.js";
 import { note } from "./usage.js";
 import { over } from "./over.js";
@@ -32,9 +31,7 @@ import { autopilotInit, autopilotSection, autopilotFlush } from "./autopilot-sec
 import { spaceName } from "./core/spaces.js";
 import { NOTIFY, NOTIFY_DEFAULT, notifyMachine, notifyMachineOwn, notifyOf, notifyOwn, notifyEverywhere,
   setNotifyEverywhere, setNotifyMachine, setNotify } from "./notify.js";
-import { machinesSection } from "./machines-section.js";
 import { TEXT, RADIUS, H, button, link, toggleSwitch, segmented, menuRow } from "./ui.js";
-import { webSection } from "./web-section.js";
 import { SH } from "./core/paths.js";
 import { dirs } from "./dirs.js";
 // Every page's, row's and button's words, and the rows' choices: core/settings.js, shared with the web app.
@@ -691,11 +688,8 @@ export default class ShepherdrSettings extends View {
     const body = this.section === "agents" ? this.agents(t, cx)
       : this.section === "tasks" ? this.tasks(t)
       : this.section === "secrets" ? secretsSection(this, t)
-      : this.section === "window" ? layoutSection(this, t)
-      : this.section === "web" ? webSection(this, t)
       : this.section === "notify" ? this.notify(t)
-      : this.section === "autopilot" ? autopilotSection(this, t, cx)
-      : machinesSection(this, t, cx);
+      : autopilotSection(this, t, cx);
     const card = h_flex().id("coord-settings").track_focus(this.handle).w_full().h_full().max_h(900).min_h(0).items_start()
       .rounded(12).border_1().border_color(t.border).bg(t.popover).shadow_lg().overflow_hidden()
       // A click inside stays inside: only one beside the window closes it.

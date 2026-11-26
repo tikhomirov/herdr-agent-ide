@@ -14,7 +14,7 @@ home=${HERDR_APP_HOME:-$HOME/.config/herdr-app}
 force=; link=
 for a in "$@"; do case "$a" in --force) force=1 ;; --hib) link=1 ;; esac; done
 
-mods="ide-topbar ide-browser ide-browser-bar ide-browser-menu remote-files tabs-ide tabs-ide-tasks agents-ide rename-dialog layout-switcher chat-acp pi-settings
+mods="ide-topbar ide-browser ide-browser-bar ide-browser-menu remote-files tabs-ide tabs-ide-tasks agents-ide rename-dialog layout-switcher chat-acp pi-settings chat-sessions
 accept-card artifacts chat chat-image chat-models chat-react confirm-chat coordinator coord-settings git-graph
 menu-tasks new-menu-tasks newspace pane-chat prompt-chat spaces-chat task-artifacts task-browser task-pr tasks tasks-menu toasts workspace-status-chat"
 
@@ -93,13 +93,12 @@ copy_layout() {
     echo "layout $name.json exists, left as it is (--force replaces it)"
   fi
 }
-copy_layout ide
-copy_layout ide-coord
+copy_layout agent-ide
 
 python3 - "$home/layouts" "$home/mods" $fresh <<'PY'
 import json, os, sys
 layouts, mods, *fresh = sys.argv[1:]
-coord = os.path.join(layouts, "ide-coord.json")
+coord = os.path.join(layouts, "agent-ide.json")
 def load(p):
     try:
         return json.load(open(p))
@@ -122,8 +121,7 @@ if os.path.isdir(os.path.join(mods, "file-editor")):
         files(t)
         save(path, t)
         print("layout: Files block uses file-editor")
-    use_editor(os.path.join(layouts, "ide.json"), "ide" in fresh)
-    use_editor(coord, "ide-coord" in fresh)
+    use_editor(coord, "agent-ide" in fresh)
 PY
 
 # Russian / English UI: copy the dictionary into the mods and wrap their labels (tools/localize.py; --undo reverts).
@@ -135,4 +133,4 @@ fi
 
 command -v node >/dev/null 2>&1 || echo "warning: node is needed (the browser viewer is a Node script)" >&2
 command -v agent-browser >/dev/null 2>&1 || echo "note: install the browser engine with: npm i -g agent-browser && agent-browser install" >&2
-echo "Next: herdr-app do layout.switch '{\"name\":\"ide-coord\"}'"
+echo "Next: herdr-app do layout.switch '{\"name\":\"agent-ide\"}'"

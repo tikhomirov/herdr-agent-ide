@@ -57,6 +57,12 @@ pi_file() {
     if [ "\$d" -le 8 ] && [ "\$d" -lt "\$gap" ]; then best=\$f; gap=\$d; fi
   done
   [ -n "\$best" ] && { printf '%s' "\$best"; return 0; }
+  # A resumed session (pi -c, /resume) goes on in an older file: the newest one, when it was written since this
+  # process started, or when the process has run a while and nothing else could be its file.
+  newest=\$(ls -t "\$dir"/*.jsonl 2>/dev/null | head -n 1)
+  [ -n "\$newest" ] || return 1
+  m=\$(stat -c %Y "\$newest" 2>/dev/null) || return 1
+  if [ "\$m" -ge \$(( start - 2 )) ] || [ \$(( now - start )) -gt 20 ]; then printf '%s' "\$newest"; return 0; fi
   return 1
 }
 pi_seen=0

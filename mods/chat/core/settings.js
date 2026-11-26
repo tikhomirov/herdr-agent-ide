@@ -17,9 +17,6 @@ export const SECTIONS = [
   { id: "autopilot", title: "Autopilot", icon: "plane", space: true },
   { id: "notify", title: "Notify", icon: "bell", space: true },
   { id: "secrets", title: "Secrets", icon: "key", space: true },
-  { id: "machines", title: "Machines", icon: "network" },
-  { id: "window", title: "Window", icon: "layout" },
-  { id: "web", title: "Web", icon: "globe" },
 ];
 // The window's title over its pages: Everywhere's, or a space's own.
 export const TITLE = "Settings";

@@ -4,7 +4,7 @@ import { h_flex, v_flex, ScrollHandle } from "gpui-base";
 import { closeOverlay, layouts, props, run, shared, theme } from "herdr";
 
 // Names people see; any other layout shows its file name, capitalised.
-const labels = new Map([["main", "Herdr"], ["ide", "Agent IDE (agent + browser + files)"], ["terminals", "Terminals"]]);
+const labels = new Map([["main", "Herdr"], ["agent-ide", "Agent IDE"], ["terminals", "Terminals"]]);
 const pretty = (name) => labels.get(name) ?? name.replace(/[-_]+/g, " ").replace(/^./, (c) => c.toUpperCase());
 
 export default class LayoutSwitcher extends View {

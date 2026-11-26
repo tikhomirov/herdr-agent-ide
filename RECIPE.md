@@ -38,7 +38,7 @@ With the device button on, the toolbar grows by a 40px row: a preset button ("Re
 
 ## Built from
 
-`layouts/ide.json`: a clone of the shipped `main` layout (0.1.17). `root` row → `sidebar` column (`workspace-chrome`, `spaces`, `agents`, `workspace-chrome` footer) and `work` column: `tabs` block with `{"mod":"tabs-ide"}` (px 42), `work-body` row with `main` (the active tab's panes) and `panel` column (px 460) holding a `stack` `panel-body` with children `files` (`{"mod":"files"}`), `changes` (`{"mod":"changes"}`), `git-graph` (`{"mod":"git-graph"}`), `remote` (`{"mod":"remote-files"}`) and `browser`, a column of `browser-bar` (block, px 44, `ide-browser-bar`) and `browser-host` (block, `ide-browser`); then the `status` block. A person with a different file editor mod can put it in the `files` block (the `file-editor` mod from `werlang/herdr-file-editor` opens clicked files in tabs).
+`layouts/agent-ide.json`: a clone of the shipped `main` layout (0.1.17). `root` row → `sidebar` column (`workspace-chrome`, `spaces`, `agents`, `workspace-chrome` footer) and `work` column: `tabs` block with `{"mod":"tabs-ide"}` (px 42), `work-body` row with `main` (the active tab's panes) and `panel` column (px 460) holding a `stack` `panel-body` with children `files` (`{"mod":"files"}`), `changes` (`{"mod":"changes"}`), `git-graph` (`{"mod":"git-graph"}`), `remote` (`{"mod":"remote-files"}`) and `browser`, a column of `browser-bar` (block, px 44, `ide-browser-bar`) and `browser-host` (block, `ide-browser`); then the `status` block. A person with a different file editor mod can put it in the `files` block (the `file-editor` mod from `werlang/herdr-file-editor` opens clicked files in tabs).
 
 Mods (`mods/<name>/`, all `place: none`):
 
@@ -72,7 +72,7 @@ Programs it runs: `node`, `agent-browser` (+ Chrome for Testing, installed by `a
 ## Done when
 
 1. `herdr-app check` passes in each of `mods/tabs-ide`, `mods/layout-switcher`, `mods/ide-browser`, `mods/ide-browser-bar`, `mods/ide-browser-menu`, `mods/remote-files`, `mods/agents-ide`, `mods/rename-dialog`, and `node --check mods/ide-browser/viewer.js` passes.
-2. `layout.switch {name:"ide"}` shows the layout. The tab bar has Chat, Files, Changes, Git, Remote, Browser and the layout button. Git opens `git-graph`. Remote is the SSH file manager (`remote-files`, including the SSH terminal button). The button opens the list of layouts.
+2. `layout.switch {name:"agent-ide"}` shows the layout. The tab bar has Chat, Files, Changes, Git, Remote, Browser and the layout button. Git opens `git-graph`. Remote is the SSH file manager (`remote-files`, including the SSH terminal button). The button opens the list of layouts.
 3. Opening Browser makes a `node …/viewer.js --task <project>` terminal appear (`hc ls`), the toolbar shows the page's address, and the page is visible in the panel, filling its width.
 4. Typing `example.com` in the address field and pressing Enter loads it; Back works.
 5. In another space (another project) the Browser tab shows a different browser (its own address); going back shows the first one's page again.
@@ -83,7 +83,7 @@ Programs it runs: `node`, `agent-browser` (+ Chrome for Testing, installed by `a
 10. Hiding the panel ends the viewer terminal; the page is still there when the panel is shown again.
 
 
-## Agent IDE + Coordinator (`layouts/ide-coord.json`)
+## Agent IDE + Coordinator (`layouts/agent-ide.json`)
 
 The Agent IDE panel with a per-space coordinator. The mods, `herdr-task`, and the role templates ship in this repo (MIT, from Shepherdr; see THIRD_PARTY.md). Nothing is read from a Shepherdr install. Task data is under `~/.config/herdr-ide`, `~/.local/share/herdr-ide` and `~/.local/state/herdr-ide`.
 
@@ -94,7 +94,7 @@ The Agent IDE panel with a per-space coordinator. The mods, `herdr-task`, and th
 - **Sidebar**: spaces (`spaces-chat`) on top; `agents-ide` below lists **Coordinators** first, then worker agents by space.
 - Browser is unchanged: `ide-browser` still finds `browser`, `browser-bar`, `browser-host`.
 
-Install: `./install.sh` then `herdr-app do layout.switch '{"name":"ide-coord"}'`. `"ide"` is the panel without the coordinator.
+Install: `./install.sh` then `herdr-app do layout.switch '{"name":"agent-ide"}'`.
 
 Done when: sidebar, tab bar, main and right panel show; the pane header is Herdr's `pane`; the bar has Files, Changes, Git, Tasks, Artifacts, Remote, Browser, Pi and the switcher; Tasks lists `herdr-task` tasks and opens the thread; Browser/Select/Remote work as above; the Assistant tab starts on the first message; `herdr-app check` passes for `tabs-ide-tasks` and `agents-ide`.
 

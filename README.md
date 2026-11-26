@@ -2,7 +2,7 @@
 
 ![Agent IDE + Coordinator](docs/cover.jpg)
 
-> **New:** `layouts/ide-coord.json` adds a per-project **Coordinator** (Assistant chat + Tasks + Artifacts). See RECIPE.md, "Agent IDE + Coordinator".
+> **New:** `layouts/agent-ide.json` adds a per-project **Coordinator** (Assistant chat + Tasks + Artifacts). See RECIPE.md, "Agent IDE + Coordinator".
 
 **A layout for [Herdr](https://herdr.dev) that turns the window into an IDE for coding agents.** Your agents (Claude Code, Codex, Pi, …) stay in their terminals on the left. On the right is a panel with everything you reach for while they work: what they changed, the project's files, the same project on your server, and a real browser that you and your agents share.
 
@@ -76,14 +76,14 @@ git clone https://github.com/tikhomirov/herdr-agent-ide
 cd herdr-agent-ide
 ./install.sh --hib          # mods, both layouts, herdr-task, templates, the browser skill
 npm i -g agent-browser && agent-browser install     # the browser engine
-herdr-app do layout.switch '{"name":"ide-coord"}'   # assistants, git, editor, remote; "ide" is the panel alone
+herdr-app do layout.switch '{"name":"agent-ide"}'   # assistants, git, editor, remote, coordinators
 ```
 
 Or let your agent do it: *"Add the layout from https://github.com/tikhomirov/herdr-agent-ide"* (Herdr's agents read `RECIPE.md` and the files).
 
 Requirements: Herdr (run once so `~/.config/herdr-app` exists), `node` 22+, `git`, [agent-browser](https://github.com/vercel-labs/agent-browser) for the Browser tab, and `ssh` with a key or agent for Remote. Developed and tested on Linux.
 
-`install.sh` never replaces an existing `layouts/ide.json` or `layouts/ide-coord.json` unless you pass `--force`. It replaces the mods it ships, including the coordinator, chat, and tasks mods (see [THIRD_PARTY.md](THIRD_PARTY.md)). No Shepherdr install is required. Task lists are stored under `~/.local/share/herdr-ide`.
+`install.sh` never replaces an existing `layouts/agent-ide.json` unless you pass `--force`. It replaces the mods it ships, including the coordinator, chat, and tasks mods (see [THIRD_PARTY.md](THIRD_PARTY.md)). No Shepherdr install is required. Task lists are stored under `~/.local/share/herdr-ide`.
 
 `install.sh` copies `skills/herdr-ide-browser` to `~/.agents/skills/` so agents use the shared browser.
 
@@ -107,8 +107,7 @@ hib screenshot /tmp/shot.png
 
 | Path | What |
 | --- | --- |
-| `layouts/ide.json` | the layout: Herdr's `main` plus the right panel |
-| `layouts/ide-coord.json` | the same panel plus the coordinator (tasks, artifacts, assistant chat) |
+| `layouts/agent-ide.json` | the one layout: Herdr's `main` plus the right panel, the coordinators, tasks, artifacts and the assistant chat |
 | `THIRD_PARTY.md` | Shepherdr and git-graph, MIT, with the commits they were taken from |
 | `mods/tabs-ide` | the tab bar with the panel buttons, the Chat button and the layout button (a clone of Herdr's `tabs`) |
 | `mods/agents-ide` | the Agents list (a clone of Herdr's `agents`) that also lists agents shown as a chat |

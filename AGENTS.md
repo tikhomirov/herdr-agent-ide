@@ -4,7 +4,7 @@ Notes for agents working in this repository (a Herdr layout + mods; see README.m
 
 ## Layout of the repo
 
-- `layouts/ide.json`: the layout. `mods/<name>/`: one folder per mod. `skills/`: a skill for agents that *use* the browser. `RECIPE.md` and `preview.png`: the gallery's brief and picture; `docs/`: the screenshots the README shows. Herdr's gallery reads them from the repo root; the topic `herdr-layout` is on the repo.
+- `layouts/agent-ide.json`: the one layout. `mods/<name>/`: one folder per mod. `skills/`: a skill for agents that *use* the browser. `RECIPE.md` and `preview.png`: the gallery's brief and picture; `docs/`: the screenshots the README shows. Herdr's gallery reads them from the repo root; the topic `herdr-layout` is on the repo.
 - Nothing outside `layouts/` and `mods/` is copied into a person's Herdr by Herdr's own "add a layout" flow; that's why `viewer.js`, `hib` and `start.html` live inside `mods/ide-browser/`.
 
 ## Installing for a person (when asked to "add this layout")
@@ -12,7 +12,7 @@ Notes for agents working in this repository (a Herdr layout + mods; see README.m
 1. Read `RECIPE.md` and every file under `mods/` and `layouts/` first. Tell the person that the mods run programs (`node`, `agent-browser`, `git`, `hc`, `herdr-app`, `ssh`, optionally a clipboard tool), read and write `layouts/<current>.json`, write files in `~/.local/state/herdr-ide/` and `~/Pictures/herdr-screenshots/`, and that Chrome pages are loaded from the network.
 2. Run `./install.sh --hib`. It copies every mod under `mods/`, both layouts, the role templates, and links `herdr-task`. The app home is `$HERDR_APP_HOME` or `~/.config/herdr-app`. Coordinator and chat code is vendored (see THIRD_PARTY.md); do not tell the person to install Shepherdr.
 3. Check agent-browser: `command -v agent-browser`; if missing, `npm i -g agent-browser && agent-browser install`.
-4. `herdr-app check` each mod directory (`cd mods/<name> && herdr-app check .`), then `herdr-app do layout.switch '{"name":"ide-coord"}'`. The pane header is Herdr's `pane`. `"ide"` is the same panel without the coordinator.
+4. `herdr-app check` each mod directory (`cd mods/<name> && herdr-app check .`), then `herdr-app do layout.switch '{"name":"agent-ide"}'`. The pane header is Herdr's `pane`.
 5. The installer already copied `skills/herdr-ide-browser` to `~/.agents/skills/`.
 
 ## Working on the code

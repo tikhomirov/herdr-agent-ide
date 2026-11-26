@@ -54,7 +54,7 @@ export class ChatReader {
     const kind = kindOf(t);
     const pid = t?.foreground?.pid;
     if (!kind || !pid) { const was = this.state; if (was !== "none") { this.reset(); this.state = "none"; } return was !== "none"; }
-    if (this.path && this.kind === kind && this.pid === pid) return false;
+    if (this.path && this.kind === kind && this.pid === pid && kind !== "pi") return false;
     const f = await this.io.sh(FIND, ["chat", kind, String(pid)], this.machine);
     let path = String(f.stdout ?? "").trim().split("\n").pop() ?? "";
     // Not in its session yet (no report, no turn): perhaps on its CLI's own start screen (Codex's "Update available",
@@ -64,6 +64,8 @@ export class ChatReader {
     // Codex opens its log with its first message: past those screens and idle, with no message yet, it has none.
     // Still an empty chat (the first message can be typed here), until it has worked a turn with no log to show.
     if (!path && kind === "codex" && t?.state === "live" && !((t.turn ?? 0) > 1) && (t.status?.state ?? "idle") !== "blocked") path = "pending";
+    // Pi can move to another session file inside one process (/new, /resume); a quiet look keeps the one it has.
+    if (this.path && this.kind === "pi" && this.pid === pid && (path === "pending" || !path)) return false;
     if (path === "pending" || !path) {
       const was = this.state;
       this.reset();

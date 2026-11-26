@@ -56,6 +56,7 @@ import { dirsReady } from "./dirs.js";
 import * as agent from "./agent.js";
 import { cleanCommand } from "./core/clean-env.js";
 import * as choices from "./settings.js";
+import { LIST as PI_SESSIONS, parseSessions } from "./core/pi-sessions.js";
 import { CHOICE_KEY, choiceOf, sameChoice, withChoice } from "./core/agents.js";
 import { Dictation, BUN_PATH, warmAudio } from "./dictate.js";
 
@@ -453,6 +454,7 @@ export default class Chat extends View {
     this.viewAsked = new Set();
     this.callReqAt = shared("chat.callreq")?.at ?? null;
     this.restartReqAt = shared("chat.restartreq")?.at ?? null;
+    this.sessionReqAt = shared("chat.sessionreq")?.at ?? null;
     this.reactReqAt = shared("chat.reactreq")?.at ?? null;
     this.sendReqAt = shared("chat.sendreq")?.at ?? null;
     this.startReqAt = shared("chat.startreq")?.at ?? null;
@@ -2816,6 +2818,53 @@ export default class Chat extends View {
     this.openPicker(b ? { x: b.x + b.width - 90, y: b.y + b.height - 18 } : this.pickAt, cx, name);
   }
 
+  // The history button (Pi): the agent's saved conversations for this folder, newest first, in a popover
+  // (mods/chat-sessions); choosing one restarts the agent on it (switchSession).
+  openSessions(at, cx) {
+    const pid = this.t?.foreground?.pid;
+    if (this.kind !== "pi" || !pid || this.sessionsOpening) return;
+    this.sessionsOpening = true;
+    cx.spawn(async (cx) => {
+      try {
+        const r = await exec("sh", ["-c", PI_SESSIONS, "chat", String(pid)], { on: this.machine });
+        const sessions = parseSessions(r.stdout);
+        const W = 340, shown = Math.max(1, Math.min(sessions.length, 8));
+        const H = 30 + 10 + shown * 45 + 8;
+        openOverlay({ mod: "chat-sessions", kind: "popup", frame: "none", width: W, height: H,
+          at: at ? { x: Math.max(8, at.x - 20), y: Math.max(8, at.y - H - 10) } : "pointer",
+          props: { pane: this.pickKey(), sessions, current: agent.sessionOf(this.kind, this.path), width: W, height: H } });
+      } catch (e) {
+        toast({ title: "Can't list the conversations", body: plainError(e), level: "error" });
+      }
+      this.sessionsOpening = false;
+      cx.notify();
+    });
+  }
+
+  // Restarts the agent on another saved conversation; this chat follows the new one.
+  switchSession(session, cx) {
+    const mine = this.myPane();
+    if (this.restarting || !mine || !this.addr || !session) return;
+    this.restarting = true;
+    const kind = this.kind;
+    cx.spawn(async (cx) => {
+      try {
+        const t = JSON.parse((await hc(["get", this.addr, "--json"])).stdout);
+        const argv = agent.resumeArgv(kind, t.foreground?.argv ?? this.argv ?? [kind], session);
+        this.swapping = true;
+        const next = await agent.restart(t, { argv, resume: true, base: argv }, mine);
+        this.follow_to(next);
+        this.note = { id: `note-${Date.now()}`, text: "Switched conversation." };
+        cx.timer.after(6000, (cx) => { this.note = null; cx.notify(); });
+      } catch (e) {
+        toast({ title: "The agent didn't switch", body: plainError(e), level: "error" });
+      }
+      this.swapping = false;
+      this.restarting = false;
+      cx.notify();
+    });
+  }
+
   // Who the picker's Restart is for (chat-models' props.pane, back in shared "chat.restartreq"):
   // this chat's pane, or in a task's chat (the Tasks panel; no pane of its own) its worker.
   pickKey() {
@@ -4116,6 +4165,11 @@ export default class Chat extends View {
     const model = String(c?.label ?? agent.modelName(c?.model) ?? "");
     const pick = [(this.width ?? 600) < 460 ? model.replace(/\s*·?\s*1M$/, "") : model, agent.levelName(c?.effort), agent.speedName(c?.fast)].filter(Boolean).join(" · ") || agent.NAMES[this.kind] || "Agent";
     return [
+      this.kind === "pi" && open ? h_flex().id("chat-history").size(ROUND).flex_none().justify_center().items_center().rounded(6).text_color(t.muted)
+        .cursor_pointer().hover((x) => x.bg(t.hover).text_color(t.foreground))
+        .on_mouse_down("left", (e) => { this.historyAt = e.position; })
+        .on_click((_e, cx) => { cx.stop_propagation(); this.openSessions(this.historyAt, cx); })
+        .child(svg("mods/chat/clock.svg").size(14)) : null,
       h_flex().id("chat-agent-pick").h(ROUND).pl(8).pr(5).gap(4).flex_none().items_center().rounded(6)
         .text_size(12).font_medium().text_color(t.muted)
         .when(open, (el) => el.cursor_pointer().hover((x) => x.bg(t.hover).text_color(t.foreground))
@@ -4451,6 +4505,12 @@ export default class Chat extends View {
     if (rr && pk && rr.pane === pk && rr.at !== this.restartReqAt && Date.now() - rr.at < 5000) {
       this.restartReqAt = rr.at;
       cx.timer.after(0, (cx) => { this.applyPick(rr.pick, cx); cx.notify(); });
+    }
+    // The history list's choice (mods/chat-sessions): shared "chat.sessionreq" = { pane, at, session }.
+    const sr = shared("chat.sessionreq");
+    if (sr && pk && sr.pane === pk && sr.at !== this.sessionReqAt && Date.now() - sr.at < 5000) {
+      this.sessionReqAt = sr.at;
+      cx.timer.after(0, (cx) => { this.switchSession(sr.session, cx); cx.notify(); });
     }
     // The header's Terminal on a chat with no agent yet (pane-chat): start it, then show its
     // terminal. Shared "chat.startreq" = { pane, at }.

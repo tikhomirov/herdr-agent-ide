@@ -27,7 +27,7 @@
   "mod:chat": {
     "ctrl-f": "chat.find"
   },
-  "layout:ide-coord": {
+  "layout:agent-ide": {
     "ctrl-shift-w": "tabs-ide-tasks.close",
     "ctrl-shift-n": "tabs-ide-tasks.newspace",
     "f2": "tabs-ide-tasks.rename-tab",

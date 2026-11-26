@@ -12,7 +12,7 @@
     "title": "Core",
     "about": "Coordinator layout shipped with Agent IDE: sidebar, tab bar, chat, tasks, menus and dialogs.",
     "layouts": [
-      "ide-coord"
+      "agent-ide"
     ],
     "mods": [
       "spaces-chat",

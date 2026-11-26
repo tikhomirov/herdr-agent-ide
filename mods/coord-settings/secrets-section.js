@@ -1,7 +1,6 @@
 // The Secrets section (DECISIONS.md, "Agent IDE gaps being closed": Secrets as Agent IDE's):
 // keys, tokens and passwords agents use by name (bin/herdr-secret), kept in the owner-only vault
-// on the machine that keeps them (Kept on: this one or another, moved with `shepherdr secrets
-// move-to`). Add or replace one in masked boxes, for Everywhere, a machine or a space (a
+// on the machine that keeps them. Add or replace one in masked boxes, for Everywhere, a machine or a space (a
 // space's own settings start on that space); the most specific wins. Values are never shown: the list has names and where each is kept. Agents
 // waiting on one (herdr-secret ask) are listed first, and giving it here answers them too.
 // The vault itself is lib/secrets.js's (its copy here: ./secrets.js).
@@ -21,9 +20,7 @@ const EVERYWHERE = { scope: "everywhere", machine: null, space: null };
 // The section's state, made in the window's init (boxes need a live host call).
 export function secretsInit(cx) {
   const s = { name: InputState.new({ placeholder: W.namePlaceholder }), value: InputState.new({ placeholder: W.valuePlaceholder }),
-    scope: EVERYWHERE, open: false, list: null, err: "", note: "", busy: false, confirm: null,
-    // Kept on: its menu open, the machine picked to confirm ("" this one), a move under way, what it said
-    keptOpen: false, keptSure: null, moving: null, moveErr: "" };
+    scope: EVERYWHERE, open: false, list: null, err: "", note: "", busy: false, confirm: null };
   s.value.set_masked(true);
   s.name.on("change", (_e, cx) => { s.err = ""; cx.notify(); });
   s.value.on("change", (_e, cx) => { s.err = ""; cx.notify(); });
@@ -51,22 +48,6 @@ function save(s, cx) {
       s.err = "";
     } catch (e) { s.err = String(e?.message ?? e); }
     s.busy = false;
-    s.reload(cx);
-  });
-}
-
-// Moves the secrets to a machine ("": this one): shepherdr secrets move-to, run beside the app.
-function moveTo(s, m, cx) {
-  s.keptSure = null;
-  s.moving = m || W.keptHere;
-  s.moveErr = "";
-  cx.spawn(async (cx) => {
-    const r = await exec("sh", ["-c", 'PATH="$HOME/.local/bin:$PATH"; exec shepherdr secrets move-to "$1" --json', "x", m || "here"]).catch((e) => ({ code: 1, stdout: "", stderr: String(e?.message ?? e) }));
-    let out = null;
-    try { out = JSON.parse(r.stdout.trim().split("\n").pop()); } catch {}
-    if (r.code !== 0 || !out?.ok) s.moveErr = out?.error || r.stderr.trim().split("\n").pop()?.replace(/^shepherdr: /, "") || "The move didn't finish.";
-    s.moving = null;
-    await vault.whereNow?.();
     s.reload(cx);
   });
 }
@@ -161,43 +142,11 @@ export function secretsSection(view, t) {
         : small(`sec-rm-${k}`, W.remove, () => { s.confirm = k; }, "ghost"));
   });
 
-  // Kept on: the machine whose vault every machine uses, and the others to move it to
-  const kept = vault.keptOn();
-  const ms = machines();
-  const keptWhere = !kept ? W.loading : kept.here ? W.keptHere : kept.name || W.notLinked;
-  // following Serve from: kept there already, or still where they were (they move on their own)
-  const serve = kept?.serve === null ? W.thisOne : kept?.serve || "";
-  const same = !!kept?.auto && (kept.serve === null ? kept.here : !!kept.serve && kept.serve === kept.name);
-  const keptName = !kept?.auto ? keptWhere : same ? W.sameAsServe(keptWhere) : W.forNow(keptWhere);
-  const reach = !kept || kept.here || ms.some((m) => m.name === kept.name && m.layout !== "unavailable");
-  const choices = [{ name: "", label: W.keptHere, on: !!kept?.here, off: false },
-    ...ms.filter((m) => m.name).map((m) => ({ name: m.name, label: m.name, on: !kept?.here && kept?.name === m.name, off: m.layout === "unavailable" }))];
-  const keptMenu = v_flex().id("sec-kept-menu").absolute().top(40).right(0).w(240).max_h(300).overflow_y_scroll().p(5).rounded(8).bg(t.popover)
-    .border_1().border_color(t.border).shadow_md()
-    .children(choices.map((c) => h_flex().id(`sec-kept-${c.name || "here"}`).h(29).px(9).gap(10).rounded(7).items_center()
-      .when(!c.on && !c.off, (el) => el.cursor_pointer().hover((st) => st.bg(t.selected)).on_click((_e, cx) => { s.keptOpen = false; s.keptSure = c.name; cx.notify(); }))
-      .child(div().flex_1().min_w(0).truncate().text_size(13).text_color(c.off ? t.dim : t.foreground).child(c.label))
-      .child(div().text_size(11).text_color(t.dim).child(c.off ? W.offline : ""))
-      .child(div().size(14).flex_none().when(c.on, (el) => el.child(svg("mods/workspace-chrome/check.svg").size(14).text_color(t.foreground))))));
-  const keptStatus = s.moving ? W.moving(s.moving) : s.moveErr || (!reach ? W.unreachable(kept.name) : !kept?.auto ? W.keptAbout : same || !serve ? W.sameAbout : W.following(serve));
-  const keptRow = v_flex().relative().gap(8).py(12).border_b(1).border_color(t.border)
-    .child(h_flex().gap(10).items_center()
-      .child(div().flex_1().min_w(0).truncate().text_size(TEXT.body).text_color(t.foreground).child(keptName))
-      .child(s.moving ? div() : small("sec-kept-move", W.moveVerb, () => { s.keptOpen = !s.keptOpen; })))
-    .when(s.keptSure !== null, (el) => el.child(v_flex().gap(6).p(10).rounded(RADIUS.control).border_1().border_color(t.border)
-      .child(div().text_size(TEXT.body).font_medium().text_color(t.foreground).child(W.moveConfirm(s.keptSure || W.thisOne)))
-      .child(div().text_size(TEXT.label).line_height("17px").text_color(t.dim).child(W.moveDetail(s.keptSure || W.thisOne, kept?.here ? W.thisOne : keptWhere)))
-      .child(h_flex().gap(4).justify_end()
-        .child(small("sec-kept-no", W.keep, () => { s.keptSure = null; }, "ghost"))
-        .child(small("sec-kept-yes", W.moveVerb, (cx) => moveTo(s, s.keptSure, cx))))))
-    .child(div().text_size(TEXT.label).line_height("17px").text_color(s.moveErr || !reach ? t.blocked : t.dim).child(keptStatus));
-
   return v_flex()
     .child(view.title(t, SECTIONS.find((x) => x.id === "secrets").title))
     .child(div().text_size(TEXT.label).line_height("17px").text_color(t.dim).child(W.about))
-    .child(view.heading(t, W.keptOn))
     // Each menu is drawn after the rows under it (over.js, #1002), measured from the row it opens from.
-    .child(over(keptRow, [
+    .child(over(div(), [
       ...(asks.length > 0 ? [view.heading(t, W.asked), ...askRows] : []),
       view.heading(t, W.add),
       over(form, [
@@ -206,5 +155,5 @@ export function secretsSection(view, t) {
         ...(s.list !== null && !rows.length ? [div().py(10).text_size(TEXT.body).text_color(t.dim).child(W.none)] : []),
         ...rows,
       ], s.open ? menu : null),
-    ], s.keptOpen ? keptMenu : null));
+    ], null));
 }
