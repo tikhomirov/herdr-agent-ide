@@ -306,5 +306,14 @@ export default {
  "Restart agent": "Перезапустить агента",
  "Connection failed": "Нет соединения",
  "Connected": "Соединение есть",
- "Pi": "Pi"
+ "Pi": "Pi",
+ "Send": "Отправить",
+ "Message Pi": "Сообщение Pi",
+ "Message the Coordinator": "Сообщение координатору",
+ "What should Pi do?": "Что сделать Pi?",
+ "What should the Coordinator do?": "Что сделать координатору?",
+ "It reads this folder, edits files and runs commands.": "Читает эту папку, правит файлы и запускает команды.",
+ "It plans the work, starts a task for each part and keeps you posted.": "Планирует работу, на каждую часть ставит задачу и держит в курсе.",
+ "Reasoning": "Мышление",
+ "Permissions": "Доступ"
 };

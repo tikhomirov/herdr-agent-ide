@@ -1,7 +1,8 @@
 {
   "id": "root",
   "cloned_from": {
-    "name": "ide"
+    "name": "main",
+    "version": "0.1.17"
   },
   "type": "row",
   "children": [
@@ -97,7 +98,7 @@
                 "pane": {
                   "header": {
                     "content": {
-                      "mod": "pane"
+                      "mod": "pane-chat"
                     },
                     "reveal": "always",
                     "height": 30,

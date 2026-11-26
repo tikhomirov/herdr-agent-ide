@@ -29,7 +29,7 @@ function label(tab, lead) {
 }
 
 // Claude Code and Codex are the agents Shepherdr's chat can show.
-const chatty = (p) => Boolean(p?.terminal) && (["claude-code", "codex"].includes(p.app) || ["claude", "codex"].includes(p.program?.key));
+const chatty = (p) => Boolean(p?.terminal) && (["claude-code", "codex", "pi"].includes(p.app) || ["claude", "codex", "pi"].includes(p.program?.key));
 
 // One app command, waited for: its JSON answer.
 async function app(name, args) {

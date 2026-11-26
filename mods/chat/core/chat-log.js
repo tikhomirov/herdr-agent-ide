@@ -22,6 +22,44 @@ main() { while IFS= read -r r; do head -n 1 "$r" 2>/dev/null | grep -q '"source"
 kids() { procs | sort -n | awk -v r="$1" 'function walk(p,  c, m, j) { m = split(k[p], c, " "); for (j = 1; j <= m; j++) if (!(c[j] in s)) { s[c[j]] = 1; print c[j]; walk(c[j]) } } { k[$2] = k[$2] " " $1 } END { s[r] = 1; walk(r) }'; }
 # Claude Code's config folder of process $1 when it was given its own (CLAUDE_CONFIG_DIR), else nothing.
 cdir() { if [ -r "/proc/$1/environ" ]; then tr '\\000' '\\n' < "/proc/$1/environ" 2>/dev/null; elif [ ! -d /proc/self ]; then ps -wwE -o command= -p "$1" 2>/dev/null | tr ' ' '\\n'; fi | sed -n 's/^CLAUDE_CONFIG_DIR=//p' | head -n 1; }
+# Pi names its session folder from the process cwd: /home/alex/x -> ~/.pi/agent/sessions/--home-alex-x--.
+# The file is the one this process started (its name's time) or the one --session names. No file yet: pending.
+pi_dir() {
+  cwd=$(readlink "/proc/$1/cwd" 2>/dev/null) || return 1
+  enc=\${cwd#/}
+  enc=$(printf '%s' "\$enc" | tr '/\\:' '---')
+  dir="\$HOME/.pi/agent/sessions/--\$enc--"
+  [ -d "\$dir" ] || return 1
+  printf '%s' "\$dir"
+}
+pi_file() {
+  dir=\$(pi_dir "\$1") || return 1
+  sid=""
+  if [ -r "/proc/\$1/cmdline" ]; then
+    sid=\$(tr '\\000' '\\n' < "/proc/\$1/cmdline" | awk 'p { print; exit } \$0 == "--session" { p = 1 }')
+  fi
+  if [ -n "\$sid" ]; then
+    for f in "\$dir"/*_"\$sid".jsonl; do [ -f "\$f" ] && { printf '%s' "\$f"; return 0; }; done
+  fi
+  ticks=\$(awk '{ i = index(\$0, ")"); n = split(substr(\$0, i + 2), a, " "); print a[20] }' "/proc/\$1/stat" 2>/dev/null) || return 1
+  clk=\$(getconf CLK_TCK 2>/dev/null || echo 100)
+  up=\$(awk '{ print \$1 }' /proc/uptime)
+  now=\$(date +%s)
+  start=\$(awk -v now="\$now" -v up="\$up" -v ticks="\$ticks" -v clk="\$clk" 'BEGIN { printf "%.0f", now - up + ticks / clk }')
+  best=""; gap=999999
+  for f in "\$dir"/*.jsonl; do
+    [ -f "\$f" ] || continue
+    ts=\${f##*/}; ts=\${ts%%_*}
+    ymd=\${ts%%T*}; rest=\${ts#*T}; rest=\${rest%Z}
+    hh=\${rest%%-*}; rest=\${rest#*-}; mm=\${rest%%-*}; rest=\${rest#*-}; ss=\${rest%%-*}
+    ep=\$(date -u -d "\$ymd \$hh:\$mm:\$ss" +%s 2>/dev/null) || continue
+    d=\$(( ep > start ? ep - start : start - ep ))
+    if [ "\$d" -le 8 ] && [ "\$d" -lt "\$gap" ]; then best=\$f; gap=\$d; fi
+  done
+  [ -n "\$best" ] && { printf '%s' "\$best"; return 0; }
+  return 1
+}
+pi_seen=0
 for p in "$pid" $(kids "$pid"); do
   if [ "$kind" = claude ]; then
     c="$HOME/.claude"
@@ -32,6 +70,9 @@ for p in "$pid" $(kids "$pid"); do
     [ -n "$id" ] || continue
     for f in "$c"/projects/*/"$id".jsonl; do [ -f "$f" ] && { echo "$f"; exit 0; }; done
     echo "pending"; exit 0
+  elif [ "$kind" = pi ]; then
+    pi_seen=1
+    got=$(pi_file "$p") && { echo "$got"; exit 0; }
   else
     if [ -d "/proc/$p/fd" ]; then
       f=$(for d in /proc/$p/fd/*; do readlink "$d"; done 2>/dev/null | grep '/rollout-.*\\.jsonl$' | main)
@@ -41,6 +82,7 @@ for p in "$pid" $(kids "$pid"); do
     [ -n "$f" ] && { echo "$f"; exit 0; }
   fi
 done
+[ "$kind" = pi ] && [ "$pi_seen" = 1 ] && echo pending
 true`;
 
 // Reads a log on the agent's machine, sending back only what the chat shows. Each kept line
@@ -113,6 +155,10 @@ BEGIN { pos = base; first = base; msgs = 0 }
     if (index(head, "\"task_complete\"") || index(head, "\"turn_aborted\"") || index(head, "\"token_count\"") || index(head, "\"thread_settings_applied\"")) keep = 1
   } else if (index(head, "\"type\":\"turn_context\"")) {
     keep = 1
+  } else if (index(head, "\"type\":\"message\"") && (index(head, "\"role\":\"user\"") || index(head, "\"role\":\"assistant\"") || index(head, "\"role\":\"toolResult\""))) {
+    keep = 1
+  } else if (index(head, "\"type\":\"model_change\"") || index(head, "\"type\":\"thinking_level_change\"")) {
+    keep = 1
   }
   if (!keep) next
   if (index(line, "\"type\":\"text\"") || index(line, "\"role\":\"user\",\"content\":\"") || index(head, "\"type\":\"message\"")) msgs++
@@ -174,7 +220,7 @@ true`;
 
 
 const parse = (line) => { try { return JSON.parse(line); } catch { return null; } };
-const time = (s) => Date.parse(s ?? "") || 0;
+const time = (s) => (typeof s === "number" ? s : Date.parse(s ?? "")) || 0;
 
 // Text Claude Code puts in a user line that the person didn't type.
 const INJECTED = /^\s*(<(local-command-|system-reminder|bash-|task-notification|user-memory-input|user-prompt-submit-hook|command-message)|Caveat: The messages below|\[Request interrupted)/;
@@ -544,6 +590,25 @@ function claudeStep(name, input = {}) {
   return { kind: "tool", line: `Used ${name}`, doing: input.description ? clip(input.description, 60) : `Using ${name}` };
 }
 
+// Pi's tools (lowercase names, `path` for files): shaped as Claude Code's steps so the chat words them alike.
+function piStep(name, a = {}) {
+  const file = { ...a, file_path: a.file_path ?? a.path };
+  switch (name) {
+    case "read": return claudeStep("Read", file);
+    case "write": return claudeStep("Write", file);
+    case "edit": return claudeStep("Edit", file);
+    case "bash": return claudeStep("Bash", a);
+    case "grep": return claudeStep("Grep", a);
+    case "find": return claudeStep("Glob", { pattern: a.pattern ?? a.name ?? a.path });
+    case "ls": return { kind: "search", line: `Listed ${short(a.path ?? ".")}`, doing: `Listing ${base(a.path ?? ".")}` };
+    case "todo": return { kind: "plan", line: "Updated its plan", doing: clip(a.subject ?? a.activeForm, 60) || "Planning" };
+    case "ctx_execute": return claudeStep("Bash", { command: a.code, description: "Ran a script" });
+    case "ctx_batch_execute": case "ctx_search": return { kind: "search", line: "Searched its context", doing: "Searching its context" };
+    case "Agent": case "get_subagent_result": return claudeStep("Agent", a);
+  }
+  return null;
+}
+
 // A Codex call's shell command(s), as one text (sendsOf reads it), else "".
 function codexCommand(args) {
   let a = args;
@@ -898,7 +963,9 @@ export class Conversation {
       }
       const l = parse(r.data);
       if (!l || typeof l !== "object") continue;
-      if (this.kind === "codex") this.codex(l, r.off); else this.claude(l, r.off);
+      if (this.kind === "codex") this.codex(l, r.off);
+      else if (this.kind === "pi") this.pi(l, r.off);
+      else this.claude(l, r.off);
     }
   }
 
@@ -995,6 +1062,45 @@ export class Conversation {
         }
       }
     }
+  }
+
+  pi(l, off) {
+    if (l.type === "model_change") {
+      const model = l.provider && l.modelId ? `${l.provider}/${l.modelId}` : l.modelId;
+      if (model) this.meta = { ...this.meta, model, at: time(l.timestamp) };
+      return;
+    }
+    if (l.type === "thinking_level_change") {
+      if (l.thinkingLevel) this.meta = { ...this.meta, effort: l.thinkingLevel, at: time(l.timestamp) };
+      return;
+    }
+    if (l.type !== "message" || !l.message) return;
+    const m = l.message;
+    const at = time(m.timestamp ?? l.timestamp);
+    const blocks = Array.isArray(m.content) ? m.content : [];
+    const textOf = (type) => blocks.filter((b) => b?.type === type && typeof b.text === "string").map((b) => b.text.trim()).filter(Boolean).join("\n\n");
+    if (m.role === "user") {
+      const u = cleanUser(textOf("text"));
+      if (u) this.user(`u${off}`, { ...u, at });
+      return;
+    }
+    if (m.role === "assistant") {
+      if (m.model) this.meta = { ...this.meta, model: m.provider && m.model ? `${m.provider}/${m.model}` : m.model, effort: m.thinkingLevel ?? this.meta.effort, at };
+      if (m.errorMessage) this.push({ kind: "error", id: `e${off}`, text: String(m.errorMessage), at });
+      // Its words only: "thinking" blocks are its reasoning, not part of the answer.
+      const said = this.agentText(blocks.filter((b) => b?.type === "text").map((b) => b.text ?? "").filter(Boolean).join("\n\n"));
+      if (said) this.push({ kind: "agent", id: `a${off}`, text: said, at, ...this.takeSuggest() });
+      for (const b of blocks) {
+        if (b?.type !== "toolCall") continue;
+        const args = b.arguments && typeof b.arguments === "object" ? b.arguments : {};
+        const named = piStep(String(b.name ?? ""), args) ?? claudeStep(b.name, args) ?? claudeStep(String(b.name ?? "").replace(/^./, (c) => c.toUpperCase()), args);
+        const st = named ?? { kind: "tool", line: `Used ${b.name || "a tool"}`, doing: b.name || "Working" };
+        st.at = at || Date.now();
+        this.step(String(b.id ?? `c${off}`), off, st);
+      }
+      return;
+    }
+    if (m.role === "toolResult") this.done(String(m.toolCallId ?? ""), off);
   }
 
   codex(l, off) {

@@ -126,6 +126,9 @@ if os.path.isdir(os.path.join(mods, "file-editor")):
     use_editor(coord, "ide-coord" in fresh)
 PY
 
+# Russian / English UI: copy the dictionary into the mods and wrap their labels (tools/localize.py; --undo reverts).
+HERDR_APP_HOME=$home python3 "$here/tools/localize.py" >/dev/null && echo "i18n   ru/en (RU/EN button in the sidebar's top row)"
+
 if [ -n "$link" ]; then
   ln -sf "$home/mods/ide-browser/hib" "$bindir/hib"; echo "linked $bindir/hib"
 fi
