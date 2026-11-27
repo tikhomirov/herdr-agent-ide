@@ -1,6 +1,6 @@
 # Agent IDE
 
-Herdr's main layout with a right-hand panel for working with coding agents the way an agent IDE does: **Files**, **Changes** and a real **Browser** that you and your agents share. Every project (space) has its own browser. You can click, scroll and type in it, point an element or a region out to the agent, take screenshots, and look at the page at phone or tablet size. A button in the tab bar switches layouts.
+Herdr's window as an agent IDE and a Cursor alternative. Claude Code, Codex and Pi agents each have a chat and keep running in a terminal. Every project has a multi-agent Coordinator and tasks, Files and a file editor, Changes with diffs and commits, Git, Remote SSH, and a Browser you share with the agents: click, scroll, screenshots, phone and tablet size. Russian and English. A button in the tab bar switches layouts.
 
 ![Agent IDE](preview.png)
 

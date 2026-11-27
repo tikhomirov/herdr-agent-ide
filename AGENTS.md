@@ -40,6 +40,6 @@ Read `docs/CONTEXT.md` (map of the repo, pitfalls, open work). A ready prompt fo
 
 ## Publishing
 
-`gh repo create tikhomirov/herdr-agent-ide --public --source . --push`, then `gh repo edit --add-topic herdr-layout` (only that topic: a repo with `layouts/` is a layout, `herdr-mod` is for mod-only repos). The gallery lists the repo within the hour.
+`gh repo create tikhomirov/herdr-agent-ide --public --source . --push`, then `gh repo edit --add-topic herdr-layout` (only that topic: a repo with `layouts/` is a layout, `herdr-mod` is for mod-only repos). The gallery lists the repo within the hour. Its search is the `#` title, the first paragraph of `RECIPE.md` (cut at 500 characters) and the GitHub owner. The README tag line is not searched, so words people should find the layout by belong in that first paragraph.
 
 Verify every change as in `docs/CONTEXT.md` ("Verify a change"): `herdr-app status` (no errors), `./herdr-ide doctor`, `bash tools/check.sh`, a screenshot. Add a mod to `lib/manifest.json`.

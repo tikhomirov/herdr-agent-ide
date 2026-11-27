@@ -60,4 +60,4 @@ Started as a layout with Files/Changes/Browser/Remote. Then the Coordinator syst
 - Leftover `shepherdr` words in comments and dead code (`coord-settings/service.js` and similar).
 - Strings still English on some pages (Autopilot, Tasks, Notify, Secrets) after the last pass: open each page in the RU UI and add missing keys.
 - The task engine's README for people who want to run `herdr-task` alone.
-- Stars and visibility: the README, topics and cover are the levers; ask for a star only in the README.
+- Stars and visibility: the gallery search box matches the layout name (`#` title), the first paragraph of `RECIPE.md` (cut at 500 characters) and the GitHub owner, as one lowercase string. The README tag line, the repo description and any GitHub topic besides `herdr-layout` are not searched. Ask for a star only in the README. The cover is `preview.png`.
